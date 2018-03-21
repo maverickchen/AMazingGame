@@ -1,4 +1,4 @@
-// db.js - some interface for database calls
+// db.js - some interface for mySQL database calls
 var db = require('../db.js')
 
 exports.create = function(username, password, email, done) {
