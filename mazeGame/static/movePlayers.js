@@ -41,10 +41,47 @@ document.body.appendChild(app.view);
 //To change the background color
 app.renderer.backgroundColor = 0x061639;
 
-PIXI.loader
+function chooseTeam() {
+
+    var team1 = PIXI.Sprite.fromImage('assets/team1.png');
+    var team2 = PIXI.Sprite.fromImage('assets/team2.png');
+
+    // Set the initial position
+    team1.anchor.set(0.5);
+    team1.x = app.screen.width / 4;
+    team1.y = app.screen.height / 2;
+    team2.anchor.set(0.5);
+    team2.x = app.screen.width / 4 * 3;
+    team2.y = app.screen.height / 2;
+
+    // Opt-in to interactivity
+    team1.interactive = true;
+    team2.interactive = true;
+
+    // Shows hand cursor
+    team1.buttonMode = true;
+    team2.buttonMode = true;
+
+    // Pointers normalize touch and mouse
+    team1.on('pointerdown', onClick1(team1) {
+        socket.emit('teamSelection', team1);
+    });
+    team2.on('pointerdown', onClick2(team2) {
+        socket.emit('teamSelection', team2);
+    });
+
+    // Alternatively, use the mouse & touch events:
+    // sprite.on('click', onClick); // mouse-only
+    // sprite.on('tap', onClick); // touch-only
+
+    app.stage.addChild(team1);
+    app.stage.addChild(team2);
+    
+    PIXI.loader
     .add('/assets/ScottyPlayerLantern.json')
     .add('/assets/SkeletonWalk.json')
     .load(onAssetsLoaded);
+}
 
 function onAssetsLoaded() {
     // create an array of textures from an image path
