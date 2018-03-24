@@ -8,6 +8,8 @@ var Player = require('./static/player');
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 var players = []; // list of players
+var team1 = []; // list of players in each team
+var team2 = [];
 
 app.use(express.static(path.join(__dirname,'static')));
 
@@ -18,7 +20,7 @@ app.get('/', function (req, res) {
 io.on('connection', function(socket) {
     var id = idCounter;
     idCounter += 1;
-    var player = new Player(id);
+    var player = new Player(id); // current player
     players.push(player);
     console.log('a user connected with id ' + id);
     console.log('There are now '+players.length+' player(s) in the room');
@@ -43,6 +45,21 @@ io.on('connection', function(socket) {
         players.splice(i,1); // delete the player from the list
         console.log('user '+id+' disconnected. There are '+players.length+' remaining player(s)');
     });
+
+    // When one user selects a team
+    socket.on('teamSelection', function(teamNum) {
+        // Check if this selection is valid
+        if ((teamNum1 == 1) && (team1.length == 2)) {
+            io.emit('message', "You can't enter Team1: it already has 2 players");
+        }
+        // Update players info
+        player.teamNumber = teamNum;
+        if (teamNum == 1) team1.push(player);
+        if (teamNum == 2) team2.push(player);
+
+        // Send client # of people in each team
+        io.emit('peopleInTeam', players);
+    })
 });
 
 var SERVPORT = 8080;

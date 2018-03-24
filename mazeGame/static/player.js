@@ -10,6 +10,7 @@ module.exports = class Player {
         this.health = 100;
         this.bullets = 0;
         this.connected = true;
+        this.teamNumber;
     }
 
     move(direction, deltaT) {

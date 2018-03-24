@@ -41,10 +41,12 @@ document.body.appendChild(app.view);
 //To change the background color
 app.renderer.backgroundColor = 0x061639;
 
+window.onload = chooseTeam;
+
 function chooseTeam() {
 
-    var team1 = PIXI.Sprite.fromImage('assets/team1.png');
-    var team2 = PIXI.Sprite.fromImage('assets/team2.png');
+    var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
+    var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
 
     // Set the initial position
     team1.anchor.set(0.5);
@@ -63,11 +65,11 @@ function chooseTeam() {
     team2.buttonMode = true;
 
     // Pointers normalize touch and mouse
-    team1.on('pointerdown', onClick1(team1) {
-        socket.emit('teamSelection', team1);
+    team1.on('pointerdown', function() {
+        socket.emit('teamSelection', 1);
     });
-    team2.on('pointerdown', onClick2(team2) {
-        socket.emit('teamSelection', team2);
+    team2.on('pointerdown', function() {
+        socket.emit('teamSelection', 2);
     });
 
     // Alternatively, use the mouse & touch events:
@@ -76,11 +78,7 @@ function chooseTeam() {
 
     app.stage.addChild(team1);
     app.stage.addChild(team2);
-    
-    PIXI.loader
-    .add('/assets/ScottyPlayerLantern.json')
-    .add('/assets/SkeletonWalk.json')
-    .load(onAssetsLoaded);
+
 }
 
 function onAssetsLoaded() {
