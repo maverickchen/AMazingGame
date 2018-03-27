@@ -40,7 +40,9 @@ document.body.appendChild(app.view);
 // app.renderer.resize(512, 512);
 //To change the background color
 app.renderer.backgroundColor = 0x061639;
+var graphics = new PIXI.Graphics();
 
+//app.ticker.add(chooseTeam);
 window.onload = chooseTeam;
 
 function chooseTeam() {
@@ -48,13 +50,18 @@ function chooseTeam() {
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
 
-    // Set the initial position
+    // Set the initial position and scale
     team1.anchor.set(0.5);
-    team1.x = app.screen.width / 4;
+    team1.x = app.screen.width / 3;
     team1.y = app.screen.height / 2;
+    team1.scale.x *= 0.3;
+    team1.scale.y *= 0.3;
+
     team2.anchor.set(0.5);
-    team2.x = app.screen.width / 4 * 3;
+    team2.x = app.screen.width / 3 * 2;
     team2.y = app.screen.height / 2;
+    team2.scale.x *= 0.3;
+    team2.scale.y *= 0.3;
 
     // Opt-in to interactivity
     team1.interactive = true;
@@ -64,12 +71,29 @@ function chooseTeam() {
     team1.buttonMode = true;
     team2.buttonMode = true;
 
+    // Style for UI text
+    var style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: ['#ffffff'] // gradient
+    });
+    var text;
+
     // Pointers normalize touch and mouse
     team1.on('pointerdown', function() {
         socket.emit('teamSelection', 1);
+        text = new PIXI.Text('You Selected Team 1', style);
+        text.x = 50;
+        text.y = app.screen.height / 2 + 30;
+        app.stage.addChild(text);
     });
     team2.on('pointerdown', function() {
         socket.emit('teamSelection', 2);
+        text = new PIXI.Text('You Selected Team 2', style);
+        text.x = app.screen.width / 3 * 2;
+        text.y = app.screen.height / 2;
+        app.stage.addChild(text);
     });
 
     // Alternatively, use the mouse & touch events:

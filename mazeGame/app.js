@@ -7,9 +7,12 @@ var Player = require('./static/player');
 
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
+
+/************ Set of data used throughout the game ******************/
 var players = []; // list of players
 var team1 = []; // list of players in each team
 var team2 = [];
+/******************************************************************/
 
 app.use(express.static(path.join(__dirname,'static')));
 
@@ -64,7 +67,7 @@ io.on('connection', function(socket) {
             }
             else {
                 player.teamNumber = teamNum;
-                team1.push(player);
+                team2.push(player);
             }
         }
 
