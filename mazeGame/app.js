@@ -50,29 +50,31 @@ io.on('connection', function(socket) {
     });
 
     // Send to client (movePlayers.js) - the # of people in each team
-    socket.emit('peopleInTeam', [team1.length, team2.length]);
+    io.emit('peopleInTeam', [team1.length, team2.length]);
 
     // When one user selects a team
     socket.on('teamSelection', function(teamNum) { // receives info - from movePlayers.js
         
         if (teamNum == 1) {
             if (team1.length == 2) { // Check if this selection is valid. If not, send a message
-                io.emit('validChoice', false);
-                io.emit('message', "You can't enter Team1: it already has 2 players");
+                socket.emit('validChoice', false);
+                socket.emit('message', "You can't enter Team1: it already has 2 players");
             }
             else { // Update players info
-                io.emit('validChoice', true);
+                socket.emit('validChoice', true);
+                socket.emit('peopleInTeam', [team1.length, team2.length]);
                 player.teamNumber = teamNum;
                 team1.push(player);
             }
         }
         if (teamNum == 2) {
             if (team2.length == 2) {
-                io.emit('validChoice', false);
-                io.emit('message', "You can't enter Team2: it already has 2 players");
+                socket.emit('validChoice', false);
+                socket.emit('message', "You can't enter Team2: it already has 2 players");
             }
             else {
-                io.emit('validChoice', true);
+                socket.emit('validChoice', true);
+                socket.emit('peopleInTeam', [team1.length, team2.length]);
                 player.teamNumber = teamNum;
                 team2.push(player);
             }

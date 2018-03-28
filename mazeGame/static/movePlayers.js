@@ -84,18 +84,18 @@ function chooseTeam() {
     });
 
     socket.on('peopleInTeam', function(arr) {
+        console.log("received");
         team1_ppl = arr[0];
         team2_ppl = arr[1];
+        var team1_text = new PIXI.Text('There are ' + team1_ppl + ' people in team 1', style);
+        team1_text.x = 80;
+        team1_text.y = app.screen.height / 2 - 100;
+        app.stage.addChild(team1_text);
+        team2_text = new PIXI.Text('There are ' + team2_ppl + ' people in team 2', style);
+        team2_text.x = app.screen.width - 300;
+        team2_text.y = app.screen.height / 2 - 100;
+        app.stage.addChild(team2_text);
     });
-
-    team1_text = new PIXI.Text('There are ' + team1_ppl + ' people in team 1', style);
-    team1_text.x = 80;
-    team1_text.y = app.screen.height / 2 - 100;
-    app.stage.addChild(team1_text);
-    team2_text = new PIXI.Text('There are ' + team2_ppl + ' people in team 2', style);
-    team2_text.x = app.screen.width - 300;
-    team2_text.y = app.screen.height / 2 - 100;
-    app.stage.addChild(team2_text);
 
     // Bring in image assets
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
