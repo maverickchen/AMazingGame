@@ -90,6 +90,7 @@ function chooseTeam() {
     });
     var text1;
     var text2;
+    var teamSelected = 0;
 
     // Pointers normalize touch and mouse
 
@@ -99,7 +100,7 @@ function chooseTeam() {
         var index = app.stage.children.indexOf(text2);
         if (index !== -1) app.stage.removeChild(text2);
 
-        socket.emit('teamSelection', 1);
+        teamSelected = 1;
         text1 = new PIXI.Text('You Selected Team 1', style);
         text1.x = 50;
         text1.y = app.screen.height / 2 + 30;
@@ -112,7 +113,7 @@ function chooseTeam() {
         var index = app.stage.children.indexOf(text1);
         if (index !== -1) app.stage.removeChild(text1);
 
-        socket.emit('teamSelection', 2);
+        teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
         text2.x = app.screen.width / 3 * 2;
         text2.y = app.screen.height / 2;
@@ -122,6 +123,27 @@ function chooseTeam() {
     // When Ready button is clicked,
     ready.on('pointerdown', function() {
 
+        if (teamSelected === 0) {
+            var msg = new PIXI.Text('You should select a team before you begin', style);
+            msg.x = app.screen.width / 2;
+            msg.y = app.screen.height - 10;
+            app.stage.addChild(msg);
+        }
+
+        else if (teamSelected === 1) {
+            socket.emit('teamSelection', 1); // send out final selection
+            // Disable ready button
+            ready.interactive = false;
+            ready.buttonMode = false;
+        }
+
+        else if (teamSelected === 2) {
+            socket.emit('teamSelection', 2); // send out final selection
+            // Disable ready button
+            ready.interactive = false;
+            ready.buttonMode = false;
+        }
+        
     });
 
     // Alternatively, use the mouse & touch events:
