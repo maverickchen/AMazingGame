@@ -47,8 +47,10 @@ window.onload = chooseTeam;
 
 function chooseTeam() {
 
+    // Bring in image assets
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
+    var ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
 
     // Set the initial position and scale
     team1.anchor.set(0.5);
@@ -63,13 +65,21 @@ function chooseTeam() {
     team2.scale.x *= 0.3;
     team2.scale.y *= 0.3;
 
+    ready.anchor.set(0.5);
+    ready.x = app.screen.width / 2;
+    ready.y = app.screen.height / 5 * 4;
+    ready.scale.x *= 0.3;
+    ready.scale.y *= 0.3;
+
     // Opt-in to interactivity
     team1.interactive = true;
     team2.interactive = true;
+    ready.interactive = true;
 
     // Shows hand cursor
     team1.buttonMode = true;
     team2.buttonMode = true;
+    ready.buttonMode = true;
 
     // Style for UI text
     var style = new PIXI.TextStyle({
@@ -78,22 +88,40 @@ function chooseTeam() {
         fontWeight: 'bold',
         fill: ['#ffffff'] // gradient
     });
-    var text;
+    var text1;
+    var text2;
 
     // Pointers normalize touch and mouse
+
+    // When team 1 is selected,
     team1.on('pointerdown', function() {
+        // First, get rid of previous text2
+        var index = app.stage.children.indexOf(text2);
+        if (index !== -1) app.stage.removeChild(text2);
+
         socket.emit('teamSelection', 1);
-        text = new PIXI.Text('You Selected Team 1', style);
-        text.x = 50;
-        text.y = app.screen.height / 2 + 30;
-        app.stage.addChild(text);
+        text1 = new PIXI.Text('You Selected Team 1', style);
+        text1.x = 50;
+        text1.y = app.screen.height / 2 + 30;
+        app.stage.addChild(text1);
     });
+
+    // When team 2 is selected,
     team2.on('pointerdown', function() {
+        // First, get rid of previous text1
+        var index = app.stage.children.indexOf(text1);
+        if (index !== -1) app.stage.removeChild(text1);
+
         socket.emit('teamSelection', 2);
-        text = new PIXI.Text('You Selected Team 2', style);
-        text.x = app.screen.width / 3 * 2;
-        text.y = app.screen.height / 2;
-        app.stage.addChild(text);
+        text2 = new PIXI.Text('You Selected Team 2', style);
+        text2.x = app.screen.width / 3 * 2;
+        text2.y = app.screen.height / 2;
+        app.stage.addChild(text2);
+    });
+
+    // When Ready button is clicked,
+    ready.on('pointerdown', function() {
+
     });
 
     // Alternatively, use the mouse & touch events:
@@ -102,7 +130,7 @@ function chooseTeam() {
 
     app.stage.addChild(team1);
     app.stage.addChild(team2);
-
+    app.stage.addChild(ready);
 }
 
 function onAssetsLoaded() {
