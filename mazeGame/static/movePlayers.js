@@ -240,6 +240,14 @@ function chooseTeam() {
 
 function onAssetsLoaded() {
     // create an array of textures from an image path
+    var maze = PIXI.Sprite.fromImage('assets/maze.png');
+    
+    // Add maze picture, will be delete 
+    maze.anchor.set(0.5);
+    maze.x = app.screen.width / 2;
+    maze.y = app.screen.height / 2;
+    app.stage.addChild(maze);
+    
     var frames = [];
     // load each frame from spritesheet
     for (var i = 0; i < 4; i++) {
