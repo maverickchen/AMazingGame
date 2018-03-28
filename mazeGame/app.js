@@ -49,30 +49,35 @@ io.on('connection', function(socket) {
         console.log('user '+id+' disconnected. There are '+players.length+' remaining player(s)');
     });
 
+    // Send to client (movePlayers.js) - the # of people in each team
+    socket.emit('peopleInTeam', [team1.length, team2.length]);
+
     // When one user selects a team
     socket.on('teamSelection', function(teamNum) { // receives info - from movePlayers.js
         
         if (teamNum == 1) {
             if (team1.length == 2) { // Check if this selection is valid. If not, send a message
+                io.emit('validChoice', false);
                 io.emit('message', "You can't enter Team1: it already has 2 players");
             }
             else { // Update players info
+                io.emit('validChoice', true);
                 player.teamNumber = teamNum;
                 team1.push(player);
             }
         }
         if (teamNum == 2) {
             if (team2.length == 2) {
+                io.emit('validChoice', false);
                 io.emit('message', "You can't enter Team2: it already has 2 players");
             }
             else {
+                io.emit('validChoice', true);
                 player.teamNumber = teamNum;
                 team2.push(player);
             }
         }
 
-        // Send to client (movePlayers.js) - the # of people in each team
-        io.emit('peopleInTeam', players);
     })
 });
 

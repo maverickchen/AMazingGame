@@ -45,7 +45,32 @@ var graphics = new PIXI.Graphics();
 //app.ticker.add(chooseTeam);
 window.onload = chooseTeam;
 
+/*
+var outlineFilterBlue = new PIXI.filters.OutlineFilter(2, 0x99ff99);
+var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5);
+
+function filterOn() {
+    this.filters = [outlineFilterRed]
+}
+function filterOff() {
+    this.filters = [outlineFilterBlue]
+}
+*/
+
 function chooseTeam() {
+
+    // Style for instructionText
+    var instructionStyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 30,
+        fontWeight: 'bold',
+        fill: ['#E84F2E'] // gradient
+    });
+
+    instructionText = new PIXI.Text('Choose Your Team!', instructionStyle);
+    instructionText.x = 115;
+    instructionText.y = 50;
+    app.stage.addChild(instructionText);
 
     // Bring in image assets
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
@@ -88,11 +113,25 @@ function chooseTeam() {
         fontWeight: 'bold',
         fill: ['#ffffff'] // gradient
     });
+
     var text1;
     var text2;
     var teamSelected = 0;
 
     // Pointers normalize touch and mouse
+
+    /*
+    // Red glow when a mouse is hovered over buttons
+    team1.on('pointerover', filterOn)
+        .on('pointerout', filterOff );
+    filterOff.call(team1);
+    team2.on('pointerover', filterOn)
+        .on('pointerout', filterOff );
+    filterOff.call(team2);
+    ready.on('pointerover', filterOn)
+        .on('pointerout', filterOff );
+    filterOff.call(ready);
+    */
 
     // When team 1 is selected,
     team1.on('pointerdown', function() {
