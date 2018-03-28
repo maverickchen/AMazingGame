@@ -84,7 +84,7 @@ function chooseTeam() {
     // Style for UI text
     var style = new PIXI.TextStyle({
         fontFamily: 'Arial',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         fill: ['#ffffff'] // gradient
     });
@@ -115,8 +115,8 @@ function chooseTeam() {
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
-        text2.x = app.screen.width / 3 * 2;
-        text2.y = app.screen.height / 2;
+        text2.x = app.screen.width - 220;
+        text2.y = app.screen.height / 2 + 30;
         app.stage.addChild(text2);
     });
 
@@ -125,8 +125,8 @@ function chooseTeam() {
 
         if (teamSelected === 0) {
             var msg = new PIXI.Text('You should select a team before you begin', style);
-            msg.x = app.screen.width / 2;
-            msg.y = app.screen.height - 10;
+            msg.x = 70;
+            msg.y = app.screen.height - 70;
             app.stage.addChild(msg);
         }
 
