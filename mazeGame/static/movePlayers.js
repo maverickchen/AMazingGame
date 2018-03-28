@@ -18,8 +18,8 @@ var left = keyboard(37),
 
 // make a PIXI canvas
 var app = new PIXI.Application({
-          width: 512, 
-          height: 512,
+          width: 700, 
+          height: 600,
           antialiasing: true, 
           transparent: false, 
           resolution: 1
@@ -57,6 +57,9 @@ function filterOff() {
 }
 */
 
+var team1_ppl = 0;
+var team2_ppl = 0;
+
 function chooseTeam() {
 
     // Style for instructionText
@@ -71,6 +74,28 @@ function chooseTeam() {
     instructionText.x = 115;
     instructionText.y = 50;
     app.stage.addChild(instructionText);
+
+    // Style for UI text
+    var style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: ['#ffffff'] // gradient
+    });
+
+    socket.on('peopleInTeam', function(arr) {
+        team1_ppl = arr[0];
+        team2_ppl = arr[1];
+    });
+
+    team1_text = new PIXI.Text('There are ' + team1_ppl + ' people in team 1', style);
+    team1_text.x = 80;
+    team1_text.y = app.screen.height / 2 - 100;
+    app.stage.addChild(team1_text);
+    team2_text = new PIXI.Text('There are ' + team2_ppl + ' people in team 2', style);
+    team2_text.x = app.screen.width - 300;
+    team2_text.y = app.screen.height / 2 - 100;
+    app.stage.addChild(team2_text);
 
     // Bring in image assets
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
@@ -106,14 +131,6 @@ function chooseTeam() {
     team2.buttonMode = true;
     ready.buttonMode = true;
 
-    // Style for UI text
-    var style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: ['#ffffff'] // gradient
-    });
-
     var text1;
     var text2;
     var teamSelected = 0;
@@ -141,7 +158,7 @@ function chooseTeam() {
 
         teamSelected = 1;
         text1 = new PIXI.Text('You Selected Team 1', style);
-        text1.x = 50;
+        text1.x = 80;
         text1.y = app.screen.height / 2 + 30;
         app.stage.addChild(text1);
     });
@@ -154,7 +171,7 @@ function chooseTeam() {
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
-        text2.x = app.screen.width - 220;
+        text2.x = app.screen.width - 300;
         text2.y = app.screen.height / 2 + 30;
         app.stage.addChild(text2);
     });
