@@ -60,6 +60,34 @@ function filterOff() {
 var team1_ppl = 0;
 var team2_ppl = 0;
 
+// Style for UI text
+    var style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: ['#ffffff'] // gradient
+    });
+var team1_text;
+var team2_text;
+socket.on('peopleInTeam', function(arr) {
+        console.log("received");
+        var index = app.stage.children.indexOf(team1_text);
+        if (index !== -1) app.stage.removeChild(team1_text);
+        var index = app.stage.children.indexOf(team2_text);
+        if (index !== -1) app.stage.removeChild(team2_text);
+
+        team1_ppl = arr[0];
+        team2_ppl = arr[1];
+        team1_text = new PIXI.Text('There are ' + team1_ppl + ' people in team 1', style);
+        team1_text.x = 80;
+        team1_text.y = app.screen.height / 2 - 100;
+        app.stage.addChild(team1_text);
+        team2_text = new PIXI.Text('There are ' + team2_ppl + ' people in team 2', style);
+        team2_text.x = app.screen.width - 300;
+        team2_text.y = app.screen.height / 2 - 100;
+        app.stage.addChild(team2_text);
+});
+
 function chooseTeam() {
 
     // Style for instructionText
@@ -75,14 +103,7 @@ function chooseTeam() {
     instructionText.y = 50;
     app.stage.addChild(instructionText);
 
-    // Style for UI text
-    var style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: ['#ffffff'] // gradient
-    });
-
+/*
     socket.on('peopleInTeam', function(arr) {
         console.log("received");
         team1_ppl = arr[0];
@@ -96,7 +117,7 @@ function chooseTeam() {
         team2_text.y = app.screen.height / 2 - 100;
         app.stage.addChild(team2_text);
     });
-
+*/
     // Bring in image assets
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
@@ -191,6 +212,9 @@ function chooseTeam() {
             // Disable ready button
             ready.interactive = false;
             ready.buttonMode = false;
+            PIXI.loader.add('assets/ScottyPlayerLantern.json')
+            .add('assets/SkeletonWalk.json')
+            .load(onAssetsLoaded);
         }
 
         else if (teamSelected === 2) {
@@ -198,6 +222,9 @@ function chooseTeam() {
             // Disable ready button
             ready.interactive = false;
             ready.buttonMode = false;
+            PIXI.loader.add('assets/ScottyPlayerLantern.json')
+            .add('assets/SkeletonWalk.json')
+            .load(onAssetsLoaded);
         }
         
     });
