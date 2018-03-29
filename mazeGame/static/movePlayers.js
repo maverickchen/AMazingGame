@@ -26,6 +26,17 @@ var app = new PIXI.Application({
         });
 // Display the PIXI canvas
 document.body.appendChild(app.view);
+// create the stage instead of container - needed for layers
+app.stage = new PIXI.display.Stage();
+
+// make Containers to manage separate sprite groups
+var startScreen = new PIXI.Container();
+// add startScreen Container
+app.stage.addChild(startScreen);
+var charSprites = new PIXI.Container();
+charSprites.visible = false;
+//add the charSprites Container to the stage
+app.stage.addChild(charSprites);
 
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
@@ -60,6 +71,7 @@ function filterOff() {
 var team1_ppl = 0;
 var team2_ppl = 0;
 
+
 // Style for UI text
     var style = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -81,15 +93,14 @@ socket.on('peopleInTeam', function(arr) {
         team1_text = new PIXI.Text('There are ' + team1_ppl + ' people in team 1', style);
         team1_text.x = 80;
         team1_text.y = app.screen.height / 2 - 100;
-        app.stage.addChild(team1_text);
+        startScreen.addChild(team1_text);
         team2_text = new PIXI.Text('There are ' + team2_ppl + ' people in team 2', style);
         team2_text.x = app.screen.width - 300;
         team2_text.y = app.screen.height / 2 - 100;
-        app.stage.addChild(team2_text);
+        startScreen.addChild(team2_text);
 });
 
 function chooseTeam() {
-
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -97,11 +108,10 @@ function chooseTeam() {
         fontWeight: 'bold',
         fill: ['#E84F2E'] // gradient
     });
-
     instructionText = new PIXI.Text('Choose Your Team!', instructionStyle);
     instructionText.x = 115;
     instructionText.y = 50;
-    app.stage.addChild(instructionText);
+    startScreen.addChild(instructionText);
 
 /*
     socket.on('peopleInTeam', function(arr) {
@@ -181,7 +191,7 @@ function chooseTeam() {
         text1 = new PIXI.Text('You Selected Team 1', style);
         text1.x = 80;
         text1.y = app.screen.height / 2 + 30;
-        app.stage.addChild(text1);
+        startScreen.addChild(text1);
     });
 
     // When team 2 is selected,
@@ -194,7 +204,7 @@ function chooseTeam() {
         text2 = new PIXI.Text('You Selected Team 2', style);
         text2.x = app.screen.width - 300;
         text2.y = app.screen.height / 2 + 30;
-        app.stage.addChild(text2);
+        startScreen.addChild(text2);
     });
 
     // When Ready button is clicked,
@@ -204,7 +214,7 @@ function chooseTeam() {
             var msg = new PIXI.Text('You should select a team before you begin', style);
             msg.x = 70;
             msg.y = app.screen.height - 70;
-            app.stage.addChild(msg);
+            startScreen.addChild(msg);
         }
 
         else if (teamSelected === 1) {
@@ -233,12 +243,21 @@ function chooseTeam() {
     // sprite.on('click', onClick); // mouse-only
     // sprite.on('tap', onClick); // touch-only
 
-    app.stage.addChild(team1);
-    app.stage.addChild(team2);
-    app.stage.addChild(ready);
+    startScreen.addChild(team1);
+    startScreen.addChild(team2);
+    startScreen.addChild(ready);
 }
 
 function onAssetsLoaded() {
+    PIXI.sound.Sound.from({
+            url: 'assets/bkgMusic.mp3',
+            autoPlay: true,
+            loop: true,
+    });
+    // suppress the startScreen UI elements and show the game screen
+    startScreen.visible = false;
+    charSprites.visible = true;
+
     // create an array of textures from an image path
     var maze = PIXI.Sprite.fromImage('assets/maze.png');
     
@@ -246,7 +265,24 @@ function onAssetsLoaded() {
     maze.anchor.set(0.5);
     maze.x = app.screen.width / 2;
     maze.y = app.screen.height / 2;
-    app.stage.addChild(maze);
+    maze.scale.x *= 3;
+    maze.scale.y *= 3;
+    charSprites.addChild(maze);
+
+    // make the background dark by putting a layer over it
+    var lighting = new PIXI.display.Layer();
+    lighting.on('display', function (element) {
+        element.blendMode = PIXI.BLEND_MODES.ADD
+    });
+    lighting.useRenderTexture = true;
+    lighting.clearColor = [0.03, 0.03, 0.03, 1]; // dark gray
+
+    app.stage.addChild(lighting);
+
+    var lightingSprite = new PIXI.Sprite(lighting.getRenderTexture());
+    lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+
+    app.stage.addChild(lightingSprite);
     
     var frames = [];
     // load each frame from spritesheet
@@ -256,7 +292,16 @@ function onAssetsLoaded() {
     }
     scottyFrames = frames;
     // create an AnimatedSprite
-    player = new PIXI.extras.AnimatedSprite(scottyFrames);
+    var player = new PIXI.extras.AnimatedSprite(scottyFrames);
+    
+    var lightbulb = new PIXI.Graphics();
+    lightbulb.beginFill((0x70 << 16) + (0x60 << 8) + 0x50, 1.0);
+    lightbulb.drawCircle(0, 0, 300);
+    lightbulb.endFill();
+    lightbulb.parentLayer = lighting;
+    player.addChild(lightbulb);
+
+    charSprites.addChild(player);
 
     frames = [];
     for (var i = 0; i < 7; i++) {
@@ -275,8 +320,6 @@ function onAssetsLoaded() {
     player.anchor.set(0.5);
     player.animationSpeed = 0.05;
     player.play();
-
-    app.stage.addChild(player);
 
     this.player = player;
     socket.on('newGameState', function(state){
@@ -395,7 +438,7 @@ function newSprite(frames, x, y, isVisible) {
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
-    app.stage.addChild(sprite);
+    charSprites.addChild(sprite);
     sprite.visible = isVisible;
     return sprite;
 }
