@@ -4,8 +4,8 @@ var speed = 1;
 
 module.exports = class Player {
     constructor(id) {
-        this.x = 256;
-        this.y = 256;
+        this.x = 350;
+        this.y = 300;
         this.id = id;
         this.health = 100;
         this.bullets = 0;
