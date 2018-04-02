@@ -7,14 +7,16 @@ var local_time = 0.016;
 var speed = 1;
 
 // sprite animation frames
-var skeletonFrames; 
-var scottyFrames;
+var p1Frames = {};
+var p2Frames = {}; 
+var potionFrames = [];
 var otherPlayerSprites = [];
 
-var left = keyboard(37),
+var left = keyboard(37), // arrowkeys
     up = keyboard(38),
     right = keyboard(39),
-    down = keyboard(40);
+    down = keyboard(40),
+    shoot = keyboard(32); // spacebar
 
 // make a PIXI canvas
 var app = new PIXI.Application({
@@ -217,26 +219,24 @@ function chooseTeam() {
             startScreen.addChild(msg);
         }
 
-        else if (teamSelected === 1) {
-            socket.emit('teamSelection', 1); // send out final selection
+        else if (teamSelected === 1 || teamSelected === 2) {
+            socket.emit('teamSelection', teamSelected); // send out final selection
             // Disable ready button
             ready.interactive = false;
             ready.buttonMode = false;
-            PIXI.loader.add('assets/ScottyPlayerLantern.json')
-            .add('assets/SkeletonWalk.json')
+            PIXI.loader.add('assets/Player1Up.json')
+            .add('assets/Player1Down.json')
+            .add('assets/Player1Left.json')
+            .add('assets/Player1Right.json')
+            .add('assets/Player1Shoot.json')
+            .add('assets/Player2Up.json')
+            .add('assets/Player2Down.json')
+            .add('assets/Player2Left.json')
+            .add('assets/Player2Right.json')
+            .add('assets/Player2Shoot.json')
+            .add('assets/Potion.json')
             .load(onAssetsLoaded);
         }
-
-        else if (teamSelected === 2) {
-            socket.emit('teamSelection', 2); // send out final selection
-            // Disable ready button
-            ready.interactive = false;
-            ready.buttonMode = false;
-            PIXI.loader.add('assets/ScottyPlayerLantern.json')
-            .add('assets/SkeletonWalk.json')
-            .load(onAssetsLoaded);
-        }
-        
     });
 
     // Alternatively, use the mouse & touch events:
@@ -248,12 +248,97 @@ function chooseTeam() {
     startScreen.addChild(ready);
 }
 
+/* 
+ * placeItems: place 5 potion and ammo sprites at random locations on the LOCAL screen
+ * (NOT synchronized)
+ */
+function placeItems(potFrames) {
+    for (var i = 0; i < 5; i++) {
+        var ammo = PIXI.Sprite.fromImage('assets/Ammo.png');
+        ammo.scale.x *= .1;
+        ammo.scale.y *= .1;
+        ammo.x = Math.floor(Math.random() *Math.floor(app.screen.width))
+        ammo.y = Math.floor(Math.random() *Math.floor(app.screen.height))
+        charSprites.addChild(ammo);
+        x = Math.floor(Math.random() *Math.floor(app.screen.width))
+        y = Math.floor(Math.random() *Math.floor(app.screen.height))
+        var potion = newSprite(potionFrames, x, y, true);
+        potion.scale.x *= .5;
+        potion.scale.y *= .5;
+    }
+}
+
+/* 
+ * loadFrames: loads ALL the sprite animations and stores them in the global 
+ * vars p1Frames and p2Frames {.left .right .up .down}
+ */
+function loadFrames() {
+    // Player 1's animations:
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1Up' + i + '.png'));
+    }
+    p1Frames.up = frames;
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1Down' + i + '.png'));
+    }
+    p1Frames.down = frames;
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1Left' + i + '.png'));
+    }
+    p1Frames.left = frames;
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1Right' + i + '.png'));
+    }
+    p1Frames.right = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1Shoot' + i + '.png'));
+    }
+    p1Frames.shoot = frames;
+    // Player 2's animations: 
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2Up' + i + '.png'));
+    }
+    p2Frames.up = frames;
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2Down' + i + '.png'));
+    }
+    p2Frames.down = frames;
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2Left' + i + '.png'));
+    }
+    p2Frames.left = frames;
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2Right' + i + '.png'));
+    }
+    p2Frames.right = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2Shoot' + i + '.png'));
+    }
+    p2Frames.shoot = frames;
+    // Load Potion frames
+    frames = []
+    for (var i = 0; i < 10; i++) {
+        frames.push(PIXI.Texture.fromFrame('Potion' + i + '.png'));
+    }
+    potionFrames = frames;
+}
+
 function onAssetsLoaded() {
-    PIXI.sound.Sound.from({
-            url: 'assets/bkgMusic.mp3',
-            autoPlay: true,
-            loop: true,
-    });
+    // PIXI.sound.Sound.from({
+    //         url: 'assets/bkgMusic.mp3',
+    //         autoPlay: true,
+    //         loop: true,
+    // });
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     charSprites.visible = true;
@@ -284,15 +369,11 @@ function onAssetsLoaded() {
 
     app.stage.addChild(lightingSprite);
     
-    var frames = [];
-    // load each frame from spritesheet
-    for (var i = 0; i < 4; i++) {
-        // magically works since the spritesheet was loaded with the pixi loader
-        frames.push(PIXI.Texture.fromFrame('ScottyPlayerLantern' + i + '.png'));
-    }
-    scottyFrames = frames;
+    loadFrames();
+
     // create an AnimatedSprite
-    var player = new PIXI.extras.AnimatedSprite(scottyFrames);
+    var player;
+    player = newSprite(p1Frames.down, app.screen.width/2, app.screen.height/2, true);   
     
     var lightbulb = new PIXI.Graphics();
     lightbulb.beginFill((0x70 << 16) + (0x60 << 8) + 0x50, 1.0);
@@ -303,25 +384,10 @@ function onAssetsLoaded() {
 
     charSprites.addChild(player);
 
-    frames = [];
-    for (var i = 0; i < 7; i++) {
-        frames.push(PIXI.Texture.fromFrame('SkeletonWalk' + i + '.png'));
-    }
-    skeletonFrames = frames;
-
-    /*
-     * An AnimatedSprite inherits all the properties of a PIXI sprite
-     * so you can change its position, its anchor, mask it, etc
-     */
-    player.width = 120;
-    player.height = 120;
-    player.x = app.screen.width / 2;
-    player.y = app.screen.height / 2;
-    player.anchor.set(0.5);
-    player.animationSpeed = 0.05;
-    player.play();
-
     this.player = player;
+
+    placeItems();
+
     socket.on('newGameState', function(state){
         console.log(state);
         console.log(myID);
@@ -335,7 +401,7 @@ function onAssetsLoaded() {
                     otherPlayerSprites[cnt].x = state[i].x;
                     otherPlayerSprites[cnt].y = state[i].y;
                 } else { // generate more player sprites
-                    var newSpr = newSprite(skeletonFrames, state[i].x, state[i].y, true);
+                    var newSpr = newSprite(p2Frames.down, state[i].x, state[i].y, true);
                     otherPlayerSprites.push(newSpr);
                 }
                 cnt += 1;
@@ -431,8 +497,8 @@ function keyboard(keyCode) {
  */
 function newSprite(frames, x, y, isVisible) {
     var sprite = new PIXI.extras.AnimatedSprite(frames);
-    sprite.width = 100;
-    sprite.height = 100;
+    sprite.width = 42;
+    sprite.height = 60;
     sprite.x = x
     sprite.y = y
     sprite.anchor.set(0.5);

@@ -4,12 +4,14 @@ var server = require('http').Server(app);
 var path = require('path');
 var io = require('socket.io')(server);
 var Player = require('./static/player');
+var Item = require('./static/item');
 
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
 var players = []; // list of players
+var items = [];
 var team1 = []; // list of players in each team
 var team2 = [];
 /******************************************************************/
@@ -77,10 +79,8 @@ io.on('connection', function(socket) {
                 team2.push(player);
                 socket.emit('validChoice', true);
                 socket.emit('peopleInTeam', [team1.length, team2.length]);
-                
             }
         }
-
     })
 });
 

@@ -1,1 +1,38 @@
-{"frames":{"ScottyPlayerLantern0.png":{"frame":{"x":0,"y":0,"w":378,"h":378},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},"sourceSize":{"w":378,"h":378}},"ScottyPlayerLantern1.png":{"frame":{"x":378,"y":0,"w":378,"h":378},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},"sourceSize":{"w":378,"h":378}},"ScottyPlayerLantern2.png":{"frame":{"x":0,"y":378,"w":378,"h":378},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},"sourceSize":{"w":378,"h":378}},"ScottyPlayerLantern3.png":{"frame":{"x":378,"y":378,"w":378,"h":378},"rotated":false,"trimmed":false,"spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},"sourceSize":{"w":378,"h":378}}},"meta":{"app":"https://github.com/piskelapp/piskel/","version":"1.0","image":"ScottyPlayerLantern.png","format":"RGBA8888","size":{"w":756,"h":756}}}
+{
+    "frames":{
+        "ScottyPlayerLantern0.png": {
+            "frame":{"x":0,"y":0,"w":378,"h":378},
+            "rotated":false,
+            "trimmed":false,
+            "spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},
+            "sourceSize":{"w":378,"h":378}
+        },
+        "ScottyPlayerLantern1.png":{
+            "frame":{"x":378,"y":0,"w":378,"h":378},
+            "rotated":false,
+            "trimmed":false,
+            "spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},
+            "sourceSize":{"w":378,"h":378}
+        },
+        "ScottyPlayerLantern2.png":{
+            "frame":{"x":0,"y":378,"w":378,"h":378},
+            "rotated":false,"trimmed":false,
+            "spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},
+            "sourceSize":{"w":378,"h":378}
+        },
+        "ScottyPlayerLantern3.png":{
+            "frame":{"x":378,"y":378,"w":378,"h":378},
+            "rotated":false,
+            "trimmed":false,
+            "spriteSourceSize":{"x":0,"y":0,"w":378,"h":378},
+            "sourceSize":{"w":378,"h":378}
+        }
+    },
+    "meta":{
+        "app":"https://github.com/piskelapp/piskel/",
+        "version":"1.0",
+        "image":"ScottyPlayerLantern.png",
+        "format":"RGBA8888",
+        "size":{"w":756,"h":756}
+    }
+}
