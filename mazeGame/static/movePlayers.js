@@ -44,17 +44,23 @@ document.body.appendChild(app.view);
 // create the stage instead of container - needed for layers
 app.stage = new PIXI.display.Stage();
 
-// make Containers to manage separate sprite groups
+/* Make Containers to manage separate sprite groups */
 var startScreen = new PIXI.Container();
-// add startScreen Container
 app.stage.addChild(startScreen);
+
+var gameScreen = new PIXI.Container();
+app.stage.addChild(gameScreen);
+gameScreen.visible = false;
+
 var charSprites = new PIXI.Container();
 charSprites.visible = false;
-//add the charSprites Container to the stage
 app.stage.addChild(charSprites);
+gameScreen.addChild(charSprites);
 
 var gameUI = new PIXI.Container();
 gameUI.visible = false;
+gameScreen.addChild(gameUI);
+
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
 // app.renderer.view.style.height = window.innerHeight - 50 + "px";
