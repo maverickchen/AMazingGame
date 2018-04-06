@@ -116,7 +116,7 @@ socket.on('peopleInTeam', function(arr) {
         team2_text.y = app.screen.height / 2 - 100;
         startScreen.addChild(team2_text);
 });
- 
+
 function chooseTeam() {
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
@@ -200,7 +200,9 @@ function chooseTeam() {
 
     // When team 1 is selected,
     team1.on('pointerdown', function() {
-        // First, get rid of previous text2
+        // First, get rid of previous text1, text2
+        var index = startScreen.children.indexOf(text1);
+        if (index !== -1) startScreen.removeChild(text1);
         var index = startScreen.children.indexOf(text2);
         if (index !== -1) startScreen.removeChild(text2);
 
@@ -213,9 +215,11 @@ function chooseTeam() {
 
     // When team 2 is selected,
     team2.on('pointerdown', function() {
-        // First, get rid of previous text1
+        // First, get rid of previous text1, text2
         var index = startScreen.children.indexOf(text1);
         if (index !== -1) startScreen.removeChild(text1);
+        var index = startScreen.children.indexOf(text2);
+        if (index !== -1) startScreen.removeChild(text2);
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
@@ -224,11 +228,15 @@ function chooseTeam() {
         startScreen.addChild(text2);
     });
 
+    var msg;
     // When Ready button is clicked,
     ready.on('pointerdown', function() {
 
         if (teamSelected === 0) {
-            var msg = new PIXI.Text('You should select a team before you begin', style);
+            // First, get rid of previous msg
+            var index = startScreen.children.indexOf(msg);
+            if (index !== -1) startScreen.removeChild(msg);
+            msg = new PIXI.Text('You should select a team before you begin', style);
             msg.x = 70;
             msg.y = app.screen.height - 70;
             startScreen.addChild(msg);
@@ -239,6 +247,7 @@ function chooseTeam() {
             // Disable ready button
             ready.interactive = false;
             ready.buttonMode = false;
+
             PIXI.loader.add('assets/Player1Up.json')
             .add('assets/Player1Down.json')
             .add('assets/Player1Left.json')
