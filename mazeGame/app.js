@@ -5,11 +5,13 @@ var path = require('path');
 var io = require('socket.io')(server);
 var Player = require('./static/player');
 var Item = require('./static/item');
+var Collision = require('./static/collides');
 
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
+var gameState = {};
 var players = []; // list of players
 var items = [];
 var team1 = []; // list of players in each team
@@ -23,6 +25,16 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function(socket) {
+    // For now: Only the first time: on first connection, place the items
+    if (idCounter == 0) {
+        for (var i = 0; i < 5; i++) {
+            potion = new Item('Potion');
+            ammo = new Item('Ammo');
+            items.push(potion);
+            items.push(ammo);
+        }
+    }
+
     var id = idCounter;
     idCounter += 1;
     var player = new Player(id); // current player
@@ -34,9 +46,20 @@ io.on('connection', function(socket) {
 
 
     socket.on('move', function(direction) {
-        // console.log('Input received from player '+id+': '+direction);
-        player.move(direction,1); // update game state based off new input
-        io.emit('newGameState', players); // tell all players the new game state
+        // update game state based off new input
+        player.move(direction,1);
+        var i;
+        for (i = 0; i < items.length; i++) {
+            if (Collision.collides(player, items[i])) {
+                console.log('Collision detected');
+                items[i].use(player);
+                break;
+            }
+        }
+        items.splice(i,1); // 
+        gameState.players = players;
+        gameState.items = items;
+        io.emit('newGameState', gameState); // tell all players the new game state
     });
 
     socket.on('disconnect', function() {

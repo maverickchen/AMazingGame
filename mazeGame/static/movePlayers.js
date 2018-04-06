@@ -12,16 +12,29 @@ var p2Frames = {};
 var potionFrames = [];
 var otherPlayerSprites = [];
 
+var potionSprites = [];
+var ammoSprites = [];
+var playerSprites = {};
+
 var left = keyboard(37), // arrowkeys
     up = keyboard(38),
     right = keyboard(39),
     down = keyboard(40),
     shoot = keyboard(32); // spacebar
 
+
+var w = window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth;
+
+var h = window.innerHeight
+|| document.documentElement.clientHeight
+|| document.body.clientHeight;
+
 // make a PIXI canvas
 var app = new PIXI.Application({
-          width: 700, 
-          height: 600,
+          width: w, 
+          height: h,
           antialiasing: true, 
           transparent: false, 
           resolution: 1
@@ -249,30 +262,10 @@ function chooseTeam() {
 }
 
 /* 
- * placeItems: place 5 potion and ammo sprites at random locations on the LOCAL screen
- * (NOT synchronized)
- */
-function placeItems(potFrames) {
-    for (var i = 0; i < 5; i++) {
-        var ammo = PIXI.Sprite.fromImage('assets/Ammo.png');
-        ammo.scale.x *= .1;
-        ammo.scale.y *= .1;
-        ammo.x = Math.floor(Math.random() *Math.floor(app.screen.width))
-        ammo.y = Math.floor(Math.random() *Math.floor(app.screen.height))
-        charSprites.addChild(ammo);
-        x = Math.floor(Math.random() *Math.floor(app.screen.width))
-        y = Math.floor(Math.random() *Math.floor(app.screen.height))
-        var potion = newSprite(potionFrames, x, y, true);
-        potion.scale.x *= .5;
-        potion.scale.y *= .5;
-    }
-}
-
-/* 
  * loadFrames: loads ALL the sprite animations and stores them in the global 
  * vars p1Frames and p2Frames {.left .right .up .down}
  */
-function loadFrames() {
+function loadFrames(lighting) {
     // Player 1's animations:
     frames = []
     for (var i = 0; i < 4; i++) {
@@ -331,7 +324,46 @@ function loadFrames() {
         frames.push(PIXI.Texture.fromFrame('Potion' + i + '.png'));
     }
     potionFrames = frames;
+
+    // create an AnimatedSprite for each possible direction.
+    playerSprites.down = newSprite(p1Frames.down, app.screen.width/2, app.screen.height/2, true);  
+    playerSprites.up = newSprite(p1Frames.up, app.screen.width/2, app.screen.height/2, false); 
+    playerSprites.left = newSprite(p1Frames.left, app.screen.width/2, app.screen.height/2, false);
+    playerSprites.right = newSprite(p1Frames.right, app.screen.width/2, app.screen.height/2, false);
+    playerSprites.shoot = newSprite(p1Frames.shoot, app.screen.width/2, app.screen.height/2, false);
+    for (var i = 0; i < 5; i++) {
+        var lightbulb = new PIXI.Graphics();
+        lightbulb.beginFill(0x706050, 1.0);
+        lightbulb.drawCircle(0, 0, 300);
+        lightbulb.endFill();
+        lightbulb.parentLayer = lighting;
+        if (i == 0) playerSprites.down.addChild(lightbulb);
+        if (i == 1) playerSprites.up.addChild(lightbulb);
+        if (i == 2) playerSprites.left.addChild(lightbulb);
+        if (i == 3) playerSprites.right.addChild(lightbulb);
+        if (i == 4) playerSprites.shoot.addChild(lightbulb);
+    }
 }
+
+/* 
+ * setSprite: given an animatedSprite from the object playerSprites{.left.right.up.down.shoot}
+ * make the new sprite visible with the right coordinates and the old sprite invisble
+ */
+function setSprite(animation) {
+    if (player !== animation) {
+        newDirSprite = animation;
+        newDirSprite.x = player.x;
+        newDirSprite.y = player.y;
+        newDirSprite.visible = true;
+        player.visible = false;
+        player = newDirSprite;
+    }
+}
+
+function checkCollisions() {
+
+}
+
 
 function onAssetsLoaded() {
     // PIXI.sound.Sound.from({
@@ -369,48 +401,67 @@ function onAssetsLoaded() {
 
     app.stage.addChild(lightingSprite);
     
-    loadFrames();
+    loadFrames(lighting);
 
-    // create an AnimatedSprite
+    // initialize player to the downward facing sprite
     var player;
-    player = newSprite(p1Frames.down, app.screen.width/2, app.screen.height/2, true);   
-    
-    var lightbulb = new PIXI.Graphics();
-    lightbulb.beginFill((0x70 << 16) + (0x60 << 8) + 0x50, 1.0);
-    lightbulb.drawCircle(0, 0, 300);
-    lightbulb.endFill();
-    lightbulb.parentLayer = lighting;
-    player.addChild(lightbulb);
-
-    charSprites.addChild(player);
+    player = playerSprites.down;
 
     this.player = player;
-
-    placeItems();
 
     socket.on('newGameState', function(state){
         console.log(state);
         console.log(myID);
+        // draw player sprites
         var cnt = 0;
-        for (var i = 0; i<state.length; i++) {
-            if (myID == state[i].id) {
-                player.x = state[i].x;
-                player.y = state[i].y;
+        for (var i = 0; i < state.players.length; i++) {
+            if (myID == state.players[i].id) {
+                player.x = state.players[i].x;
+                player.y = state.players[i].y;
             } else {
                 if (cnt < otherPlayerSprites.length) {
-                    otherPlayerSprites[cnt].x = state[i].x;
-                    otherPlayerSprites[cnt].y = state[i].y;
+                    otherPlayerSprites[cnt].x = state.players[i].x;
+                    otherPlayerSprites[cnt].y = state.players[i].y;
                 } else { // generate more player sprites
-                    var newSpr = newSprite(p2Frames.down, state[i].x, state[i].y, true);
+                    var newSpr = newSprite(p2Frames.down, state.players[i].x, state.players[i].y, true);
                     otherPlayerSprites.push(newSpr);
                 }
                 cnt += 1;
             }
         }
         // destroy any extra sprites if players leave
-        while (state.length-1 < otherPlayerSprites.length) {
+        while (state.players.length-1 < otherPlayerSprites.length) {
             otherPlayerSprites.pop().destroy();
         }
+        // draw item sprites
+        aS = 0;
+        pS = 0;
+        for (var i = 0; i < state.items.length; i++) {
+            item = state.items[i];
+            if (item.type == 'Ammo') {
+                if (aS >= ammoSprites.length) {
+                    ammoSprites.push(newAmmoSprite());
+                }
+                ammoSprites[aS].x = item.x;
+                ammoSprites[aS].y = item.y;
+                aS += 1;
+            } else if (item.type == 'Potion') {
+                if (pS >= potionSprites.length) {
+                    potionSprites.push(newPotionSprite());
+                }
+                potionSprites[pS].x = item.x;
+                potionSprites[pS].y = item.y;
+                pS += 1;
+            }
+        }
+        // delete unused ammo sprites
+        while (aS < ammoSprites.length) {
+            ammoSprites.pop().destroy();
+        }
+        // delete unused potion sprites
+        while (pS < potionSprites.length) {
+            potionSprites.pop().destroy();
+        } 
     });
     this.update = update;
     // Ticker will call update to begin the game loop
@@ -434,12 +485,20 @@ function handleInput(delta) {
     if (down.isDown){
         input.y_dir += 1;
     }
+    if (shoot.isDown){
+        setSprite(playerSprites.shoot);
+    }
     if (input.x_dir != 0 || input.y_dir != 0) {
         this.input_seq += 1;
         input.time = this.local_time;
         input.seq = this.input_seq;
         inputs.push(input);
         socket.emit('move', input);
+        // change the player's sprite based off movement
+        if (input.x_dir == 1) setSprite(playerSprites.right);
+        else if (input.x_dir == -1) setSprite(playerSprites.left);
+        else if (input.y_dir == 1) setSprite(playerSprites.down);
+        else if (input.y_dir == -1) setSprite(playerSprites.up);
     }
     player.x += input.x_dir*speed*delta;
     player.y += input.y_dir*speed*delta;
@@ -452,6 +511,7 @@ socket.on('onconnected', function(msg){
 });
 
 function update(delta) {
+    checkCollisions();
     handleInput(delta);
 }
 
@@ -492,15 +552,35 @@ function keyboard(keyCode) {
     return key;
 }
 
-/* Constructs a sprite from the given frames and places it at the desired x and y
+function newAmmoSprite() {
+    ammo = PIXI.Sprite.fromImage('assets/Ammo.png');
+    ammo.scale.x *= .1;
+    ammo.scale.y *= .1;
+    charSprites.addChild(ammo);
+    return ammo;
+}
+
+function newPotionSprite() {
+    sprite = new PIXI.extras.AnimatedSprite(potionFrames);
+    sprite.scale.x *= .2;
+    sprite.scale.y *= .2;
+    sprite.anchor.set(0.5);
+    sprite.animationSpeed = 0.1;
+    sprite.play();
+    charSprites.addChild(sprite);
+    return sprite;
+}
+
+/* 
+ * Constructs a sprite from the given frames and places it at the desired x and y
  * position. Will be visible if isVisible. 
  */
 function newSprite(frames, x, y, isVisible) {
     var sprite = new PIXI.extras.AnimatedSprite(frames);
     sprite.width = 42;
     sprite.height = 60;
-    sprite.x = x
-    sprite.y = y
+    sprite.x = x;
+    sprite.y = y;
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
