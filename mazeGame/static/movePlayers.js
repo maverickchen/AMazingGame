@@ -263,7 +263,9 @@ function chooseTeam() {
 
 /* 
  * loadFrames: loads ALL the sprite animations and stores them in the global 
- * vars p1Frames and p2Frames {.left .right .up .down}
+ * vars p1Frames and p2Frames {.left .right .up .down .shoot}
+ * Also creates a sprite for each direction the local player can face, and stores 
+ * them in the var playerSprites{.left .right .up .down .shoot}
  */
 function loadFrames(lighting) {
     // Player 1's animations:
@@ -346,14 +348,24 @@ function loadFrames(lighting) {
 }
 
 /* 
- * setSprite: given an animatedSprite from the object playerSprites{.left.right.up.down.shoot}
+ * setSprite: given an animatedSprite from var playerSprites{.left.right.up.down.shoot}
  * make the new sprite visible with the right coordinates and the old sprite invisble
  */
 function setSprite(animation) {
     if (player !== animation) {
+        offsetX = 1; // account for shooting sprite's different size 
+        offsetY = 4;
         newDirSprite = animation;
-        newDirSprite.x = player.x;
-        newDirSprite.y = player.y;
+        if (animation === playerSprites.shoot) {
+            newDirSprite.x = player.x - offsetX;
+            newDirSprite.y = player.y - offsetY;
+        } else if (player === playerSprites.shoot) {
+            newDirSprite.x = player.x + offsetX;
+            newDirSprite.y = player.y + offsetY;
+        } else {
+            newDirSprite.x = player.x;
+            newDirSprite.y = player.y;
+        }
         newDirSprite.visible = true;
         player.visible = false;
         player = newDirSprite;
@@ -571,16 +583,25 @@ function newPotionSprite() {
     return sprite;
 }
 
+
 /* 
  * Constructs a sprite from the given frames and places it at the desired x and y
  * position. Will be visible if isVisible. 
  */
 function newSprite(frames, x, y, isVisible) {
     var sprite = new PIXI.extras.AnimatedSprite(frames);
-    sprite.width = 42;
-    sprite.height = 60;
-    sprite.x = x;
-    sprite.y = y;
+    if (frames == p1Frames.shoot || frames == p2Frames.shoot) {
+        sprite.width = 48;
+        sprite.height = 76;
+        // shift it back and up since shooting sprite is taller
+        sprite.x = x - 6; 
+        sprite.y = y - 11;
+    } else {
+        sprite.width = 42;
+        sprite.height = 66;
+        sprite.x = x;
+        sprite.y = y;
+    }
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();

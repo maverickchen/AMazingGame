@@ -11,7 +11,7 @@ module.exports = class Player {
         this.bullets = 0;
         this.connected = true;
         this.width = 42;
-        this.height = 60;
+        this.height = 66;
         this.teamNumber;
     }
 
