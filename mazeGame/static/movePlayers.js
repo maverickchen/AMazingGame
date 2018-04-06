@@ -53,6 +53,8 @@ charSprites.visible = false;
 //add the charSprites Container to the stage
 app.stage.addChild(charSprites);
 
+var gameUI = new PIXI.Container();
+gameUI.visible = false;
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
 // app.renderer.view.style.height = window.innerHeight - 50 + "px";
@@ -386,6 +388,7 @@ function onAssetsLoaded() {
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     charSprites.visible = true;
+    gameUI.visible = true;
 
     // create an array of textures from an image path
     var maze = PIXI.Sprite.fromImage('assets/maze.png');
@@ -414,6 +417,8 @@ function onAssetsLoaded() {
     app.stage.addChild(lightingSprite);
     
     loadFrames(lighting);
+
+    app.stage.addChild(gameUI);
 
     hpObj = newHPSprite(lighting);
     console.log(hpObj);
@@ -600,10 +605,8 @@ function newHPSprite(lighting){
     spriteHP.scale.y *= .4;
     spriteHP.x = w - 200;
     spriteHP.y = 100;
-    charSprites.addChild(spriteBkg);
-    charSprites.addChild(spriteHP);
-    spriteBkg.parentLayer = lighting;
-    spriteHP.parentLayer = lighting;
+    gameUI.addChild(spriteBkg);
+    gameUI.addChild(spriteHP);
     return {spriteBkg: spriteBkg, spriteHP: spriteHP};
 }
 
