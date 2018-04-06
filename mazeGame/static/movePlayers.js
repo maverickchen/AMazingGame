@@ -448,33 +448,36 @@ function onAssetsLoaded() {
         fontFamily: 'Arial',
         fontSize: 20,
         fontWeight: 'bold',
-        fill: ['#ffffff'] // gradient
+        fill: ['#05090c'] // gradient
     });
     var healthPointText = new PIXI.Text('HP:', gameTextStyle);
-    healthPointText.x = app.screen.width - 400;
-    healthPointText.y = 40;
+    healthPointText.x = app.screen.width - 350;
+    healthPointText.y = 115;
     gameUI.addChild(healthPointText);
 
     // Display user's id - hardcoded for now
     var userID = new PIXI.Text('User', gameTextStyle);
-    userID.x = app.screen.width - 400;
-    userID.y = 70;
+    userID.x = app.screen.width - 350;
+    userID.y = 155;
     gameUI.addChild(userID);
 
     // Display user's team - also hardcoded
     var userTeam = new PIXI.Text('Team', gameTextStyle);
-    userTeam.x = app.screen.width - 400;
-    userTeam.y = 100;
+    userTeam.x = app.screen.width - 350;
+    userTeam.y = 195;
     gameUI.addChild(userTeam);
 
     // Display bullet remaining - also hardcoded
     var bulletsRemaining = new PIXI.Text('Bullet Left:', gameTextStyle);
-    bulletsRemaining.x = app.screen.width - 400;
-    bulletsRemaining.y = 130;
+    bulletsRemaining.x = app.screen.width - 350;
+    bulletsRemaining.y = 235;
     gameUI.addChild(bulletsRemaining);
 
     // Leave space for customized maze
-
+    var mazeText = new PIXI.Text('Your Maze:', gameTextStyle);
+    mazeText.x = app.screen.width - 350;
+    mazeText.y = 275;
+    gameUI.addChild(mazeText);
 
     // create an array of textures from an image path
     var maze = PIXI.Sprite.fromImage('assets/maze.png');
