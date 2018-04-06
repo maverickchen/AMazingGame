@@ -98,10 +98,10 @@ var team1_text;
 var team2_text;
 socket.on('peopleInTeam', function(arr) {
         console.log("received");
-        var index = app.stage.children.indexOf(team1_text);
-        if (index !== -1) app.stage.removeChild(team1_text);
-        var index = app.stage.children.indexOf(team2_text);
-        if (index !== -1) app.stage.removeChild(team2_text);
+        var index = startScreen.children.indexOf(team1_text);
+        if (index !== -1) startScreen.removeChild(team1_text);
+        var index = startScreen.children.indexOf(team2_text);
+        if (index !== -1) startScreen.removeChild(team2_text);
 
         team1_ppl = arr[0];
         team2_ppl = arr[1];
@@ -114,7 +114,7 @@ socket.on('peopleInTeam', function(arr) {
         team2_text.y = app.screen.height / 2 - 100;
         startScreen.addChild(team2_text);
 });
-
+ 
 function chooseTeam() {
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
@@ -199,8 +199,8 @@ function chooseTeam() {
     // When team 1 is selected,
     team1.on('pointerdown', function() {
         // First, get rid of previous text2
-        var index = app.stage.children.indexOf(text2);
-        if (index !== -1) app.stage.removeChild(text2);
+        var index = startScreen.children.indexOf(text2);
+        if (index !== -1) startScreen.removeChild(text2);
 
         teamSelected = 1;
         text1 = new PIXI.Text('You Selected Team 1', style);
@@ -212,8 +212,8 @@ function chooseTeam() {
     // When team 2 is selected,
     team2.on('pointerdown', function() {
         // First, get rid of previous text1
-        var index = app.stage.children.indexOf(text1);
-        if (index !== -1) app.stage.removeChild(text1);
+        var index = startScreen.children.indexOf(text1);
+        if (index !== -1) startScreen.removeChild(text1);
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
