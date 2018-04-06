@@ -18,6 +18,7 @@ module.exports = class Item {
     use(player) {
         if (this.type == 'Potion') {
             player.health += 25;
+            if (player.health > 100) player.health = 100;
         } else { // Ammo
             player.bullets += 3;
         }
