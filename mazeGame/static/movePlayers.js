@@ -415,6 +415,11 @@ function onAssetsLoaded() {
     
     loadFrames(lighting);
 
+    hpObj = newHPSprite(lighting);
+    console.log(hpObj);
+    hpBkg = hpObj.spriteBkg;
+    hp = hpObj.spriteHP;
+
     // initialize player to the downward facing sprite
     var player;
     player = playerSprites.down;
@@ -430,6 +435,7 @@ function onAssetsLoaded() {
             if (myID == state.players[i].id) {
                 player.x = state.players[i].x;
                 player.y = state.players[i].y;
+                hp.width = (state.players[i].health/100) * hpBkg.width;
             } else {
                 if (cnt < otherPlayerSprites.length) {
                     otherPlayerSprites[cnt].x = state.players[i].x;
@@ -583,6 +589,23 @@ function newPotionSprite() {
     return sprite;
 }
 
+function newHPSprite(lighting){
+    spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
+    spriteBkg.scale.x *= .4;
+    spriteBkg.scale.y *= .4;
+    spriteBkg.x = w - 200;
+    spriteBkg.y = 100;
+    spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
+    spriteHP.scale.x *= .4;
+    spriteHP.scale.y *= .4;
+    spriteHP.x = w - 200;
+    spriteHP.y = 100;
+    charSprites.addChild(spriteBkg);
+    charSprites.addChild(spriteHP);
+    spriteBkg.parentLayer = lighting;
+    spriteHP.parentLayer = lighting;
+    return {spriteBkg: spriteBkg, spriteHP: spriteHP};
+}
 
 /* 
  * Constructs a sprite from the given frames and places it at the desired x and y
