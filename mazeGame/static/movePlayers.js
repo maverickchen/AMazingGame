@@ -229,6 +229,7 @@ function chooseTeam() {
     });
 
     var msg;
+    var cantEnter;
     // When Ready button is clicked,
     ready.on('pointerdown', function() {
 
@@ -244,22 +245,50 @@ function chooseTeam() {
 
         else if (teamSelected === 1 || teamSelected === 2) {
             socket.emit('teamSelection', teamSelected); // send out final selection
-            // Disable ready button
-            ready.interactive = false;
-            ready.buttonMode = false;
-
-            PIXI.loader.add('assets/Player1Up.json')
-            .add('assets/Player1Down.json')
-            .add('assets/Player1Left.json')
-            .add('assets/Player1Right.json')
-            .add('assets/Player1Shoot.json')
-            .add('assets/Player2Up.json')
-            .add('assets/Player2Down.json')
-            .add('assets/Player2Left.json')
-            .add('assets/Player2Right.json')
-            .add('assets/Player2Shoot.json')
-            .add('assets/Potion.json')
-            .load(onAssetsLoaded);
+            // Check if the selection was valid (already 2 players in the team?)
+            socket.on('validChoice', function(isValid) {
+                if (isValid) {
+                    // Disable ready button
+                    ready.interactive = false;
+                    ready.buttonMode = false;
+                    // Display "Waiting for other players to get ready..." until game starts
+                    var index = startScreen.children.indexOf(msg);
+                    if (index !== -1) startScreen.removeChild(msg);
+                    var waitText = new PIXI.Text('Waiting for other players to get ready...', style);
+                    waitText.x = app.screen.width / 2;
+                    waitText.y = app.screen.height - 50;
+                    startScreen.addChild(waitText);
+                    // Wait for everyone to get ready - start game when they do
+                    socket.on('peopleInTeam', function(arr) {
+                        if ((arr[0] === 2) && (arr[1] === 2)) {
+                            PIXI.loader.add('assets/Player1Up.json')
+                            .add('assets/Player1Down.json')
+                            .add('assets/Player1Left.json')
+                            .add('assets/Player1Right.json')
+                            .add('assets/Player1Shoot.json')
+                            .add('assets/Player2Up.json')
+                            .add('assets/Player2Down.json')
+                            .add('assets/Player2Left.json')
+                            .add('assets/Player2Right.json')
+                            .add('assets/Player2Shoot.json')
+                            .add('assets/Potion.json')
+                            .load(onAssetsLoaded);
+                        }
+                    });
+                }
+                else {
+                    // Display the msg: You can't enter Team x ...
+                    socket.on('message', function(msg) {
+                        // Get rid of previous text first
+                        var index = startScreen.children.indexOf(cantEnter);
+                        if (index !== -1) startScreen.removeChild(cantEnter);
+                        cantEnter = new PIXI.Text(msg, style);
+                        cantEnter.x = app.screen.width / 2;
+                        cantEnter.y = app.screen.height - 50;
+                        startScreen.addChild(cantEnter);
+                    });
+                }
+            });
         }
     });
 
