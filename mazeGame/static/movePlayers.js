@@ -264,23 +264,6 @@ function chooseTeam() {
                     waitText.x = app.screen.width / 2;
                     waitText.y = app.screen.height - 50;
                     startScreen.addChild(waitText);
-                    // Wait for everyone to get ready - start game when they do
-                    socket.on('peopleInTeam', function(arr) {
-                        if ((arr[0] === 2) && (arr[1] === 2)) {
-                            PIXI.loader.add('assets/Player1Up.json')
-                            .add('assets/Player1Down.json')
-                            .add('assets/Player1Left.json')
-                            .add('assets/Player1Right.json')
-                            .add('assets/Player1Shoot.json')
-                            .add('assets/Player2Up.json')
-                            .add('assets/Player2Down.json')
-                            .add('assets/Player2Left.json')
-                            .add('assets/Player2Right.json')
-                            .add('assets/Player2Shoot.json')
-                            .add('assets/Potion.json')
-                            .load(onAssetsLoaded);
-                        }
-                    });
                 }
                 else {
                     // Display the msg: You can't enter Team x ...
@@ -306,6 +289,24 @@ function chooseTeam() {
     startScreen.addChild(team2);
     startScreen.addChild(ready);
 }
+
+// Wait for everyone to get ready - start game when they do
+socket.on('canStartGame', function(canStart) {
+    if (canStart) { 
+        PIXI.loader.add('assets/Player1Up.json')
+        .add('assets/Player1Down.json')
+        .add('assets/Player1Left.json')
+        .add('assets/Player1Right.json')
+        .add('assets/Player1Shoot.json')
+        .add('assets/Player2Up.json')
+        .add('assets/Player2Down.json')
+        .add('assets/Player2Left.json')
+        .add('assets/Player2Right.json')
+        .add('assets/Player2Shoot.json')
+        .add('assets/Potion.json')
+        .load(onAssetsLoaded);
+    }
+});
 
 /* 
  * loadFrames: loads ALL the sprite animations and stores them in the global 
