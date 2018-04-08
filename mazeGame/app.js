@@ -8,10 +8,6 @@ var Item = require('./static/item');
 var Collision = require('./static/collides');
 var Maze = require('./static/maze');
 
-<<<<<<< HEAD
-
-=======
->>>>>>> fbbf95c087c6dd2442eca70c912eeb25bb800fe5
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
