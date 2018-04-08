@@ -8,7 +8,10 @@ var Item = require('./static/item');
 var Collision = require('./static/collides');
 var Maze = require('./static/maze');
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fbbf95c087c6dd2442eca70c912eeb25bb800fe5
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
@@ -20,6 +23,15 @@ var team2 = [];
 var maze = Maze.returnPath();
 /******************************************************************/
 
+function initItems() {
+    for (var i = 0; i < 5; i++) {
+        potion = new Item('Potion');
+        ammo = new Item('Ammo');
+        items.push(potion);
+        items.push(ammo);
+    }
+}
+
 app.use(express.static(path.join(__dirname,'static')));
 
 app.get('/', function (req, res) {
@@ -27,16 +39,6 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function(socket) {
-    // For now: Only the first time: on first connection, place the items
-    if (idCounter == 0) {
-        for (var i = 0; i < 5; i++) {
-            potion = new Item('Potion');
-            ammo = new Item('Ammo');
-            items.push(potion);
-            items.push(ammo);
-        }
-    }
-
     var id = idCounter;
     idCounter += 1;
     var player = new Player(id); // current player
@@ -52,22 +54,29 @@ io.on('connection', function(socket) {
         // Maze collision here
         player.move(direction, 1, maze);
         var i;
+<<<<<<< HEAD
         for (i = 0; i < items.length; i++) {  
+=======
+        for (i = 0; i < items.length; i++) {
+            // If player collides with an item,
+>>>>>>> fbbf95c087c6dd2442eca70c912eeb25bb800fe5
             if (Collision.collides(player, items[i])) {
                 console.log('Collision detected');
-                items[i].use(player);
+                items[i].use(player); // update player model
+                items.splice(i,1); // delete the item from items list
+                // PIXI.sound.Sound.from({ // make collecting sound
+                //     url: 'assets/collect_sound.mp3',
+                //     autoPlay: true,
+                //     loop: false,
+                // });
                 break;
             }
         }
-        items.splice(i,1); // 
+        
         gameState.players = players;
         gameState.items = items;
-        
-        // send 
         gameState.maze = maze;
-
         io.emit('newGameState', gameState); // tell all players the new game state
-        
     });
 
     socket.on('disconnect', function() {
@@ -114,10 +123,12 @@ io.on('connection', function(socket) {
         }
         // Check if there are 2 players are in each team - ready to start
         if ((team1.length === 2) && (team2.length === 2)) {
-            io.emit('canStartGame', true);
-        }
-        else {
-            io.emit('canStartGame', false);
+            initialGameState = {};
+            initItems();
+            initialGameState.players = players;
+            initialGameState.items = items;
+            initialGameState.maze = maze;
+            io.emit('canStartGame', initialGameState);
         }
     });
 });

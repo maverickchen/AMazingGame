@@ -18,8 +18,13 @@ var width = N;
 var height = M;
 
 // The left most and right most 
+<<<<<<< HEAD
 var limit_X = 508;
 var limit_Y = 508;
+=======
+var limit_X = 511;
+var limit_Y = 511;
+>>>>>>> fbbf95c087c6dd2442eca70c912eeb25bb800fe5
 
 // Initialize the first grid and end grid
 var startPoint;
