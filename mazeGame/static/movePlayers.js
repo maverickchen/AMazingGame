@@ -15,7 +15,8 @@ var otherPlayerSprites = [];
 var potionSprites = [];
 var ammoSprites = [];
 var playerSprites = {};
-var mazeSprite = [];
+var wallSprites = [];
+const WALL_WIDTH = 100;
 
 
 var left = keyboard(37), // arrowkeys
@@ -66,6 +67,7 @@ gameScreen.addChild(gameUI);
 // Maze 
 var mazeContainer = new PIXI.Container();
 mazeContainer.visible = false;
+app.stage.addChild(mazeContainer);
 
 
 // app.renderer.view.style.position = "absolute"
@@ -318,15 +320,12 @@ socket.on('canStartGame', function(initialGameState) {
     .load(onAssetsLoaded);
 });
 
+/* 
+ * loadMaze: load 100 wall sprites to be used and recycled.
+ */
 function loadMaze() {
-    for (i = 0; i < initGameState.maze.length; i++) {
-        for (j = 0; j < initGameState.maze[0].length; j++) {
-            maze = initGameState.maze[i][j];
-            //console.log(maze);
-            if (maze == 1) {
-                mazeSprite.push(newWallSprite(i, j));
-            }
-        }  
+    for (var i = 0; i < 100; i++) {
+        mazeContainer.addChild(newWallSprite(0,0));
     }
 }
 
@@ -545,10 +544,10 @@ function onAssetsLoaded() {
 
     this.player = player;
     
-
-    updatePlayers(initGameState);
-    updateItems(initGameState);
     loadMaze(initGameState.maze);
+    updatePlayers(initGameState, gameTextStyle);
+    updateItems(initGameState);
+    updateMaze(initGameState);
 
 
     socket.on('newGameState', function(state){
@@ -557,6 +556,7 @@ function onAssetsLoaded() {
         console.log(myID);
         updatePlayers(state);
         updateItems(state);
+        updateMaze(state)
     });
     this.update = update;
     // Ticker will call update to begin the game loop
@@ -564,11 +564,35 @@ function onAssetsLoaded() {
 }
 
 /* 
+ * updateMaze: given a game state object (state), update the location of all 
+ * maze sprites
+ */ 
+function updateMaze(state) {
+    var wallCnt = 0;
+    mazeBounds = getRelevantTiles(state.maze, player);
+    for (var i = mazeBounds.l; i < mazeBounds.r; i++) {
+        for (var j = mazeBounds.u; j < mazeBounds.d; j++) {
+            if (state.maze[i][j] == 0) {
+                wallSprites[wallCnt].x = i * WALL_WIDTH;
+                wallSprites[wallCnt].y = j * WALL_WIDTH;
+                wallSprites[wallCnt].visible = true;
+                wallCnt += 1;
+            }
+        }
+    }
+    // make any unused wall sprites invisible
+    while (wallSprites[wallCnt].visible) {
+        wallSprites[wallCnt].visible = false;
+        wallCnt += 1;
+    }
+}
+
+/* 
  * updatePlayers: given a game state object (state), update the location of all 
  * player sprites
  */ 
 var bulletsNum; // Text to display the number of bullets - updated everytime newGameState is changed
-function updatePlayers(state) {
+function updatePlayers(state, gameTextStyle) {
     // draw player sprites
     var cnt = 0;
     for (var i = 0; i < state.players.length; i++) {
@@ -725,13 +749,14 @@ function keyboard(keyCode) {
 
 // Maze sprite
 function newWallSprite(x, y) {
-    wall = PIXI.Sprite.fromImage('assets/Ammo.png');
+    wall = PIXI.Sprite.fromImage('assets/Wall.png');
     console.log("Enter the newWall");
-    wall.width = 50;
-    wall.height = 50;
-    wall.x = x * 50;
-    wall.y = y * 50;
-    mazeContainer.addChild(wall);
+    wall.width = WALL_WIDTH;
+    wall.height = WALL_WIDTH;
+    wall.x = x * WALL_WIDTH;
+    wall.y = y * WALL_WIDTH;
+    wall.visible = false;
+    wallSprites.push(wall);
     return wall;
 }
 
@@ -769,6 +794,23 @@ function newHPSprite(lighting){
     gameUI.addChild(spriteHP);
     return {spriteBkg: spriteBkg, spriteHP: spriteHP};
 }
+
+
+/*
+ * getRelevantTiles: returns the bounds of tiles in the maze that are close
+ * enough to be seen by the player
+ */
+function getRelevantTiles(maze, player) {
+    row = Math.floor(player.x / WALL_WIDTH); 
+    col = Math.floor(player.y / WALL_WIDTH);
+    bounds = {};
+    bounds.l = Math.max(0,row - 6);
+    bounds.u = Math.max(col - 6);
+    bounds.r = Math.min(row + 6, maze.length);
+    bounds.d = Math.min(col + 6, maze[0].length);
+    return bounds;
+}
+
 
 /* 
  * Constructs a sprite from the given frames and places it at the desired x and y
