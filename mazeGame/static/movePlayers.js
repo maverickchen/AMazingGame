@@ -46,21 +46,27 @@ document.body.appendChild(app.view);
 // create the stage instead of container - needed for layers
 app.stage = new PIXI.display.Stage();
 
-// make Containers to manage separate sprite groups
+/* Make Containers to manage separate sprite groups */
 var startScreen = new PIXI.Container();
-// add startScreen Container
 app.stage.addChild(startScreen);
+
+var gameScreen = new PIXI.Container();
+app.stage.addChild(gameScreen);
+gameScreen.visible = false;
+
 var charSprites = new PIXI.Container();
 charSprites.visible = false;
-//add the charSprites Container to the stage
 app.stage.addChild(charSprites);
+gameScreen.addChild(charSprites);
 
 var gameUI = new PIXI.Container();
 gameUI.visible = false;
+gameScreen.addChild(gameUI);
 
 // Maze 
 var mazeContainer = new PIXI.Container();
 mazeContainer.visible = false;
+
 
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
@@ -107,10 +113,10 @@ var team1_text;
 var team2_text;
 socket.on('peopleInTeam', function(arr) {
         console.log("received");
-        var index = app.stage.children.indexOf(team1_text);
-        if (index !== -1) app.stage.removeChild(team1_text);
-        var index = app.stage.children.indexOf(team2_text);
-        if (index !== -1) app.stage.removeChild(team2_text);
+        var index = startScreen.children.indexOf(team1_text);
+        if (index !== -1) startScreen.removeChild(team1_text);
+        var index = startScreen.children.indexOf(team2_text);
+        if (index !== -1) startScreen.removeChild(team2_text);
 
         team1_ppl = arr[0];
         team2_ppl = arr[1];
@@ -209,9 +215,11 @@ function chooseTeam() {
 
     // When team 1 is selected,
     team1.on('pointerdown', function() {
-        // First, get rid of previous text2
-        var index = app.stage.children.indexOf(text2);
-        if (index !== -1) app.stage.removeChild(text2);
+        // First, get rid of previous text1, text2
+        var index = startScreen.children.indexOf(text1);
+        if (index !== -1) startScreen.removeChild(text1);
+        var index = startScreen.children.indexOf(text2);
+        if (index !== -1) startScreen.removeChild(text2);
 
         teamSelected = 1;
         text1 = new PIXI.Text('You Selected Team 1', style);
@@ -222,9 +230,11 @@ function chooseTeam() {
 
     // When team 2 is selected,
     team2.on('pointerdown', function() {
-        // First, get rid of previous text1
-        var index = app.stage.children.indexOf(text1);
-        if (index !== -1) app.stage.removeChild(text1);
+        // First, get rid of previous text1, text2
+        var index = startScreen.children.indexOf(text1);
+        if (index !== -1) startScreen.removeChild(text1);
+        var index = startScreen.children.indexOf(text2);
+        if (index !== -1) startScreen.removeChild(text2);
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
@@ -233,11 +243,16 @@ function chooseTeam() {
         startScreen.addChild(text2);
     });
 
+    var msg;
+    var cantEnter;
     // When Ready button is clicked,
     ready.on('pointerdown', function() {
 
         if (teamSelected === 0) {
-            var msg = new PIXI.Text('You should select a team before you begin', style);
+            // First, get rid of previous msg
+            var index = startScreen.children.indexOf(msg);
+            if (index !== -1) startScreen.removeChild(msg);
+            msg = new PIXI.Text('You should select a team before you begin', style);
             msg.x = 70;
             msg.y = app.screen.height - 70;
             startScreen.addChild(msg);
@@ -245,21 +260,33 @@ function chooseTeam() {
 
         else if (teamSelected === 1 || teamSelected === 2) {
             socket.emit('teamSelection', teamSelected); // send out final selection
-            // Disable ready button
-            ready.interactive = false;
-            ready.buttonMode = false;
-            PIXI.loader.add('assets/Player1Up.json')
-            .add('assets/Player1Down.json')
-            .add('assets/Player1Left.json')
-            .add('assets/Player1Right.json')
-            .add('assets/Player1Shoot.json')
-            .add('assets/Player2Up.json')
-            .add('assets/Player2Down.json')
-            .add('assets/Player2Left.json')
-            .add('assets/Player2Right.json')
-            .add('assets/Player2Shoot.json')
-            .add('assets/Potion.json')
-            .load(onAssetsLoaded);
+            // Check if the selection was valid (already 2 players in the team?)
+            socket.on('validChoice', function(isValid) {
+                if (isValid) {
+                    // Disable ready button
+                    ready.interactive = false;
+                    ready.buttonMode = false;
+                    // Display "Waiting for other players to get ready..." until game starts
+                    var index = startScreen.children.indexOf(msg);
+                    if (index !== -1) startScreen.removeChild(msg);
+                    var waitText = new PIXI.Text('Waiting for other players to get ready...', style);
+                    waitText.x = app.screen.width / 2;
+                    waitText.y = app.screen.height - 50;
+                    startScreen.addChild(waitText);
+                }
+                else {
+                    // Display the msg: You can't enter Team x ...
+                    socket.on('message', function(msg) {
+                        // Get rid of previous text first
+                        var index = startScreen.children.indexOf(cantEnter);
+                        if (index !== -1) startScreen.removeChild(cantEnter);
+                        cantEnter = new PIXI.Text(msg, style);
+                        cantEnter.x = app.screen.width / 2;
+                        cantEnter.y = app.screen.height - 50;
+                        startScreen.addChild(cantEnter);
+                    });
+                }
+            });
         }
     });
 
@@ -273,6 +300,24 @@ function chooseTeam() {
 
  
 }
+
+// Wait for everyone to get ready - start game when they do
+socket.on('canStartGame', function(canStart) {
+    if (canStart) { 
+        PIXI.loader.add('assets/Player1Up.json')
+        .add('assets/Player1Down.json')
+        .add('assets/Player1Left.json')
+        .add('assets/Player1Right.json')
+        .add('assets/Player1Shoot.json')
+        .add('assets/Player2Up.json')
+        .add('assets/Player2Down.json')
+        .add('assets/Player2Left.json')
+        .add('assets/Player2Right.json')
+        .add('assets/Player2Shoot.json')
+        .add('assets/Potion.json')
+        .load(onAssetsLoaded);
+    }
+});
 
 /* 
  * loadFrames: loads ALL the sprite animations and stores them in the global 
@@ -398,9 +443,54 @@ function onAssetsLoaded() {
     // });
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
+    gameScreen.visible = true;
     charSprites.visible = true;
     gameUI.visible = true;
     mazeContainer.visible = true;
+
+    /*************** Display Panel **************/
+    var panel = PIXI.Sprite.fromImage('assets/Panel.png');
+    panel.x = app.screen.width / 3 * 2;
+    panel.y = 30;
+    panel.scale.x *= 3.5;
+    panel.scale.y *= 4;
+    gameUI.addChild(panel);
+
+    // Display "HP:"
+    var gameTextStyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: ['#05090c'] // gradient
+    });
+    var healthPointText = new PIXI.Text('HP:', gameTextStyle);
+    healthPointText.x = app.screen.width - 350;
+    healthPointText.y = 115;
+    gameUI.addChild(healthPointText);
+
+    // Display user's id - hardcoded for now
+    var userID = new PIXI.Text('User', gameTextStyle);
+    userID.x = app.screen.width - 350;
+    userID.y = 155;
+    gameUI.addChild(userID);
+
+    // Display user's team - also hardcoded
+    var userTeam = new PIXI.Text('Team', gameTextStyle);
+    userTeam.x = app.screen.width - 350;
+    userTeam.y = 195;
+    gameUI.addChild(userTeam);
+
+    // Display bullet remaining - also hardcoded
+    var bulletsRemaining = new PIXI.Text('Bullet Left:', gameTextStyle);
+    bulletsRemaining.x = app.screen.width - 350;
+    bulletsRemaining.y = 235;
+    gameUI.addChild(bulletsRemaining);
+
+    // Leave space for customized maze
+    var mazeText = new PIXI.Text('Your Maze:', gameTextStyle);
+    mazeText.x = app.screen.width - 350;
+    mazeText.y = 275;
+    gameUI.addChild(mazeText);
 
     // create an array of textures from an image path
     //var maze = PIXI.Sprite.fromImage('assets/maze.png');
@@ -655,13 +745,13 @@ function newHPSprite(lighting){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
     spriteBkg.scale.y *= .4;
-    spriteBkg.x = w - 200;
-    spriteBkg.y = 100;
+    spriteBkg.x = w - 250;
+    spriteBkg.y = 110;
     spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
     spriteHP.scale.x *= .4;
     spriteHP.scale.y *= .4;
-    spriteHP.x = w - 200;
-    spriteHP.y = 100;
+    spriteHP.x = w - 250;
+    spriteHP.y = 110;
     gameUI.addChild(spriteBkg);
     gameUI.addChild(spriteHP);
     return {spriteBkg: spriteBkg, spriteHP: spriteHP};
