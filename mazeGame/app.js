@@ -8,10 +8,6 @@ var Item = require('./static/item');
 var Collision = require('./static/collides');
 var Maze = require('./static/maze');
 
-
-
-
-
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
@@ -30,16 +26,6 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function(socket) {
-    // For now: Only the first time: on first connection, place the items
-    if (idCounter == 0) {
-        for (var i = 0; i < 5; i++) {
-            potion = new Item('Potion');
-            ammo = new Item('Ammo');
-            items.push(potion);
-            items.push(ammo);
-        }
-    }
-
     var id = idCounter;
     idCounter += 1;
     var player = new Player(id); // current player
@@ -63,10 +49,6 @@ io.on('connection', function(socket) {
         items.splice(i,1); // 
         gameState.players = players;
         gameState.items = items;
-        
-        // send 
-        gameState.maze = maze;
-
         io.emit('newGameState', gameState); // tell all players the new game state
         
     });
@@ -115,10 +97,17 @@ io.on('connection', function(socket) {
         }
         // Check if there are 2 players are in each team - ready to start
         if ((team1.length === 2) && (team2.length === 2)) {
-            io.emit('canStartGame', true);
-        }
-        else {
-            io.emit('canStartGame', false);
+            initialGameState = {};
+            for (var i = 0; i < 5; i++) {
+                potion = new Item('Potion');
+                ammo = new Item('Ammo');
+                items.push(potion);
+                items.push(ammo);
+            }
+            initialGameState.players = players;
+            initialGameState.items = items;
+            initialGameState.maze = maze;
+            io.emit('canStartGame', initialGameState);
         }
     });
 });

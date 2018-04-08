@@ -302,22 +302,34 @@ function chooseTeam() {
 }
 
 // Wait for everyone to get ready - start game when they do
-socket.on('canStartGame', function(canStart) {
-    if (canStart) { 
-        PIXI.loader.add('assets/Player1Up.json')
-        .add('assets/Player1Down.json')
-        .add('assets/Player1Left.json')
-        .add('assets/Player1Right.json')
-        .add('assets/Player1Shoot.json')
-        .add('assets/Player2Up.json')
-        .add('assets/Player2Down.json')
-        .add('assets/Player2Left.json')
-        .add('assets/Player2Right.json')
-        .add('assets/Player2Shoot.json')
-        .add('assets/Potion.json')
-        .load(onAssetsLoaded);
-    }
+socket.on('canStartGame', function(initialGameState) {
+    initGameState = initialGameState;
+    PIXI.loader.add('assets/Player1Up.json')
+    .add('assets/Player1Down.json')
+    .add('assets/Player1Left.json')
+    .add('assets/Player1Right.json')
+    .add('assets/Player1Shoot.json')
+    .add('assets/Player2Up.json')
+    .add('assets/Player2Down.json')
+    .add('assets/Player2Left.json')
+    .add('assets/Player2Right.json')
+    .add('assets/Player2Shoot.json')
+    .add('assets/Potion.json')
+    .load(onAssetsLoaded);
 });
+
+function loadMaze() {
+    for (i = 0; i < initGameState.maze.length; i++) {
+        for (j = 0; j < initGameState.maze[0].length; j++) {
+            maze = initGameState.maze[i][j];
+            //console.log(maze);
+            if (maze == 1) {
+                mazeSprite.push(newWallSprite(i, j));
+            }
+        }  
+    }
+}
+
 
 /* 
  * loadFrames: loads ALL the sprite animations and stores them in the global 
@@ -532,64 +544,59 @@ function onAssetsLoaded() {
     player = playerSprites.down;
 
     this.player = player;
-
-
-    socket.on('canStartGame', function(gameState){
-        // Maze
-        console.log("Before maze sprite");
-        //console.log('state maze', state.maze);
-        for (i = 0; i < state.maze.length; i++) {
-            for (j = 0; j < state.maze[0].length; j++) {
-                maze = state.maze[i][j];
-                //console.log(maze);
-                if (maze == 1) {
-                    mazeSprite.push(newWallSprite(i, j));
-                }
-            }  
-        }
-    });
     
+
+    updatePlayers(initGameState);
+    updateItems(initGameState);
+    loadMaze(initGameState.maze);
+
 
     socket.on('newGameState', function(state){
         console.log("Enter new game state");
         console.log(state);
         console.log(myID);
+        updatePlayers(state);
+        updateItems(state);
+    });
+    this.update = update;
+    // Ticker will call update to begin the game loop
+    app.ticker.add(this.update.bind(this)); // pass current context to update function
+}
 
-        // Maze
-        console.log("Before maze sprite");
-        //console.log('state maze', state.maze);
-        for (i = 0; i < state.maze.length; i++) {
-            for (j = 0; j < state.maze[0].length; j++) {
-                maze = state.maze[i][j];
-                //console.log(maze);
-                if (maze == 1) {
-                    mazeSprite.push(newWallSprite(i, j));
-                }
-            }  
-        }
-        // draw player sprites
-        var cnt = 0;
-        for (var i = 0; i < state.players.length; i++) {
-            if (myID == state.players[i].id) {
-                player.x = state.players[i].x;
-                player.y = state.players[i].y;
-                hp.width = (state.players[i].health/100) * hpBkg.width;
-            } else {
-                if (cnt < otherPlayerSprites.length) {
-                    otherPlayerSprites[cnt].x = state.players[i].x;
-                    otherPlayerSprites[cnt].y = state.players[i].y;
-                } else { // generate more player sprites
-                    var newSpr = newSprite(p2Frames.down, state.players[i].x, state.players[i].y, true);
-                    otherPlayerSprites.push(newSpr);
-                }
-                cnt += 1;
+/* 
+ * updatePlayers: given a game state object (state), update the location of all 
+ * player sprites
+ */ 
+function updatePlayers(state) {
+    // draw player sprites
+    var cnt = 0;
+    for (var i = 0; i < state.players.length; i++) {
+        if (myID == state.players[i].id) {
+            player.x = state.players[i].x;
+            player.y = state.players[i].y;
+            hp.width = (state.players[i].health/100) * hpBkg.width;
+        } else {
+            if (cnt < otherPlayerSprites.length) {
+                otherPlayerSprites[cnt].x = state.players[i].x;
+                otherPlayerSprites[cnt].y = state.players[i].y;
+            } else { // generate more player sprites
+                var newSpr = newSprite(p2Frames.down, state.players[i].x, state.players[i].y, true);
+                otherPlayerSprites.push(newSpr);
             }
+            cnt += 1;
         }
-        // destroy any extra sprites if players leave
-        while (state.players.length-1 < otherPlayerSprites.length) {
-            otherPlayerSprites.pop().destroy();
-        }
+    }
+    // destroy any extra sprites if players leave
+    while (state.players.length-1 < otherPlayerSprites.length) {
+        otherPlayerSprites.pop().destroy();
+    }
+}
 
+/*
+ * updateItems: given a game state object (state), update the location of all 
+ * item sprites
+ */
+function updateItems(state) {
         // draw item sprites
         aS = 0;
         pS = 0;
@@ -618,13 +625,7 @@ function onAssetsLoaded() {
         // delete unused potion sprites
         while (pS < potionSprites.length) {
             potionSprites.pop().destroy();
-        }  
-    });
-
-
-    this.update = update;
-    // Ticker will call update to begin the game loop
-    app.ticker.add(this.update.bind(this)); // pass current context to update function
+        }
 }
 
 function handleInput(delta) {
@@ -713,13 +714,14 @@ function keyboard(keyCode) {
 
 // Maze sprite
 function newWallSprite(x, y) {
-    wall = PIXI.Sprite.fromImage('assets/Wall.png');
+    wall = PIXI.Sprite.fromImage('assets/Ammo.png');
     console.log("Enter the newWall");
     wall.width = 50;
     wall.height = 50;
     wall.x = x * 50;
     wall.y = y * 50;
     mazeContainer.addChild(wall);
+    return wall;
 }
 
 function newAmmoSprite() {
