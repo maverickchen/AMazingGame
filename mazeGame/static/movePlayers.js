@@ -567,15 +567,26 @@ function onAssetsLoaded() {
  * updatePlayers: given a game state object (state), update the location of all 
  * player sprites
  */ 
+var bulletsNum; // Text to display the number of bullets - updated everytime newGameState is changed
 function updatePlayers(state) {
     // draw player sprites
     var cnt = 0;
     for (var i = 0; i < state.players.length; i++) {
+        // Update my character
         if (myID == state.players[i].id) {
             player.x = state.players[i].x;
             player.y = state.players[i].y;
             hp.width = (state.players[i].health/100) * hpBkg.width;
-        } else {
+
+            // Create texts for number of bullets
+            var index = gameUI.children.indexOf(bulletsNum);
+            if (index !== -1) gameUI.removeChild(bulletsNum);
+            bulletsNum = new PIXI.Text(state.players[i].bullets, gameTextStyle);
+            bulletsNum.x = app.screen.width - 200;
+            bulletsNum.y = 235;
+            gameUI.addChild(bulletsNum);
+        } else { 
+            // Update other characters
             if (cnt < otherPlayerSprites.length) {
                 otherPlayerSprites[cnt].x = state.players[i].x;
                 otherPlayerSprites[cnt].y = state.players[i].y;
