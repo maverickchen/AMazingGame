@@ -6,6 +6,10 @@ var io = require('socket.io')(server);
 var Player = require('./static/player');
 var Item = require('./static/item');
 var Collision = require('./static/collides');
+var Maze = require('./static/maze');
+
+
+
 
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
@@ -16,6 +20,7 @@ var players = []; // list of players
 var items = [];
 var team1 = []; // list of players in each team
 var team2 = [];
+var maze = Maze.returnPath();
 /******************************************************************/
 
 app.use(express.static(path.join(__dirname,'static')));
@@ -44,7 +49,6 @@ io.on('connection', function(socket) {
 
     socket.emit('onconnected', {id: id}); // send the client their server id 
 
-
     socket.on('move', function(direction) {
         // update game state based off new input
         player.move(direction,1);
@@ -59,7 +63,12 @@ io.on('connection', function(socket) {
         items.splice(i,1); // 
         gameState.players = players;
         gameState.items = items;
+        
+        // send 
+        gameState.maze = maze;
+
         io.emit('newGameState', gameState); // tell all players the new game state
+        
     });
 
     socket.on('disconnect', function() {

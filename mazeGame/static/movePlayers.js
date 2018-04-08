@@ -15,6 +15,8 @@ var otherPlayerSprites = [];
 var potionSprites = [];
 var ammoSprites = [];
 var playerSprites = {};
+var mazeSprite = [];
+
 
 var left = keyboard(37), // arrowkeys
     up = keyboard(38),
@@ -55,6 +57,11 @@ app.stage.addChild(charSprites);
 
 var gameUI = new PIXI.Container();
 gameUI.visible = false;
+
+// Maze 
+var mazeContainer = new PIXI.Container();
+mazeContainer.visible = false;
+
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
 // app.renderer.view.style.height = window.innerHeight - 50 + "px";
@@ -149,6 +156,8 @@ function chooseTeam() {
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
     var ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
+    // Maze 
+    var wall = PIXI.Sprite.fromImage('/assets/wall.png');
 
     // Set the initial position and scale
     team1.anchor.set(0.5);
@@ -261,6 +270,8 @@ function chooseTeam() {
     startScreen.addChild(team1);
     startScreen.addChild(team2);
     startScreen.addChild(ready);
+
+ 
 }
 
 /* 
@@ -389,17 +400,18 @@ function onAssetsLoaded() {
     startScreen.visible = false;
     charSprites.visible = true;
     gameUI.visible = true;
+    mazeContainer.visible = true;
 
     // create an array of textures from an image path
-    var maze = PIXI.Sprite.fromImage('assets/maze.png');
-    
+    //var maze = PIXI.Sprite.fromImage('assets/maze.png');
+
     // Add maze picture, will be delete 
-    maze.anchor.set(0.5);
+    /*maze.anchor.set(0.5);
     maze.x = app.screen.width / 2;
     maze.y = app.screen.height / 2;
     maze.scale.x *= 3;
     maze.scale.y *= 3;
-    charSprites.addChild(maze);
+    charSprites.addChild(maze);*/
 
     // make the background dark by putting a layer over it
     var lighting = new PIXI.display.Layer();
@@ -431,9 +443,40 @@ function onAssetsLoaded() {
 
     this.player = player;
 
+
+    socket.on('canStartGame', function(gameState){
+        // Maze
+        console.log("Before maze sprite");
+        //console.log('state maze', state.maze);
+        for (i = 0; i < state.maze.length; i++) {
+            for (j = 0; j < state.maze[0].length; j++) {
+                maze = state.maze[i][j];
+                //console.log(maze);
+                if (maze == 1) {
+                    mazeSprite.push(newWallSprite(i, j));
+                }
+            }  
+        }
+    });
+    
+
     socket.on('newGameState', function(state){
+        console.log("Enter new game state");
         console.log(state);
         console.log(myID);
+
+        // Maze
+        console.log("Before maze sprite");
+        //console.log('state maze', state.maze);
+        for (i = 0; i < state.maze.length; i++) {
+            for (j = 0; j < state.maze[0].length; j++) {
+                maze = state.maze[i][j];
+                //console.log(maze);
+                if (maze == 1) {
+                    mazeSprite.push(newWallSprite(i, j));
+                }
+            }  
+        }
         // draw player sprites
         var cnt = 0;
         for (var i = 0; i < state.players.length; i++) {
@@ -456,6 +499,7 @@ function onAssetsLoaded() {
         while (state.players.length-1 < otherPlayerSprites.length) {
             otherPlayerSprites.pop().destroy();
         }
+
         // draw item sprites
         aS = 0;
         pS = 0;
@@ -484,8 +528,10 @@ function onAssetsLoaded() {
         // delete unused potion sprites
         while (pS < potionSprites.length) {
             potionSprites.pop().destroy();
-        } 
+        }  
     });
+
+
     this.update = update;
     // Ticker will call update to begin the game loop
     app.ticker.add(this.update.bind(this)); // pass current context to update function
@@ -573,6 +619,17 @@ function keyboard(keyCode) {
     window.addEventListener(
     "keyup", key.upHandler.bind(key), false);
     return key;
+}
+
+// Maze sprite
+function newWallSprite(x, y) {
+    wall = PIXI.Sprite.fromImage('assets/Wall.png');
+    console.log("Enter the newWall");
+    wall.width = 50;
+    wall.height = 50;
+    wall.x = x * 50;
+    wall.y = y * 50;
+    mazeContainer.addChild(wall);
 }
 
 function newAmmoSprite() {

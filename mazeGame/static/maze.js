@@ -7,12 +7,11 @@
 */ 
 
 //wallArray = [];
-
-// draw in the HTML
-N = 512;
+// M is the width of the maze and N is the height of the maze
 M = 512;
-var oC2 = document.getElementById('c2d');
-var ctx = oC2.getContext('2d');
+N = 512;
+
+
 
 // width and height are the same to the moveplayer UI
 var width = N;
@@ -41,6 +40,7 @@ function Maze() {
     this.road = [];
     this.walls = [];
     this.grids = [];
+    this.path = [];
     this.init();
 }
 
@@ -142,26 +142,76 @@ Maze.prototype.findRoad = function() {
             walls.splice(index, 1);
         }
     }
-console.log("walls "  + walls.length);
+//console.log("walls "  + walls.length);
 };
 
 Maze.prototype.drawRoad = function() {
 //function drawRoad() {
     var i;
-    ctx.fillStyle = 'black';
+    /*ctx.fillStyle = 'black';
 
     for(i = 0; i <= 512; i+=20) {
-        ctx.fillRect(0, i, 510, 10);
-        ctx.fillRect(i, 0, 10, 510);
+        //ctx.fillRect(0, i, 510, 10);
+        //ctx.fillRect(i, 0, 10, 510);
     }
 
     ctx.fillStyle = 'white';
 
     for(i = 0; i < this.road.length; i++) {
-        ctx.fillRect(10 + this.road[i].x * 10, 10 + this.road[i].y * 10, 10, 10);
+        //ctx.fillRect(10 + this.road[i].x * 10, 10 + this.road[i].y * 10, 10, 10);
+    }*/
+    //console.log('THE PATH',this.path);
+    this.path = [];
+    //console.log('THE NEW PATH', this.path);
+    for (var i = 0; i < M; i++) {
+        row = [];
+        // this.path[i] = [];
+        for (var j = 0; j < N; j++) {
+            row.push(0);
+            // this.path[i][j] = 0;
+        }
+        //console.log('A ROW',row);
+        this.path.push(row);
     }
+
+    //console.log(this.path);
+
+    for (i = 0; i  < M; i++) {
+        for (j = 0; j < N; j++) {
+            if (i % 2 != 0 && j % 2 != 0) {
+                this.path[i][j] = 1;
+            }
+            
+        }
+    }
+
+    for (i = 0; i < this.road.length; i++) {
+        var x = this.road[i].x;
+        var y = this.road[i].y;
+        //console.log(x);
+        //console.log(y);
+        this.path[x][y] = 1;
+
+    }
+    return this.path;
+
 }
 
-var maze = new Maze();
-maze.findRoad();
-maze.drawRoad();
+exports.returnPath = function() {
+    maze = new Maze();
+    maze.findRoad();
+    //maze.drawRoad();
+    
+    return maze.drawRoad();
+}
+
+var maze;
+//maze.drawRoad();
+
+
+
+console.log("where is the road");
+
+
+
+
