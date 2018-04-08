@@ -40,13 +40,20 @@ io.on('connection', function(socket) {
         player.move(direction,1);
         var i;
         for (i = 0; i < items.length; i++) {
+            // If player collides with an item,
             if (Collision.collides(player, items[i])) {
                 console.log('Collision detected');
-                items[i].use(player);
+                items[i].use(player); // update player model
+                items.splice(i,1); // delete the item from items list
+                PIXI.sound.Sound.from({ // make collecting sound
+                    url: 'assets/collect_sound.mp3',
+                    autoPlay: true,
+                    loop: false,
+                });
                 break;
             }
         }
-        items.splice(i,1); // 
+        
         gameState.players = players;
         gameState.items = items;
         io.emit('newGameState', gameState); // tell all players the new game state
