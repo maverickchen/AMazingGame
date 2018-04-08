@@ -54,12 +54,8 @@ io.on('connection', function(socket) {
         // Maze collision here
         player.move(direction, 1, maze);
         var i;
-<<<<<<< HEAD
-        for (i = 0; i < items.length; i++) {  
-=======
         for (i = 0; i < items.length; i++) {
             // If player collides with an item,
->>>>>>> fbbf95c087c6dd2442eca70c912eeb25bb800fe5
             if (Collision.collides(player, items[i])) {
                 console.log('Collision detected');
                 items[i].use(player); // update player model
