@@ -448,11 +448,11 @@ function checkCollisions() {
 
 
 function onAssetsLoaded() {
-    // PIXI.sound.Sound.from({
-    //         url: 'assets/bkgMusic.mp3',
-    //         autoPlay: true,
-    //         loop: true,
-    // });
+    PIXI.sound.Sound.from({
+            url: 'assets/bkgMusic.mp3',
+            autoPlay: true,
+            loop: true,
+    });
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     gameScreen.visible = true;
