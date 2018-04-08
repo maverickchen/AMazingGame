@@ -5,6 +5,7 @@ var inputs = []; // a log of this player's last few inputs
 var myID; // the server generated ID
 var local_time = 0.016;
 var speed = 1;
+var maze;
 
 // sprite animation frames
 var p1Frames = {};
@@ -16,6 +17,7 @@ var potionSprites = [];
 var ammoSprites = [];
 var playerSprites = {};
 var mazeSprite = [];
+
 
 
 var left = keyboard(37), // arrowkeys
@@ -534,7 +536,7 @@ function onAssetsLoaded() {
     this.player = player;
 
 
-    socket.on('canStartGame', function(gameState){
+    socket.on('canStartGame', function(state){
         // Maze
         console.log("Before maze sprite");
         //console.log('state maze', state.maze);
@@ -554,19 +556,8 @@ function onAssetsLoaded() {
         console.log("Enter new game state");
         console.log(state);
         console.log(myID);
+        maze = state.maze;
 
-        // Maze
-        console.log("Before maze sprite");
-        //console.log('state maze', state.maze);
-        for (i = 0; i < state.maze.length; i++) {
-            for (j = 0; j < state.maze[0].length; j++) {
-                maze = state.maze[i][j];
-                //console.log(maze);
-                if (maze == 1) {
-                    mazeSprite.push(newWallSprite(i, j));
-                }
-            }  
-        }
         // draw player sprites
         var cnt = 0;
         for (var i = 0; i < state.players.length; i++) {
@@ -659,8 +650,32 @@ function handleInput(delta) {
         else if (input.y_dir == 1) setSprite(playerSprites.down);
         else if (input.y_dir == -1) setSprite(playerSprites.up);
     }
-    player.x += input.x_dir*speed*delta;
-    player.y += input.y_dir*speed*delta;
+   
+
+    // maze
+    //console.log(maze);
+    //console.log(maze[Math.floor(tmp_x / 50)][Math.floor(tmp_y / 50)]);
+
+    //console.log(maze == null);
+    if (maze != null) {
+        console.log(maze);
+        
+        var tmp_x = player.x + input.x_dir*speed*delta;
+        var tmp_y = player.y + input.y_dir*speed*delta;
+        console.log(maze[Math.floor(tmp_x / 50)][Math.floor(tmp_y / 50)]);
+        if (maze[Math.floor(tmp_x / 50)][Math.floor(tmp_y / 50)] == 1) {
+        
+            player.x = tmp_x;
+            player.y = tmp_y;
+        }
+    } else {
+        
+
+        player.x += input.x_dir*speed*delta;
+        player.y += input.y_dir*speed*delta;
+    }
+    
+    
     return input;
 }
 

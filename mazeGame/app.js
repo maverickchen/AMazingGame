@@ -9,9 +9,6 @@ var Collision = require('./static/collides');
 var Maze = require('./static/maze');
 
 
-
-
-
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
@@ -51,9 +48,11 @@ io.on('connection', function(socket) {
 
     socket.on('move', function(direction) {
         // update game state based off new input
-        player.move(direction,1);
+
+        // Maze collision here
+        player.move(direction, 1, maze);
         var i;
-        for (i = 0; i < items.length; i++) {
+        for (i = 0; i < items.length; i++) {  
             if (Collision.collides(player, items[i])) {
                 console.log('Collision detected');
                 items[i].use(player);
