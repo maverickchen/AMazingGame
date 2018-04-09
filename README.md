@@ -9,22 +9,24 @@ So my id in commits shows as "SChandra96'.
 
 Our game's PIXI.Container hierarchy
 
-	-- app.stage
+	— app.stage
 
 		— startScreen Container
 			—  UI Buttons and stuff
 		
-		— game Container
- 			— gameView Container
-			— mazeContainer (bottom)
- 				|- itemSprites Container
-					— ammoSprites
-					— potionSprites
-				|- charSprites container
-					— playerSprites
- 			— Lighting layer (top)
- 			— PanelContainer
+		— gameScreen
+ 			— gameView
+				— mazeContainer (bottom)
+					— mazeSpriteContainer 
+						— wall sprites
+ 					— itemContainer
+						— ammoSprites
+						— potionSprites
+					— charContainer
+						— playerSprites
+ 				— lighting layer
+ 			— gameUI
  				— UI elements
 
-		— EndGameContainer
+		— endGameContainer
 			— You won/lost text assets
