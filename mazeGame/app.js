@@ -67,7 +67,7 @@ io.on('connection', function(socket) {
         
         gameState.players = players;
         gameState.items = items;
-        gameState.maze = maze;
+        //gameState.maze = maze;
         io.emit('newGameState', gameState); // tell all players the new game state
     });
 

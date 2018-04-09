@@ -57,19 +57,23 @@ var gameScreen = new PIXI.Container();
 app.stage.addChild(gameScreen);
 gameScreen.visible = false;
 
-var charSprites = new PIXI.Container();
-charSprites.visible = false;
-app.stage.addChild(charSprites);
-gameScreen.addChild(charSprites);
-
-var gameUI = new PIXI.Container();
-gameUI.visible = false;
-gameScreen.addChild(gameUI);
+var gameView = new PIXI.Container();
+gameView.visible = false;
+gameScreen.addChild(gameView);
 
 // Maze 
 var mazeContainer = new PIXI.Container();
 mazeContainer.visible = false;
-app.stage.addChild(mazeContainer);
+gameView.addChild(mazeContainer);
+
+var charSprites = new PIXI.Container();
+charSprites.visible = false;
+app.stage.addChild(charSprites);
+gameView.addChild(charSprites);
+
+var gameUI = new PIXI.Container();
+gameUI.visible = false;
+gameScreen.addChild(gameUI);
 
 
 // app.renderer.view.style.position = "absolute"
@@ -457,6 +461,7 @@ function onAssetsLoaded() {
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     gameScreen.visible = true;
+    gameView.visible = true;
     charSprites.visible = true;
     gameUI.visible = true;
     mazeContainer.visible = true;
@@ -524,19 +529,18 @@ function onAssetsLoaded() {
     lighting.useRenderTexture = true;
     lighting.clearColor = [0.03, 0.03, 0.03, 1]; // dark gray
 
-    app.stage.addChild(lighting);
+    gameView.addChild(lighting);
 
     var lightingSprite = new PIXI.Sprite(lighting.getRenderTexture());
     lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
 
-    app.stage.addChild(lightingSprite);
+    gameView.addChild(lightingSprite);
     
     loadFrames(lighting);
 
-    app.stage.addChild(gameUI);
+    // app.stage.addChild(gameUI);
 
     hpObj = newHPSprite(lighting);
-    console.log(hpObj);
     hpBkg = hpObj.spriteBkg;
     hp = hpObj.spriteHP;
 
@@ -546,14 +550,14 @@ function onAssetsLoaded() {
 
     this.player = player;
     
-    loadMaze(initGameState.maze);
+    maze = initGameState.maze;
+    loadMaze();
     updatePlayers(initGameState, gameTextStyle);
     updateItems(initGameState);
     updateMaze(initGameState);
 
 
     socket.on('newGameState', function(state){
-        console.log("Enter new game state");
         console.log(state);
         console.log(myID);
         updatePlayers(state);
@@ -571,10 +575,10 @@ function onAssetsLoaded() {
  */ 
 function updateMaze(state) {
     var wallCnt = 0;
-    mazeBounds = getRelevantTiles(state.maze, player);
+    mazeBounds = getRelevantTiles(maze, player);
     for (var i = mazeBounds.l; i < mazeBounds.r; i++) {
         for (var j = mazeBounds.u; j < mazeBounds.d; j++) {
-            if (state.maze[i][j] == 0) {
+            if (maze[i][j] == 0) {
                 wallSprites[wallCnt].x = i * WALL_WIDTH;
                 wallSprites[wallCnt].y = j * WALL_WIDTH;
                 wallSprites[wallCnt].visible = true;
@@ -776,7 +780,6 @@ function keyboard(keyCode) {
 // Maze sprite
 function newWallSprite(x, y) {
     wall = PIXI.Sprite.fromImage('assets/Wall.png');
-    console.log("Enter the newWall");
     wall.width = WALL_WIDTH;
     wall.height = WALL_WIDTH;
     wall.x = x * WALL_WIDTH;
