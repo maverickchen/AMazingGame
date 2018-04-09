@@ -66,6 +66,9 @@ gameScreen.addChild(gameView);
 var mazeContainer = new PIXI.Container();
 gameView.addChild(mazeContainer);
 
+var mazeSpritesContainer = new PIXI.Container();
+mazeContainer.addChild(mazeSpritesContainer);
+
 var itemContainer = new PIXI.Container();
 mazeContainer.addChild(itemContainer);
 
@@ -331,7 +334,7 @@ socket.on('canStartGame', function(initialGameState) {
  */
 function loadMaze() {
     for (var i = 0; i < 100; i++) {
-        mazeContainer.addChild(newWallSprite(0,0));
+        wallSprites.push(newWallSprite(0,0));
     }
 }
 
@@ -776,7 +779,7 @@ function newWallSprite(x, y) {
     wall.x = x * WALL_WIDTH;
     wall.y = y * WALL_WIDTH;
     wall.visible = false;
-    wallSprites.push(wall);
+    mazeSpritesContainer.addChild(wall);
     return wall;
 }
 
