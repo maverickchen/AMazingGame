@@ -27,7 +27,7 @@ function initItems() {
         items.push(ammo);
     }
 }
-
+initItems();
 app.use(express.static(path.join(__dirname,'static')));
 
 app.get('/', function (req, res) {
@@ -116,7 +116,6 @@ io.on('connection', function(socket) {
         // Check if there are 2 players are in each team - ready to start
         if ((team1.length === 2) && (team2.length === 2)) {
             initialGameState = {};
-            initItems();
             initialGameState.players = players;
             initialGameState.items = items;
             initialGameState.maze = maze;

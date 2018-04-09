@@ -50,29 +50,29 @@ document.body.appendChild(app.view);
 app.stage = new PIXI.display.Stage();
 
 /* Make Containers to manage separate sprite groups */
+// Container for all start screen assets
 var startScreen = new PIXI.Container();
 app.stage.addChild(startScreen);
 
+// Container for all in game assets
 var gameScreen = new PIXI.Container();
 app.stage.addChild(gameScreen);
 gameScreen.visible = false;
 
 var gameView = new PIXI.Container();
-gameView.visible = false;
 gameScreen.addChild(gameView);
 
 // Maze 
 var mazeContainer = new PIXI.Container();
-mazeContainer.visible = false;
 gameView.addChild(mazeContainer);
 
-var charSprites = new PIXI.Container();
-charSprites.visible = false;
-app.stage.addChild(charSprites);
-gameView.addChild(charSprites);
+var itemContainer = new PIXI.Container();
+mazeContainer.addChild(itemContainer);
+
+var charContainer = new PIXI.Container();
+mazeContainer.addChild(charContainer);
 
 var gameUI = new PIXI.Container();
-gameUI.visible = false;
 gameScreen.addChild(gameUI);
 
 
@@ -461,10 +461,6 @@ function onAssetsLoaded() {
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     gameScreen.visible = true;
-    gameView.visible = true;
-    charSprites.visible = true;
-    gameUI.visible = true;
-    mazeContainer.visible = true;
 
     /*************** Display Panel **************/
     var panel = PIXI.Sprite.fromImage('assets/Panel.png');
@@ -510,17 +506,6 @@ function onAssetsLoaded() {
     mazeText.y = 275;
     gameUI.addChild(mazeText);
 
-    // create an array of textures from an image path
-    //var maze = PIXI.Sprite.fromImage('assets/maze.png');
-
-    // Add maze picture, will be delete 
-    /*maze.anchor.set(0.5);
-    maze.x = app.screen.width / 2;
-    maze.y = app.screen.height / 2;
-    maze.scale.x *= 3;
-    maze.scale.y *= 3;
-    charSprites.addChild(maze);*/
-
     // make the background dark by putting a layer over it
     var lighting = new PIXI.display.Layer();
     lighting.on('display', function (element) {
@@ -538,8 +523,6 @@ function onAssetsLoaded() {
     
     loadFrames(lighting);
 
-    // app.stage.addChild(gameUI);
-
     hpObj = newHPSprite(lighting);
     hpBkg = hpObj.spriteBkg;
     hp = hpObj.spriteHP;
@@ -555,7 +538,7 @@ function onAssetsLoaded() {
     updatePlayers(initGameState, gameTextStyle);
     updateItems(initGameState);
     updateMaze(initGameState);
-
+    recenterView();
 
     socket.on('newGameState', function(state){
         console.log(state);
@@ -563,6 +546,7 @@ function onAssetsLoaded() {
         updatePlayers(state);
         updateItems(state);
         updateMaze(state)
+        recenterView();
     });
     this.update = update;
     // Ticker will call update to begin the game loop
@@ -669,6 +653,13 @@ function updateItems(state) {
         }
 }
 
+function recenterView() {
+    xdiff = w/2 - player.worldTransform.tx;
+    ydiff = h/2 - player.worldTransform.ty;
+    mazeContainer.x += xdiff;
+    mazeContainer.y += ydiff;
+}
+
 function handleInput(delta) {
     this.local_time += delta;
     var input = {};
@@ -709,11 +700,11 @@ function handleInput(delta) {
 
     //console.log(maze == null);
     if (maze != null) {
-        console.log(maze);
+        // console.log(maze);
         
         var tmp_x = player.x + input.x_dir*speed*delta;
         var tmp_y = player.y + input.y_dir*speed*delta;
-        console.log(maze[Math.floor(tmp_x / 100)][Math.floor(tmp_y / 100)]);
+        // console.log(maze[Math.floor(tmp_x / 100)][Math.floor(tmp_y / 100)]);
         if (maze[Math.floor(tmp_x / 100)][Math.floor(tmp_y / 100)] == 1) {
         
             player.x = tmp_x;
@@ -793,7 +784,7 @@ function newAmmoSprite() {
     ammo = PIXI.Sprite.fromImage('assets/Ammo.png');
     ammo.scale.x *= .1;
     ammo.scale.y *= .1;
-    charSprites.addChild(ammo);
+    itemContainer.addChild(ammo);
     return ammo;
 }
 
@@ -804,7 +795,7 @@ function newPotionSprite() {
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
-    charSprites.addChild(sprite);
+    itemContainer.addChild(sprite);
     return sprite;
 }
 
@@ -862,7 +853,7 @@ function newSprite(frames, x, y, isVisible) {
     sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
-    charSprites.addChild(sprite);
+    charContainer.addChild(sprite);
     sprite.visible = isVisible;
     return sprite;
 }
