@@ -17,6 +17,7 @@ var potionSprites = [];
 var ammoSprites = [];
 var playerSprites = {};
 var wallSprites = [];
+var floorSprites = [];
 const WALL_WIDTH = 100;
 
 
@@ -336,6 +337,9 @@ function loadMaze() {
     for (var i = 0; i < 100; i++) {
         wallSprites.push(newWallSprite(0,0));
     }
+    for (i = 0; i < 100; i++) {
+        floorSprites.push(newFloorSprite(0,0));
+    }
 }
 
 
@@ -562,6 +566,7 @@ function onAssetsLoaded() {
  */ 
 function updateMaze(state) {
     var wallCnt = 0;
+    var floorCnt = 0;
     mazeBounds = getRelevantTiles(maze, player);
     for (var i = mazeBounds.l; i < mazeBounds.r; i++) {
         for (var j = mazeBounds.u; j < mazeBounds.d; j++) {
@@ -570,6 +575,11 @@ function updateMaze(state) {
                 wallSprites[wallCnt].y = j * WALL_WIDTH;
                 wallSprites[wallCnt].visible = true;
                 wallCnt += 1;
+            } else {
+                floorSprites[floorCnt].x = i*WALL_WIDTH;
+                floorSprites[floorCnt].y = j * WALL_WIDTH;
+                floorSprites[floorCnt].visible = true;
+                floorCnt += 1;                
             }
         }
     }
@@ -577,6 +587,10 @@ function updateMaze(state) {
     while (wallSprites[wallCnt].visible) {
         wallSprites[wallCnt].visible = false;
         wallCnt += 1;
+    }
+    while (floorSprites[floorCnt].visible) {
+        floorSprites[floorCnt].visible = false;
+        floorCnt += 1;
     }
 }
 
@@ -781,6 +795,17 @@ function newWallSprite(x, y) {
     wall.visible = false;
     mazeSpritesContainer.addChild(wall);
     return wall;
+}
+
+function newFloorSprite(x, y) {
+    floor = PIXI.Sprite.fromImage('assets/Floor.png');
+    floor.width = WALL_WIDTH;
+    floor.height = WALL_WIDTH;
+    floor.x = x * WALL_WIDTH;
+    floor.y = y * WALL_WIDTH;
+    floor.visible = false;
+    mazeSpritesContainer.addChild(floor);
+    return floor;
 }
 
 function newAmmoSprite() {

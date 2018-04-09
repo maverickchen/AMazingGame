@@ -98,7 +98,7 @@ io.on('connection', function(socket) {
                 player.teamNumber = teamNum;
                 team1.push(player);
                 socket.emit('validChoice', true);
-                socket.emit('peopleInTeam', [team1.length, team2.length]);
+                io.emit('peopleInTeam', [team1.length, team2.length]);
             }
         }
         if (teamNum == 2) { // If player selected team 2
@@ -110,7 +110,7 @@ io.on('connection', function(socket) {
                 player.teamNumber = teamNum;
                 team2.push(player);
                 socket.emit('validChoice', true);
-                socket.emit('peopleInTeam', [team1.length, team2.length]);
+                io.emit('peopleInTeam', [team1.length, team2.length]);
             }
         }
         // Check if there are 2 players are in each team - ready to start
