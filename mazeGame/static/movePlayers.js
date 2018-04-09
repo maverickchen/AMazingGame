@@ -709,8 +709,8 @@ function handleInput(delta) {
         
         var tmp_x = player.x + input.x_dir*speed*delta;
         var tmp_y = player.y + input.y_dir*speed*delta;
-        console.log(maze[Math.floor(tmp_x / 50)][Math.floor(tmp_y / 50)]);
-        if (maze[Math.floor(tmp_x / 50)][Math.floor(tmp_y / 50)] == 1) {
+        console.log(maze[Math.floor(tmp_x / 100)][Math.floor(tmp_y / 100)]);
+        if (maze[Math.floor(tmp_x / 100)][Math.floor(tmp_y / 100)] == 1) {
         
             player.x = tmp_x;
             player.y = tmp_y;

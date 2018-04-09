@@ -4,7 +4,7 @@ var speed = 1;
 
 module.exports = class Player {
     constructor(id) {
-        this.x = 500;
+        this.x = 350;
         this.y = 500;
         this.id = id;
         this.health = 100;
@@ -16,8 +16,8 @@ module.exports = class Player {
     }
 
     move(direction, deltaT, maze) {
-        var x = Math.floor((this.x + speed*deltaT*direction.x_dir) / 50);
-        var y = Math.floor((this.y + speed*deltaT*direction.y_dir ) / 50) ;
+        var x = Math.floor((this.x + speed*deltaT*direction.x_dir) / 100);
+        var y = Math.floor((this.y + speed*deltaT*direction.y_dir ) / 100) ;
         console.log("=======")
         console.log(x);
         console.log(y);
