@@ -4,6 +4,9 @@ Repository for team3
 Presentation for Sprint 1:
 https://docs.google.com/presentation/d/1Vqu5jBVtbk-YtsDbt7JHoOfFBxnFe5BgMcRvPhLHiMA/edit?usp=sharing
 
+Presentation for Sprint 2:
+https://docs.google.com/presentation/d/1iCLLIOb6F7LBdgQSFq89oVJAO1P8pGEHcp8UIhZaijs/edit#slide=id.g36e5ca5457_0_0
+
 MinSun Park - I broke my computer so I'm using someone else's laptop for a month.
 So my id in commits shows as "SChandra96'.
 
