@@ -55,13 +55,13 @@ io.on('connection', function(socket) {
             if (Collision.collides(player, items[i])) {
                 console.log('Collision detected');
                 items[i].use(player); // update player model
-                items.splice(i,1); // delete the item from items list
+                items.splice(i,1); // delete the item from items list                
                 // PIXI.sound.Sound.from({ // make collecting sound
                 //     url: 'assets/collect_sound.mp3',
                 //     autoPlay: true,
                 //     loop: false,
                 // });
-                break;
+                break; 
             }
         }
         
