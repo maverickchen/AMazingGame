@@ -23,9 +23,9 @@ var maze = Maze.returnPath();
 /******************************************************************/
 
 function initItems() {
-    for (var i = 0; i < 5; i++) {
-        potion = new Item('Potion');
-        ammo = new Item('Ammo');
+    for (var i = 0; i < 100; i++) {
+        potion = new Item('Potion', maze);
+        ammo = new Item('Ammo', maze);
         items.push(potion);
         items.push(ammo);
     }
