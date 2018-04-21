@@ -41,8 +41,8 @@ io.on('connection', function(socket) {
     var id = idCounter;
     idCounter += 1;
     var player = new Player(id); // current player
-    console.log('a user connected with id ' + id);
-    console.log('There are now '+Object.keys(players).length+' player(s) in the room');
+    //console.log('a user connected with id ' + id);
+    //console.log('There are now '+Object.keys(players).length+' player(s) in the room');
 
     socket.emit('onconnected', {id: id}); // send the client their server id 
 
@@ -55,7 +55,7 @@ io.on('connection', function(socket) {
     socket.on('disconnect', function() {
         if (players[id]) delete players[id];
         if (clientSockets[id]) delete clientSockets[id];
-        console.log('user '+id+' disconnected. There are '+Object.keys(players).length+' remaining player(s)');
+        //console.log('user '+id+' disconnected. There are '+Object.keys(players).length+' remaining player(s)');
     });
 
     // Send to client (movePlayers.js) - the # of people in each team
@@ -63,7 +63,7 @@ io.on('connection', function(socket) {
 
     // When one user selects a team
     socket.on('teamSelection', function(teamNum) { // receives info - from movePlayers.js
-        console.log("teamSelection");
+        //console.log("teamSelection");
         if (teamNum == 1) { // If player selected team 1
             if (team1.length == 2) { // Check if this selection is valid. If not, send a message
                 socket.emit('validChoice', false);
@@ -112,5 +112,5 @@ io.on('connection', function(socket) {
 
 var SERVPORT = 8080;
 server.listen(SERVPORT,'0.0.0.0', function () {
-  console.log('App listening on port ' + SERVPORT);
+  //console.log('App listening on port ' + SERVPORT);
 });

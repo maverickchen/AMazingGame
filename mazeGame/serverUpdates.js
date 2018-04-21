@@ -21,7 +21,7 @@ exports.updatePhysics = function() {
         // check item collisions
         for (var i = 0; i < this.items.length; i++) {
             if (Collision.collides(this.items[i],player)) {
-                console.log('Item collision');
+                //console.log('Item collision');
                 this.items[i].use(player);
                 this.items.splice(i,1);
                 break;

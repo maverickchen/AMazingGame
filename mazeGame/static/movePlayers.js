@@ -9,7 +9,7 @@ var myID; // the server-generated ID
 var local_time = 0.016;
 
 var currTime;
-const speed = 100;
+const speed = 150;
 const WALL_WIDTH = 100;
 var maze;
 
@@ -119,7 +119,7 @@ window.onload = chooseTeam;
 
 
 socket.on('onconnected', function(msg){
-    console.log('My server id is '+msg.id);
+    //console.log('My server id is '+msg.id);
     myID = msg.id;
 });
 
@@ -145,7 +145,7 @@ var team2_ppl = 0;
 var team1_text;
 var team2_text;
 socket.on('peopleInTeam', function(arr) {
-        console.log("received");
+        //console.log("received");
         var index = startScreen.children.indexOf(team1_text);
         if (index !== -1) startScreen.removeChild(team1_text);
         var index = startScreen.children.indexOf(team2_text);
@@ -245,7 +245,7 @@ function chooseTeam() {
     //     .on('pointerout', filterOff );
     // filterOff.call(ready);
     
-    console.log(team1.scale);
+    //console.log(team1.scale);
     team1.on('pointerover', () => { team1.scale.x *= 1.5; team1.scale.y *= 1.5; })
         .on('pointerout', () => { team1.scale.x /= 1.5; team1.scale.y /= 1.5; });
     team2.on('pointerover', () => {team2.scale.x *= 1.5; team2.scale.y *= 1.5;})
@@ -471,9 +471,9 @@ function onAssetsLoaded() {
         // console.log(myID);
         serverStates.push(state);
         this.ping = new Date().getTime() - state.t;
-        console.log('ping', this.ping);
+        //console.log('ping', this.ping);
         currTime = state.t - this.ping;
-        console.log('new Game state, currTime now', currTime);
+        //console.log('new Game state, currTime now', currTime);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
         }
@@ -558,8 +558,8 @@ function getRelevantTiles(maze, player) {
  * Note if there aren't any serverStates, we can't do anything.
  */
 function processServerUpdates(currTime) {
-    console.log('currTime', currTime);
-    console.log('players', localState.players);
+    //console.log('currTime', currTime);
+    //console.log('players', localState.players);
     if (serverStates.length) {
         var next;
         var prev;
@@ -574,7 +574,7 @@ function processServerUpdates(currTime) {
         }
 
         if (next && prev) {
-            console.log('INTERPOLATING');
+            //console.log('INTERPOLATING');
             progress = currTime - prev.t;
             totalTime = next.t - prev.t;
             var ratio = progress/totalTime; 

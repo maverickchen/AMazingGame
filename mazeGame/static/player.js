@@ -1,6 +1,6 @@
 // A class to represent a player
 "use strict"; 
-var speed = 100;
+var speed = 150;
 
 module.exports = class Player {
     constructor(id) {
