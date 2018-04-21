@@ -458,7 +458,6 @@ function checkCollisions() {
 
 }
 
-
 function onAssetsLoaded() {
     PIXI.sound.Sound.from({
             url: 'assets/bkgMusic.mp3',
@@ -616,8 +615,14 @@ function updatePlayers(state, gameTextStyle) {
             bulletsNum.x = app.screen.width - 200;
             bulletsNum.y = 235;
             gameUI.addChild(bulletsNum);
+
+            // Decrease HP by 3 every second
+            window.setInterval(function() {
+                state.players[i].health -= 1;
+            }, 3000);
+
+        // Update other characters
         } else { 
-            // Update other characters
             if (cnt < otherPlayerSprites.length) {
                 otherPlayerSprites[cnt].x = state.players[i].x;
                 otherPlayerSprites[cnt].y = state.players[i].y;
