@@ -81,7 +81,7 @@ io.on('connection', function(socket) {
                 socket.emit('message', "You can't enter Team1: it already has 2 players");
             }
             else { // Update players info
-                player = new Player(id, teamNum); // current player
+                player = new Player(id, teamNum, maze); // current player
                 team1.push(player);
                 players[id] = player; // player successfully added to player roster
                 clientSockets[id] = socket; // subscribe client socket to server updates
@@ -95,7 +95,7 @@ io.on('connection', function(socket) {
                 socket.emit('message', "You can't enter Team2: it already has 2 players");
             }
             else {
-                player = new Player(id, teamNum); // current player
+                player = new Player(id, teamNum, maze); // current player
                 team2.push(player);
                 players[id] = player; // player successfully added to game roster
                 clientSockets[id] = socket; // add client socket to server updates

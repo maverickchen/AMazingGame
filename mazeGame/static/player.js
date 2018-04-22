@@ -3,15 +3,30 @@
 var speed = 150;
 
 module.exports = class Player {
-    constructor(id, teamNumber) {
+    constructor(id, teamNumber, maze) {
         this.teamNumber = teamNumber;
+        // Place the player on upper top left
         if (teamNumber === 1) {
-            this.x = 50;
-            this.y = 50;
+            // Find path (not wall) on upper top left on the maze
+            var x = 0;
+            var y = 0;
+            while (maze[x][y] === 0) {
+                x++;
+                y++;
+            }
+            this.x = x*100 + 50;
+            this.y = y*100 + 50;
         }
         else {
-            this.x = 51150;
-            this.y = 51150;
+            // Find path (not wall) on lower bottom right on the maze
+            var x = maze.length - 1;
+            var y = maze.length - 1;
+            while (maze[x][y] === 0) {
+                x--;
+                y--;
+            }
+            this.x = x*100 + 50;
+            this.y = y*100 + 50;
         }
         
         this.id = id;
