@@ -50,8 +50,8 @@ function getRelevantItems(itemList, player) {
     var arr = [];
     for (var i = 0; i < itemList.length; i++) {
         // Only render items that are at most 500 pixels from the player
-        var x_squared = ((player.x - itemList[i].x) ** 2);
-        var y_squared = ((player.y - itemList[i].y) ** 2);
+        var x_squared = Math.pow(player.x - itemList[i].x, 2);
+        var y_squared = Math.pow(player.y - itemList[i].y, 2);
         if (Math.sqrt(x_squared + y_squared) < 500) {
             arr.push(itemList[i]);
         }
