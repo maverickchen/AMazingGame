@@ -9,7 +9,7 @@ var myID; // the server-generated ID
 var local_time = 0.016;
 
 var currTime;
-const speed = 100;
+const speed = 150;
 const WALL_WIDTH = 100;
 //const WALL_LENGTH = 105;
 var maze;

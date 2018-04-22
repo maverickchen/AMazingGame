@@ -8,14 +8,20 @@ exports.updatePhysics = function() {
     dt = .015; // change this later; 15ms
     for (var id in this.players) {
         player = this.players[id];
+
+        // Decrease health points
+        player.health -= 1/1000;
+
+        // Re-render players
         for (var i = 0; i < player.inputs.length; i++) {
             player.move(player.inputs[i], dt, this.maze);
         }
+
         player.inputs = []; // clear their inputs
         // check item collisions
         for (var i = 0; i < this.items.length; i++) {
             if (Collision.collides(this.items[i],player)) {
-                console.log('Item collision');
+                //console.log('Item collision');
                 this.items[i].use(player);
                 this.items.splice(i,1);
                 break;
