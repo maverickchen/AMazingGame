@@ -184,7 +184,7 @@ Maze.prototype.drawRoad = function() {
             
         }
     }
-
+    // 1 is the path and 0 is the wall
     for (i = 0; i < this.road.length; i++) {
         var x = this.road[i].x;
         var y = this.road[i].y;
