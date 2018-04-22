@@ -111,7 +111,7 @@ io.on('connection', function(socket) {
             this.items = items;
             this.maze = maze;
             this.clientSockets = clientSockets;
-            initialGameState.items = items;
+            initialGameState.items = []; // for now send nothing
             initialGameState.maze = maze;
             initialGameState.t = new Date().getTime();
             io.emit('canStartGame', initialGameState);
