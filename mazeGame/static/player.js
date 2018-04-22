@@ -15,7 +15,7 @@ module.exports = class Player {
                 y++;
             }
             this.x = x*100 + 50;
-            this.y = y*100 + 50;
+            this.y = y*100 + 25;
         }
         else {
             // Find path (not wall) on lower bottom right on the maze
@@ -26,7 +26,7 @@ module.exports = class Player {
                 y--;
             }
             this.x = x*100 + 50;
-            this.y = y*100 + 50;
+            this.y = y*100 + 25;
         }
         
         this.id = id;

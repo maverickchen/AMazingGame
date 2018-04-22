@@ -73,19 +73,25 @@ gameScreen.addChild(gameView);
 // Maze 
 var mazeContainer = new PIXI.Container();
 gameView.addChild(mazeContainer);
+console.log(mazeContainer.x, mazeContainer.y);
 
 var mazeSpritesContainer = new PIXI.Container();
 mazeContainer.addChild(mazeSpritesContainer);
 
 var itemContainer = new PIXI.Container();
 mazeContainer.addChild(itemContainer);
+itemContainer.x += 21;
+itemContainer.y += 33;
 
 var charContainer = new PIXI.Container();
 mazeContainer.addChild(charContainer);
+charContainer.x += 21;
+charContainer.y += 33;
 
 var localPlayerContainer = new PIXI.Container();
 gameView.addChild(localPlayerContainer);
-
+localPlayerContainer.x += 21;
+localPlayerContainer.y += 33;
 var gameUI = new PIXI.Container();
 gameScreen.addChild(gameUI);
 
@@ -477,7 +483,7 @@ function onAssetsLoaded() {
         currTime = new Date().getTime();
 
         ping = currTime - state.t;
-        console.log(ping);
+        //console.log('ping',ping);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
         }
@@ -537,8 +543,8 @@ function handleInput(delta) {
         else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
         else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
         else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
-        if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
     }
+    if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
 }
 
 
@@ -866,8 +872,8 @@ function updatePlayerSprites(state, gameTextStyle) {
         // Update my character
         if (myID == id) {
             // move maze instead so that local player remains centered
-            xdiff = w/2 - state.players[id].x;
-            ydiff = h/2 - state.players[id].y;
+            xdiff = w/2 - (state.players[id].x);
+            ydiff = h/2 - (state.players[id].y);
             mazeContainer.x = xdiff;
             mazeContainer.y = ydiff;
 
