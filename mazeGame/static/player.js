@@ -10,7 +10,7 @@ module.exports = class Player {
             // Find path (not wall) on upper top left on the maze
             var x = 0;
             var y = 0;
-            while (maze[x][y] === 0) {
+            while (maze[y][x] === 0) {
                 x++;
                 y++;
             }
@@ -21,7 +21,7 @@ module.exports = class Player {
             // Find path (not wall) on lower bottom right on the maze
             var x = maze.length - 1;
             var y = maze.length - 1;
-            while (maze[x][y] === 0) {
+            while (maze[y][x] === 0) {
                 x--;
                 y--;
             }
@@ -45,24 +45,10 @@ module.exports = class Player {
         var y1 = Math.floor((this.y + speed*deltaT*direction.y_dir ) / 100);
         var y2 = Math.floor((this.y + this.height + speed*deltaT*direction.y_dir) / 100);
 
-        // console.log("x1 " + x1);
-        // console.log("x2 " + x2);
-        // console.log("y1 " + y1);
-        // console.log("y2 " + y2);
+        if (x1 < 0 || x1 >= maze[0].length) return; // x corresponds to COLUMNS
+        if (y1 < 0 || y1 >= maze.length) return; // y corresponds to ROWS
 
-        
-
-        if (x1 < 0 || x1 >= maze.length) return;
-        if (y1 < 0 || y1 >= maze[0].length) return;
-
-        // console.log("x1y1 " + maze[x1][y1]);
-        //     console.log("x1y2 " + maze[x1][y2]);
-        //     console.log("x2y1 " + maze[x2][y1]);
-        //     console.log("x2y2 " + maze[x2][y2]);
-
-        if (maze[x1][y1] == 1 && maze[x1][y2] == 1 && maze[x2][y1] == 1 && maze[x2][y2] == 1) {
-            
-
+        if (maze[y1][x1] == 1 && maze[y2][x1] == 1 && maze[y1][x2] == 1 && maze[y2][x2] == 1) {
             this.x = this.x + speed*deltaT*direction.x_dir;
             this.y = this.y + speed*deltaT*direction.y_dir;  
         }

@@ -10,7 +10,7 @@ module.exports = class Item {
         var tempX = Math.floor(Math.random() * (maze.length-1));
         var tempY = Math.floor(Math.random() * (maze.length-1));
         // Until it finds path
-        while (maze[tempX][tempY] === 0) {
+        while (maze[tempY][tempX] === 0) {
             tempX = Math.floor(Math.random() * (maze.length-1));
             tempY = Math.floor(Math.random() * (maze.length-1));
         }

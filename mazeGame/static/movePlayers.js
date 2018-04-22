@@ -473,14 +473,11 @@ function onAssetsLoaded() {
     currTime = initGameState.t - ping;
 
     socket.on('newGameState', function(state){
-        // console.log(state);
-        // console.log(myID);
         serverStates.push(state);
         currTime = new Date().getTime();
 
         ping = currTime - state.t;
         console.log(ping);
-        //console.log('new Game state, currTime now', currTime);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
         }
@@ -550,13 +547,13 @@ function handleInput(delta) {
  * enough to be seen by the player
  */
 function getRelevantTiles(maze, player) {
-    row = Math.floor(player.x / WALL_WIDTH); 
-    col = Math.floor(player.y / WALL_WIDTH);
+    row = Math.floor(player.y / WALL_WIDTH); 
+    col = Math.floor(player.x / WALL_WIDTH);
     bounds = {};
-    bounds.l = Math.max(0, row - 5);
-    bounds.u = Math.max(0, col - 5);
-    bounds.r = Math.min(row + 5, maze.length);
-    bounds.d = Math.min(col + 5, maze[0].length);
+    bounds.l = Math.max(0, col - 5);
+    bounds.u = Math.max(0, row - 5);
+    bounds.r = Math.min(col + 5, maze[0].length);
+    bounds.d = Math.min(row + 5, maze.length);
     return bounds;
 }
 
@@ -597,7 +594,6 @@ function processServerUpdates(time) {
         } else { // (!next && !prev)
             // no states to interpolate between; just snap other players to 
             // latest server position
-            console.log('snapping to latest server data with currTime', time);
             latest = serverStates[serverStates.length-1];
             localState.items = latest.items;
             localState.players[myID].bullets = latest.players[myID].bullets;
@@ -967,18 +963,16 @@ function updateMazeSprites(state) {
     var wallCnt = 0;
     var floorCnt = 0;
     mazeBounds = getRelevantTiles(maze, state.players[myID]);
-    for (var i = mazeBounds.l; i < mazeBounds.r; i++) {
-        for (var j = mazeBounds.u; j < mazeBounds.d; j++) {
-            if (maze[i][j] == 0) {
-                wallSprites[wallCnt].x = i * WALL_WIDTH;
-                wallSprites[wallCnt].y = j * WALL_WIDTH;
-                //wallSprites[wallCnt].y = j * WALL_LENGTH;
+    for (var row = mazeBounds.u; row < mazeBounds.d; row++) {
+        for (var col = mazeBounds.l; col < mazeBounds.r; col++) {
+            if (maze[row][col] == 0) {
+                wallSprites[wallCnt].x = col * WALL_WIDTH;
+                wallSprites[wallCnt].y = row * WALL_WIDTH;
                 wallSprites[wallCnt].visible = true;
                 wallCnt += 1;
             } else {
-                floorSprites[floorCnt].x = i*WALL_WIDTH;
-                //floorSprites[floorCnt].y = j * WALL_LENGTH;
-                floorSprites[floorCnt].y = j * WALL_WIDTH;
+                floorSprites[floorCnt].x = col * WALL_WIDTH;
+                floorSprites[floorCnt].y = row * WALL_WIDTH;
                 floorSprites[floorCnt].visible = true;
                 floorCnt += 1;                
             }
