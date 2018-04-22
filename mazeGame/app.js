@@ -46,9 +46,10 @@ app.get('/', function (req, res) {
 });
 
 io.on('connection', function(socket) {
+    var player;
     var id = idCounter;
     idCounter += 1;
-    var player = new Player(id); // current player
+    
     //console.log('a user connected with id ' + id);
     //console.log('There are now '+Object.keys(players).length+' player(s) in the room');
 
@@ -57,7 +58,9 @@ io.on('connection', function(socket) {
     socket.on('move', function(direction) {
         // store the input to be processed in the physics loop later
         // (See serverUpdates.js: updatePhysics)
-        player.inputs.push(direction);
+        if (player) {
+            player.inputs.push(direction);
+        }
     });
 
     socket.on('disconnect', function() {
@@ -68,7 +71,7 @@ io.on('connection', function(socket) {
 
     // Send to client (movePlayers.js) - the # of people in each team
     io.emit('peopleInTeam', [team1.length, team2.length]);    
-
+    
     // When one user selects a team
     socket.on('teamSelection', function(teamNum) { // receives info - from movePlayers.js
         //console.log("teamSelection");
@@ -78,7 +81,7 @@ io.on('connection', function(socket) {
                 socket.emit('message', "You can't enter Team1: it already has 2 players");
             }
             else { // Update players info
-                player.teamNumber = teamNum;
+                player = new Player(id, teamNum); // current player
                 team1.push(player);
                 players[id] = player; // player successfully added to player roster
                 clientSockets[id] = socket; // subscribe client socket to server updates
@@ -92,7 +95,7 @@ io.on('connection', function(socket) {
                 socket.emit('message', "You can't enter Team2: it already has 2 players");
             }
             else {
-                player.teamNumber = teamNum;
+                player = new Player(id, teamNum); // current player
                 team2.push(player);
                 players[id] = player; // player successfully added to game roster
                 clientSockets[id] = socket; // add client socket to server updates

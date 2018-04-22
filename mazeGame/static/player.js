@@ -3,9 +3,17 @@
 var speed = 150;
 
 module.exports = class Player {
-    constructor(id) {
-        this.x = 350;
-        this.y = 500;
+    constructor(id, teamNumber) {
+        this.teamNumber = teamNumber;
+        if (teamNumber === 1) {
+            this.x = 50;
+            this.y = 50;
+        }
+        else {
+            this.x = 51150;
+            this.y = 51150;
+        }
+        
         this.id = id;
         this.health = 100;
         this.bullets = 0;
@@ -13,7 +21,7 @@ module.exports = class Player {
         this.width = 42;
         this.height = 66;
         this.inputs = [];
-        this.teamNumber;
+        
     }
 
     move(direction, deltaT, maze) {
