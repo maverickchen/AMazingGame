@@ -8,7 +8,8 @@ var localState = {}; // clientside model of game state
 var myID; // the server-generated ID
 var local_time = 0.016;
 
-var currTime;
+var currTime = new Date().getTime();
+var ping = 0;
 const speed = 150;
 const WALL_WIDTH = 100;
 //const WALL_LENGTH = 105;
@@ -26,6 +27,7 @@ var ammoSprites = [];
 var playerSprites = {};
 var wallSprites = [];
 var floorSprites = [];
+var bulletSprites = {lefts:[], rights:[], ups:[], downs:[]};
 
 var left = keyboard(37), // arrowkeys
     up = keyboard(38),
@@ -467,16 +469,16 @@ function onAssetsLoaded() {
     updateItemSprites(localState);
     updateMazeSprites(localState);
 
-    this.ping = new Date().getTime() - initGameState.t;
-    currTime = initGameState.t - this.ping;
+    ping = new Date().getTime() - initGameState.t;
+    currTime = initGameState.t - ping;
 
     socket.on('newGameState', function(state){
         // console.log(state);
         // console.log(myID);
         serverStates.push(state);
-        this.ping = new Date().getTime() - state.t;
-        //console.log('ping', this.ping);
-        currTime = state.t - this.ping;
+        currTime = new Date().getTime();
+
+        ping = currTime - state.t;
         //console.log('new Game state, currTime now', currTime);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
@@ -499,9 +501,10 @@ function onAssetsLoaded() {
 -------------------------------------------------------------------------- */
 
 function update(delta) {
+    var now = currTime;
     checkCollisions();
     handleInput(delta);
-    processServerUpdates(currTime);
+    processServerUpdates(now);
     updatePlayerSprites(localState, this.gameTextStyle);
     updateItemSprites(localState);
     updateMazeSprites(localState);
@@ -518,12 +521,12 @@ function handleInput(delta) {
     var input = {};
     input.x_dir = 0;
     input.y_dir = 0;
-
+    input.shooting = false;
     if (left.isDown) input.x_dir += -1; 
     if (right.isDown) input.x_dir += 1; 
     if (up.isDown) input.y_dir += -1;
     if (down.isDown) input.y_dir += 1; 
-    if (shoot.isDown) setSprite(playerSprites[myID].shoot, myID);
+    if (shoot.isDown) input.shooting = true;
 
     if (input.x_dir != 0 || input.y_dir != 0) {
         this.input_seq += 1;
@@ -536,6 +539,7 @@ function handleInput(delta) {
         else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
         else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
         else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
+        if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
     }
 }
 
@@ -561,41 +565,61 @@ function getRelevantTiles(maze, player) {
  * more recent server data
  * Note if there aren't any serverStates, we can't do anything.
  */
-function processServerUpdates(currTime) {
-    //console.log('currTime', currTime);
-    //console.log('players', localState.players);
+function processServerUpdates(time) {
+    console.log('frozen currTime', time);
     if (serverStates.length) {
         var next;
         var prev;
         for (var i = 0; i < serverStates.length - 1; i++) {
-            //console.log(serverStates[i].t, 'vs',currTime,'vs',serverStates[i+1].t);
-            if (serverStates[i].t < currTime && 
-                currTime < serverStates[i+1].t) {
+            if (serverStates[i].t < time && 
+                time < serverStates[i+1].t) {
+                console.log('HERE');
                 next = serverStates[i+1];
                 prev = serverStates[i];
                 break;
             }
         }
-
         if (next && prev) {
-            //console.log('INTERPOLATING');
-            progress = currTime - prev.t;
+            console.log('INTERPOLATING');
+            progress = time - prev.t;
             totalTime = next.t - prev.t;
-            var ratio = progress/totalTime; 
+            var ratio = progress/totalTime;
+            // apply item changes immediately
+            localState.items = prev.items;
+            localState.players[myID].bullets = prev.players[myID].bullets;
+            localState.players[myID].health = prev.players[myID].health;
             for (var id in localState.players) {
-                // for all nonlocal players, interpolate between their two server 
-                // positions
                 if (myID != id) {
-                    px = prev.players[id].x;
-                    py = prev.players[id].y;
-                    nx = next.players[id].x;
-                    ny = next.players[id].y;
-                    localState.players[id].x = px + (nx - px)*ratio;
-                    localState.players[id].y = py + (ny - py)*ratio;
+                    // interpolate player position
+                    interpolatePlayer(prev,next,id,ratio);
+                }
+            }
+        } else { // (!next && !prev)
+            // no states to interpolate between; just snap other players to 
+            // latest server position
+            latest = serverStates[serverStates.length-1];
+            localState.items = latest.items;
+            for (var id in localState.players) {
+                if (myID != id) {
+                    localState.players[id] = latest.players[id];
                 }
             }
         }
     }
+}
+
+
+/* 
+ * interpolatePlayer: given two server states and a player, interpolate between 
+ * that player's positions at each state.
+ */
+function interpolatePlayer(prev, next, id, ratio) {
+    px = prev.players[id].x;
+    py = prev.players[id].y;
+    nx = next.players[id].x;
+    ny = next.players[id].y;
+    localState.players[id].x = px + (nx - px)*ratio;
+    localState.players[id].y = py + (ny - py)*ratio;
 }
 
 
@@ -675,6 +699,19 @@ function loadMazeSprites() {
     }
     for (i = 0; i < 100; i++) {
         floorSprites.push(newFloorSprite(0,0));
+    }
+}
+
+
+/* 
+ * loadBulletSprites: creates bullet sprites and stores them to be recycled
+ */
+function loadBulletSprites() {
+    for (var i = 0; i < 15; i++) {
+        bulletSprites.lefts.push(newBulletSprite('l'));
+        bulletSprites.rights.push(newBulletSprite('r'));
+        bulletSprites.ups.push(newBulletSprite('u'));
+        bulletSprites.downs.push(newBulletSprite('d'));
     }
 }
 
@@ -864,6 +901,22 @@ function updatePlayerSprites(state, gameTextStyle) {
 
 
 /*
+ * updateBulletSprites: given a game state object (state), update the location of all 
+ * bullet sprites
+ */
+function updateBulletSprites(state) {
+    lCount = 0;
+    rCount = 0;
+    uCount = 0;
+    dCount = 0;
+    for (var dir in state.bullets) {
+        for (var i = 0; i < state.bullets[dir].length; i++) {
+        }
+    }
+}
+
+
+/*
  * updateItemSprites: given a game state object (state), update the location of all 
  * item sprites
  */
@@ -905,6 +958,8 @@ function updateItemSprites(state) {
             potionSprites.pop().destroy();
         }
 }
+
+
 
 /* 
  * updateMazeSprites: given a game state object (state), update the location of all 
@@ -976,6 +1031,19 @@ function newAmmoSprite() {
     itemContainer.addChild(ammo);
     return ammo;
 }
+
+
+function newBulletSprite(dir) {
+    if (dir == 'l') bullet = PIXI.Sprite.fromImage('assets/BulletLeft.png');
+    else if (dir == 'r') bullet = PIXI.Sprite.fromImage('assets/BulletRight.png');
+    else if (dir == 'u') bullet = PIXI.Sprite.fromImage('assets/BulletUp.png');
+    else bullet = PIXI.Sprite.fromImage('assets/BulletDown.png');
+    bullet.scale.x *= .2;
+    bullet.scale.y *= .2;
+    itemContainer.addChild(bullet);
+    return bullet;
+}
+
 
 function newPotionSprite() {
     sprite = new PIXI.extras.AnimatedSprite(potionFrames);
