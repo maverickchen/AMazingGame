@@ -10,7 +10,7 @@ exports.updatePhysics = function() {
         player = this.players[id];
 
         // Decrease health points
-        player.health -= 1/1000;
+        player.health -= 1/100;
 
         // Re-render players
         for (var i = 0; i < player.inputs.length; i++) {
@@ -35,12 +35,26 @@ exports.updatePhysics = function() {
  * send each client an updated gameState. 
  */ 
 exports.updateClients = function() {
-    gameState = {
-                    players : this.players, 
-                    items : this.items,
-                    t : new Date().getTime()
-                };
+    
     for (var id in this.clientSockets) {
+        gameState = {
+            players : this.players, 
+            items : getRelevantItems(this.items, this.players[id]),
+            t : new Date().getTime()
+        };
         this.clientSockets[id].emit('newGameState', gameState);
     }
+}
+
+function getRelevantItems(itemList, player) {
+    var arr = [];
+    for (var i = 0; i < itemList.length; i++) {
+        // Only render items that are at most 500 pixels from the player
+        var x_squared = ((player.x - itemList[i].x) ** 2);
+        var y_squared = ((player.y - itemList[i].y) ** 2);
+        if (Math.sqrt(x_squared + y_squared) < 500) {
+            arr.push(itemList[i]);
+        }
+    }
+    return arr;
 }

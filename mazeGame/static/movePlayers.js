@@ -479,6 +479,7 @@ function onAssetsLoaded() {
         currTime = new Date().getTime();
 
         ping = currTime - state.t;
+        console.log(ping);
         //console.log('new Game state, currTime now', currTime);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
@@ -566,7 +567,6 @@ function getRelevantTiles(maze, player) {
  * Note if there aren't any serverStates, we can't do anything.
  */
 function processServerUpdates(time) {
-    console.log('frozen currTime', time);
     if (serverStates.length) {
         var next;
         var prev;
@@ -597,8 +597,11 @@ function processServerUpdates(time) {
         } else { // (!next && !prev)
             // no states to interpolate between; just snap other players to 
             // latest server position
+            console.log('snapping to latest server data with currTime', time);
             latest = serverStates[serverStates.length-1];
             localState.items = latest.items;
+            localState.players[myID].bullets = latest.players[myID].bullets;
+            localState.players[myID].health = latest.players[myID].health;
             for (var id in localState.players) {
                 if (myID != id) {
                     localState.players[id] = latest.players[id];
@@ -926,26 +929,21 @@ function updateItemSprites(state) {
         pS = 0;
         for (var i = 0; i < state.items.length; i++) {
             item = state.items[i];
-            // Only render items that are at most 500 pixels from the player
-            var x_squared = (Math.abs(state.players[myID].x - item.x)) * (Math.abs(state.players[myID].x - item.x));
-            var y_squared = (Math.abs(state.players[myID].y - item.y)) * (Math.abs(state.players[myID].y - item.y));
-            if (Math.sqrt(x_squared + y_squared) < 500) {
-                // Item is around the player
-                if (item.type == 'Ammo') {
-                    if (aS >= ammoSprites.length) {
-                        ammoSprites.push(newAmmoSprite());
-                    }
-                    ammoSprites[aS].x = item.x;
-                    ammoSprites[aS].y = item.y;
-                    aS += 1;
-                } else if (item.type == 'Potion') {
-                    if (pS >= potionSprites.length) {
-                        potionSprites.push(newPotionSprite());
-                    }
-                    potionSprites[pS].x = item.x;
-                    potionSprites[pS].y = item.y;
-                    pS += 1;
+            // Item is around the player
+            if (item.type == 'Ammo') {
+                if (aS >= ammoSprites.length) {
+                    ammoSprites.push(newAmmoSprite());
                 }
+                ammoSprites[aS].x = item.x;
+                ammoSprites[aS].y = item.y;
+                aS += 1;
+            } else if (item.type == 'Potion') {
+                if (pS >= potionSprites.length) {
+                    potionSprites.push(newPotionSprite());
+                }
+                potionSprites[pS].x = item.x;
+                potionSprites[pS].y = item.y;
+                pS += 1;
             }
         }
 
