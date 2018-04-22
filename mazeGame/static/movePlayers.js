@@ -545,15 +545,13 @@ function handleInput(delta) {
  * enough to be seen by the player
  */
 function getRelevantTiles(maze, player) {
-    //row = Math.floor(player.x / WALL_LENGTH); 
     row = Math.floor(player.x / WALL_WIDTH); 
-    //col = Math.floor(player.y / WALL_LENGTH);
     col = Math.floor(player.y / WALL_WIDTH);
     bounds = {};
-    bounds.l = Math.max(0,row - 7);
-    bounds.u = Math.max(col - 6);
+    bounds.l = Math.max(0, row - 5);
+    bounds.u = Math.max(0, col - 5);
     bounds.r = Math.min(row + 5, maze.length);
-    bounds.d = Math.min(col + 7, maze[0].length);
+    bounds.d = Math.min(col + 5, maze[0].length);
     return bounds;
 }
 
@@ -875,22 +873,29 @@ function updateItemSprites(state) {
         pS = 0;
         for (var i = 0; i < state.items.length; i++) {
             item = state.items[i];
-            if (item.type == 'Ammo') {
-                if (aS >= ammoSprites.length) {
-                    ammoSprites.push(newAmmoSprite());
+            // Only render items that are at most 500 pixels from the player
+            var x_squared = (Math.abs(state.players[myID].x - item.x)) * (Math.abs(state.players[myID].x - item.x));
+            var y_squared = (Math.abs(state.players[myID].y - item.y)) * (Math.abs(state.players[myID].y - item.y));
+            if (Math.sqrt(x_squared + y_squared) < 500) {
+                // Item is around the player
+                if (item.type == 'Ammo') {
+                    if (aS >= ammoSprites.length) {
+                        ammoSprites.push(newAmmoSprite());
+                    }
+                    ammoSprites[aS].x = item.x;
+                    ammoSprites[aS].y = item.y;
+                    aS += 1;
+                } else if (item.type == 'Potion') {
+                    if (pS >= potionSprites.length) {
+                        potionSprites.push(newPotionSprite());
+                    }
+                    potionSprites[pS].x = item.x;
+                    potionSprites[pS].y = item.y;
+                    pS += 1;
                 }
-                ammoSprites[aS].x = item.x;
-                ammoSprites[aS].y = item.y;
-                aS += 1;
-            } else if (item.type == 'Potion') {
-                if (pS >= potionSprites.length) {
-                    potionSprites.push(newPotionSprite());
-                }
-                potionSprites[pS].x = item.x;
-                potionSprites[pS].y = item.y;
-                pS += 1;
             }
         }
+
         // delete unused ammo sprites
         while (aS < ammoSprites.length) {
             ammoSprites.pop().destroy();
@@ -900,7 +905,6 @@ function updateItemSprites(state) {
             potionSprites.pop().destroy();
         }
 }
-
 
 /* 
  * updateMazeSprites: given a game state object (state), update the location of all 

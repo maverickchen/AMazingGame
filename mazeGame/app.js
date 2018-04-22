@@ -23,7 +23,15 @@ var maze = Maze.returnPath();
 /******************************************************************/
 
 function initItems() {
-    for (var i = 0; i < 100; i++) {
+    var pathCount = 0;
+    for (var i=0; i<maze.length; i++) {
+        for (var j=0; j<maze.length; j++) {
+            if (maze[i][j] === 1) pathCount++;
+        }
+    }
+    var itemNum = Math.floor(pathCount * 0.3);
+    console.log(itemNum);
+    for (var i = 0; i < itemNum; i++) {
         potion = new Item('Potion', maze);
         ammo = new Item('Ammo', maze);
         items.push(potion);

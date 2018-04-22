@@ -19,6 +19,7 @@ module.exports = class Item {
         var randomY = Math.floor(Math.random() * 100);
         this.x = tempX * 100 + randomX;
         this.y = tempY * 100 + randomY;
+        //console.log("item.x: " + this.x + ", item.y: " + this.y);
 
         if (this.type == 'Potion') {
             this.width = 30.8;
