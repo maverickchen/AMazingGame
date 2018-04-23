@@ -80,18 +80,18 @@ mazeContainer.addChild(mazeSpritesContainer);
 
 var itemContainer = new PIXI.Container();
 mazeContainer.addChild(itemContainer);
-itemContainer.x += 21;
-itemContainer.y += 33;
+// itemContainer.x += 21;
+// itemContainer.y += 33;
 
 var charContainer = new PIXI.Container();
 mazeContainer.addChild(charContainer);
-charContainer.x += 21;
-charContainer.y += 33;
+// charContainer.x += 21;
+// charContainer.y += 33;
 
 var localPlayerContainer = new PIXI.Container();
 gameView.addChild(localPlayerContainer);
-localPlayerContainer.x += 21;
-localPlayerContainer.y += 33;
+// localPlayerContainer.x += 21;
+// localPlayerContainer.y += 33;
 var gameUI = new PIXI.Container();
 gameScreen.addChild(gameUI);
 
@@ -1047,7 +1047,6 @@ function newPotionSprite() {
     sprite = new PIXI.extras.AnimatedSprite(potionFrames);
     sprite.scale.x *= .2;
     sprite.scale.y *= .2;
-    sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
     itemContainer.addChild(sprite);
@@ -1089,7 +1088,7 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
         sprite.x = x;
         sprite.y = y;
     }
-    sprite.anchor.set(0.5);
+    //sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
     container.addChild(sprite);
