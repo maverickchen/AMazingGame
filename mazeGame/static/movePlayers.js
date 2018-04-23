@@ -12,8 +12,9 @@ var currTime = new Date().getTime();
 var ping = 0;
 const speed = 150;
 const WALL_WIDTH = 100;
-//const WALL_LENGTH = 105;
 var maze;
+
+var lighting;
 
 // View variables
 // sprite animation frames
@@ -73,25 +74,23 @@ gameScreen.addChild(gameView);
 // Maze 
 var mazeContainer = new PIXI.Container();
 gameView.addChild(mazeContainer);
-console.log(mazeContainer.x, mazeContainer.y);
 
 var mazeSpritesContainer = new PIXI.Container();
 mazeContainer.addChild(mazeSpritesContainer);
 
 var itemContainer = new PIXI.Container();
 mazeContainer.addChild(itemContainer);
-// itemContainer.x += 21;
-// itemContainer.y += 33;
 
 var charContainer = new PIXI.Container();
 mazeContainer.addChild(charContainer);
-// charContainer.x += 21;
-// charContainer.y += 33;
+charContainer.x += 21;
+charContainer.y += 33;
 
 var localPlayerContainer = new PIXI.Container();
 gameView.addChild(localPlayerContainer);
-// localPlayerContainer.x += 21;
-// localPlayerContainer.y += 33;
+localPlayerContainer.x += 21;
+localPlayerContainer.y += 33;
+
 var gameUI = new PIXI.Container();
 gameScreen.addChild(gameUI);
 
@@ -114,7 +113,6 @@ var graphics = new PIXI.Graphics();
 //app.ticker.add(chooseTeam);
 window.onload = chooseTeam;
 
-
 // var outlineFilterBlue = new PIXI.filters.OutlineFilter(2, 0x99ff99);
 // var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5);
 
@@ -124,8 +122,6 @@ window.onload = chooseTeam;
 // function filterOff() {
 //     this.filters = [outlineFilterBlue];
 // }
-
-
 
 socket.on('onconnected', function(msg){
     //console.log('My server id is '+msg.id);
@@ -440,8 +436,12 @@ function onAssetsLoaded() {
     mazeText.y = 275;
     gameUI.addChild(mazeText);
 
+    // var hazeSprite = PIXI.Sprite.fromImage('/assets/haze.png');
+    // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 50);
+    // gameView.filters = [dispFilt];
+
     // make the background dark by putting a layer over it
-    var lighting = new PIXI.display.Layer();
+    lighting = new PIXI.display.Layer();
     lighting.on('display', function (element) {
         element.blendMode = PIXI.BLEND_MODES.ADD
     });
@@ -454,6 +454,10 @@ function onAssetsLoaded() {
     lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
 
     gameView.addChild(lightingSprite);
+
+    // var hazeSprite = PIXI.Sprite.fromImage('/assets/smoke.png');
+    // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 2);
+    // lighting.filters = [dispFilt];
     
     loadPlayerSprites(lighting);
     loadMazeSprites();
@@ -847,6 +851,7 @@ function setSprite(animation,id) {
         if (animation === playerSprites[id].shoot) {
             newDirSprite.x = playerSprites[id].current.x - offsetX;
             newDirSprite.y = playerSprites[id].current.y - offsetY;
+            animation.gotoAndPlay(0);
         } else if (playerSprites[id].current === playerSprites[id].shoot) {
             newDirSprite.x = playerSprites[id].current.x + offsetX;
             newDirSprite.y = playerSprites[id].current.y + offsetY;
@@ -1082,13 +1087,14 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
         // shift it back and up since shooting sprite is taller
         sprite.x = x - 6; 
         sprite.y = y - 11;
+        sprite.loop = false;
     } else {
         sprite.width = 42;
         sprite.height = 66;
         sprite.x = x;
         sprite.y = y;
     }
-    //sprite.anchor.set(0.5);
+    sprite.anchor.set(0.5);
     sprite.animationSpeed = 0.1;
     sprite.play();
     container.addChild(sprite);
