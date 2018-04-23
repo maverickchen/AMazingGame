@@ -851,7 +851,7 @@ function setSprite(animation,id) {
         if (animation === playerSprites[id].shoot) {
             newDirSprite.x = playerSprites[id].current.x - offsetX;
             newDirSprite.y = playerSprites[id].current.y - offsetY;
-            animation.gotoAndPlay(0);
+            animation.gotoAndPlay(4);
         } else if (playerSprites[id].current === playerSprites[id].shoot) {
             newDirSprite.x = playerSprites[id].current.x + offsetX;
             newDirSprite.y = playerSprites[id].current.y + offsetY;
@@ -862,7 +862,7 @@ function setSprite(animation,id) {
         newDirSprite.visible = true;
         playerSprites[id].current.visible = false;
         playerSprites[id].current = newDirSprite;
-    }
+    } else if (animation === playerSprites[id].shoot) animation.gotoAndPlay(4);
 }
 
 
@@ -1037,12 +1037,23 @@ function newAmmoSprite() {
 
 
 function newBulletSprite(dir) {
-    if (dir == 'l') bullet = PIXI.Sprite.fromImage('assets/BulletLeft.png');
-    else if (dir == 'r') bullet = PIXI.Sprite.fromImage('assets/BulletRight.png');
-    else if (dir == 'u') bullet = PIXI.Sprite.fromImage('assets/BulletUp.png');
-    else bullet = PIXI.Sprite.fromImage('assets/BulletDown.png');
-    bullet.scale.x *= .2;
-    bullet.scale.y *= .2;
+    if (dir == 'l') {
+        bullet = PIXI.Sprite.fromImage('assets/BulletLeft.png');
+        bullet.scale.x = .06;
+        bullet.scale.y = .1;
+    } else if (dir == 'r') {
+        bullet = PIXI.Sprite.fromImage('assets/BulletRight.png');
+        bullet.scale.x = .06;
+        bullet.scale.y = .1;
+    } else if (dir == 'u') {
+        bullet = PIXI.Sprite.fromImage('assets/BulletUp.png');
+        bullet.scale.x = .1;
+        bullet.scale.y = .06;
+    } else {
+        bullet = PIXI.Sprite.fromImage('assets/BulletDown.png');
+        bullet.scale.x = .1;
+        bullet.scale.y = .06;
+    }
     itemContainer.addChild(bullet);
     return bullet;
 }
@@ -1088,15 +1099,16 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
         sprite.x = x - 6; 
         sprite.y = y - 11;
         sprite.loop = false;
+        sprite.animationSpeed = 0.2;
     } else {
         sprite.width = 42;
         sprite.height = 66;
         sprite.x = x;
         sprite.y = y;
+        sprite.animationSpeed = 0.1;
+        sprite.play();
     }
     sprite.anchor.set(0.5);
-    sprite.animationSpeed = 0.1;
-    sprite.play();
     container.addChild(sprite);
     sprite.visible = isVisible;
     return sprite;
