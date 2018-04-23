@@ -16,11 +16,13 @@ function physicsUpdate() {
 
         if (x1 < 0 || x1 >= maze[0].length) return; // x corresponds to COLUMNS
         if (y1 < 0 || y1 >= maze.length) return; // y corresponds to ROWS
+        if (x2 < 0 || x2 >= maze[0].length) return;
+        if (y2 < 0 || y2 >= maze.length) return;
 
         if (this.maze[y1][x1] == 1 && this.maze[y2][x1] == 1 && this.maze[y1][x2] == 1 && this.maze[y2][x2] == 1) {
             player.x = player.x + speed*dt*input.x_dir;
             player.y = player.y + speed*dt*input.y_dir;  
-        } else { console.log('You are colliding with a wall'); }
+        }
     }
     this.inputs = []; // clear inputs
 }

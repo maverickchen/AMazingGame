@@ -47,6 +47,8 @@ module.exports = class Player {
 
         if (x1 < 0 || x1 >= maze[0].length) return; // x corresponds to COLUMNS
         if (y1 < 0 || y1 >= maze.length) return; // y corresponds to ROWS
+        if (x2 < 0 || x2 >= maze[0].length) return;
+        if (y2 < 0 || y2 >= maze.length) return;
 
         if (maze[y1][x1] == 1 && maze[y2][x1] == 1 && maze[y1][x2] == 1 && maze[y2][x2] == 1) {
             this.x = this.x + speed*deltaT*direction.x_dir;
