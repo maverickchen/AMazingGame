@@ -85,8 +85,13 @@ io.on('connection', function(socket) {
                 team1.push(player);
                 players[id] = player; // player successfully added to player roster
                 clientSockets[id] = socket; // subscribe client socket to server updates
-                socket.emit('validChoice', true);
-                io.emit('peopleInTeam', [team1.length, team2.length]);
+
+                if ((team1.length === 2) && (team2.length === 2)) {
+                    startGame();
+                } else {
+                    socket.emit('validChoice', true);
+                    io.emit('peopleInTeam', [team1.length, team2.length]);
+                }
             }
         }
         if (teamNum == 2) { // If player selected team 2
@@ -99,27 +104,35 @@ io.on('connection', function(socket) {
                 team2.push(player);
                 players[id] = player; // player successfully added to game roster
                 clientSockets[id] = socket; // add client socket to server updates
-                socket.emit('validChoice', true);
-                io.emit('peopleInTeam', [team1.length, team2.length]);
+
+                if ((team1.length === 2) && (team2.length === 2)) {
+                    startGame();
+                } else {
+                    socket.emit('validChoice', true);
+                    io.emit('peopleInTeam', [team1.length, team2.length]);
+                }
             }
-        }
-        // Check if there are 2 players are in each team - ready to start
-        if ((team1.length === 2) && (team2.length === 2)) {
-            initialGameState = {};
-            initialGameState.players = players;
-            this.players = players;
-            this.items = items;
-            this.maze = maze;
-            this.clientSockets = clientSockets;
-            initialGameState.items = []; // for now send nothing
-            initialGameState.maze = maze;
-            initialGameState.t = new Date().getTime();
-            io.emit('canStartGame', initialGameState);
-            setInterval(Updates.updatePhysics.bind(this), 15);
-            setInterval(Updates.updateClients.bind(this), 45);
         }
     });
 });
+
+function startGame() {
+    this.players = players;
+    this.items = items;
+    this.maze = maze;
+    this.clientSockets = clientSockets;
+
+    initialGameState = {};
+    initialGameState.players = players;
+    initialGameState.items = []; // for now send nothing
+    initialGameState.maze = maze;
+    initialGameState.t = new Date().getTime();
+
+    io.emit('canStartGame', initialGameState);
+    setInterval(Updates.updatePhysics.bind(this), 15);
+    setInterval(Updates.updateClients.bind(this), 45);
+
+}
 
 var SERVPORT = 8080;
 server.listen(SERVPORT,'0.0.0.0', function () {
