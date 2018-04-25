@@ -96,6 +96,7 @@ gameScreen.addChild(gameUI);
 
 var endGameContainer = new PIXI.Container();
 app.stage.addChild(endGameContainer);
+endGameContainer.visible = false;
 
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
@@ -1137,4 +1138,21 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
     container.addChild(sprite);
     sprite.visible = isVisible;
     return sprite;
+}
+
+/************** End game screen *******************/
+function loadGameEnd(won) {
+    // Switch visible screen
+    gameScreen.visible = false;
+    endGameContainer.visible = true;
+
+    // My team won the game
+    if (won) {
+        result = PIXI.Sprite.fromImage('assets/YouLose.png');
+    }
+    // My team lost the game
+    else {
+        result = PIXI.Sprite.fromImage('assets/YouWin.png');
+    }
+    endGameContainer.addChild(result);
 }
