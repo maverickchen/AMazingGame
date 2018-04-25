@@ -1154,11 +1154,14 @@ function loadGameEnd(won) {
 
     // My team won the game
     if (won) {
-        result = PIXI.Sprite.fromImage('assets/YouLose.png');
+        result = PIXI.Sprite.fromImage('assets/YouWin.png');
     }
     // My team lost the game
     else {
-        result = PIXI.Sprite.fromImage('assets/YouWin.png');
+        result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
+    result.scale.x *= 1;
+    result.scale.y *= 1;
+    
     endGameContainer.addChild(result);
 }
