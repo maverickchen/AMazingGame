@@ -7,7 +7,6 @@ var Player = require('./static/player');
 var Item = require('./static/item');
 // var Collision = require('./static/collides');
 var Updates = require('./serverUpdates');
-//var Maze = require('./static/mazeGenerator');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
@@ -15,10 +14,6 @@ var width = 512;
 
 var maze_cell = generator(width);
 var maze = converter.convertMaze(maze_cell);
-
-// Width == 8, height == 4, maze edges are open
-//var maze = generator(512, 512, true);
- 
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
@@ -30,65 +25,6 @@ var items = [];
 var team1 = []; // list of players in each team
 var team2 = [];
 var clientInputs = [];
-
-//var maze = maze_cell;
-
-// var maze = [];
-
-// for (var i = 0; i < 2 * width; i++) {
-//     row = [];
-//     for (var j = 0; j < 2 * width; j++) {
-//         row.push(0);
-//     }
-//     maze.push(row);
-// }
-
-
-// for (i = 0; i  < width * 2; i++) {
-//     for (j = 0; j < width * 2; j++) {
-//         maze[i][j] = 1;
-//     }
-// }
-
-// rowCount = 0;
-// colCount = 0;
-// for (var row = 0; i <; ) {
-//     for (var col = 0;...) {
-//         if (maze_cell[row][col].left) {
-
-//         }
-//     } 
-// }
-
-// // top && bottom
-// /*for(var j = 0; j < 2 * width; j++) {
-//     if (maze_cell[0][j].top == false) {
-//         maze[0][j] = 1;
-//     }
-//     if (maze_cell[width - 1][j].bottom == false) {
-//         maze[width][j] = 1;
-//     }
-// }
-
-// // left most
-// for(var i = 0; i < width; i++) { 
-//     if (maze_cell[i][0].left == false) {
-//         maze[i][0] = 1;
-//     } 
-// }*/
-
-// for(var i = 0, m = 0; i < width; i++, m+=2) {  
-//     for(var j = 0, n = 0; j < width; j++, n+=2) {
-//         if(maze_cell[i][j].right == false) {
-//             maze[m][n] = 1;
-//         }
-//     }
-// }
-
-//console.log(maze_cell);
-
-//var maze = Maze.returnPath();
-//console.log(maze);
 /******************************************************************/
 
 function initItems() {
@@ -133,8 +69,21 @@ io.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
+        for (var i = 0; i < team1.length; i++) {
+            if (team1[i].id == id) {
+                team1.splice(i,1);
+                break;
+            }
+        }
+        for (var j = 0; j < team2.length; j++) {
+            if (team2[i].id == id) {
+                team2.splice(i,1);
+                break;
+            }
+        }
         if (players[id]) delete players[id];
         if (clientSockets[id]) delete clientSockets[id];
+
         //console.log('user '+id+' disconnected. There are '+Object.keys(players).length+' remaining player(s)');
     });
 
@@ -187,6 +136,8 @@ io.on('connection', function(socket) {
 
 function startGame() {
     this.players = players;
+    this.team1 = team1;
+    this.team2 = team2;
     this.items = items;
     this.maze = maze;
     this.clientSockets = clientSockets;
