@@ -18,6 +18,7 @@ var maze = converter.convertMaze(maze_cell);
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 
 /************ Set of data used throughout the game ******************/
+var gameInProgress = false;
 var gameState = {};
 var clientSockets = {}; // dictionary mapping player id to socket
 var players = {}; // dictionary mapping player id to player
@@ -76,8 +77,8 @@ io.on('connection', function(socket) {
             }
         }
         for (var j = 0; j < team2.length; j++) {
-            if (team2[i].id == id) {
-                team2.splice(i,1);
+            if (team2[j].id == id) {
+                team2.splice(j,1);
                 break;
             }
         }
@@ -105,7 +106,8 @@ io.on('connection', function(socket) {
                 clientSockets[id] = socket; // subscribe client socket to server updates
 
                 if ((team1.length === 2) && (team2.length === 2)) {
-                    startGame();
+                    if (!gameInProgress) startGame();
+                    else joinGame();
                 } else {
                     socket.emit('validChoice', true);
                     io.emit('peopleInTeam', [team1.length, team2.length]);
@@ -124,7 +126,8 @@ io.on('connection', function(socket) {
                 clientSockets[id] = socket; // add client socket to server updates
 
                 if ((team1.length === 2) && (team2.length === 2)) {
-                    startGame();
+                    if (!gameInProgress) startGame();
+                    else joinGame();
                 } else {
                     socket.emit('validChoice', true);
                     io.emit('peopleInTeam', [team1.length, team2.length]);
@@ -135,6 +138,7 @@ io.on('connection', function(socket) {
 });
 
 function startGame() {
+    gameInProgress = true;
     this.players = players;
     this.team1 = team1;
     this.team2 = team2;
@@ -152,6 +156,23 @@ function startGame() {
     setInterval(Updates.updatePhysics.bind(this), 15);
     setInterval(Updates.updateClients.bind(this), 45);
 
+}
+
+function joinGame() {
+    this.players = players;
+    this.team1 = team1;
+    this.team2 = team2;
+    this.items = items;
+    this.maze = maze;
+    this.clientSockets = clientSockets;
+
+    initialGameState = {};
+    initialGameState.players = players;
+    initialGameState.items = []; // for now send nothing
+    initialGameState.maze = maze;
+    initialGameState.t = new Date().getTime();
+
+    io.emit('canStartGame', initialGameState);
 }
 
 var SERVPORT = 8080;
