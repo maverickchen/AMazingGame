@@ -11,33 +11,10 @@ exports.updatePhysics = function() {
     dt = .015; // change this later; 15ms
 
     if (!gameOver) {
-
-        // Determine if the game has ended, and determine if they won or lost
-        var team1_dead = 0;
-        if (this.team1[0].health === 0) team1_dead++;
-        if (this.team1[1].health === 0) team1_dead++;
-        var team2_dead = 0;
-        if (this.team2[0].health === 0) team2_dead++;
-        if (this.team2[1].health === 0) team2_dead++;
-
-        // Only emit socket when game is finished
-        if ((team1_dead === 2) || (team2_dead === 2)) {
-            gameOver = true;
-            if (team1_dead === 2) { // Team 1 LOST
-                for (var id in this.players) {
-                    if (this.players[id].teamNumber === 1) this.clientSockets[id].emit('wonGame', false);
-                    else this.clientSockets[id].emit('wonGame', true);
-                }
-            }
-            if (team2_dead === 2) { // Team 2 LOST
-                for (var id in this.players) {
-                    if (this.players[id].teamNumber === 1) this.clientSockets[id].emit('wonGame', true);
-                    else this.clientSockets[id].emit('wonGame', false);
-                }
-            }
-            return;
-        }
-
+        // First check if game is over by checking the health of all players
+        checkGameOver();
+    }
+    if (!gameOver) { // Check again since it might have changed in checkGameOver
         // Game has not ended yet!
         for (var id in this.players) {
             player = this.players[id];
@@ -63,7 +40,35 @@ exports.updatePhysics = function() {
             }
         }
     }
-    
+}
+
+function checkGameOver() {
+    // Determine if the game has ended, and determine if they won or lost
+    var team1_dead = 0;
+    for (var i=0; i<this.team1.length; i++) {
+        if (this.team1[i].health === 0) team1_dead++;
+    }
+    var team2_dead = 0;
+    for (var i=0; i<this.team2.length; i++) {
+        if (this.team2[i].health === 0) team2_dead++;
+    }
+
+    // Only emit socket when game is finished
+    if ((team1_dead === team1.length) || (team2_dead === team2.length)) {
+        gameOver = true;
+        if (team1_dead === 2) { // Team 1 LOST
+            for (var id in this.players) {
+                if (this.players[id].teamNumber === 1) this.clientSockets[id].emit('wonGame', false);
+                else this.clientSockets[id].emit('wonGame', true);
+            }
+        }
+        if (team2_dead === 2) { // Team 2 LOST
+            for (var id in this.players) {
+                if (this.players[id].teamNumber === 1) this.clientSockets[id].emit('wonGame', true);
+                else this.clientSockets[id].emit('wonGame', false);
+            }
+        }
+    }
 }
 
 /* 
