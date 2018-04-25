@@ -1030,7 +1030,7 @@ function updateMazeSprites(state) {
 // CONSTRUCTING NEW SPRITES
 
 function newWallSprite(x, y) {
-    wall = PIXI.Sprite.fromImage('assets/Wall_1.png');
+    wall = PIXI.Sprite.fromImage('assets/Wall.png');
     wall.width = WALL_WIDTH;
     wall.height = WALL_WIDTH;
    // wall.height = WALL_LENGTH;
