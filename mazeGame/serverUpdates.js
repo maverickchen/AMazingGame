@@ -10,7 +10,7 @@ exports.updatePhysics = function() {
         player = this.players[id];
 
         // Decrease health points
-        player.health -= 1/100;
+        player.health -= 1;
         if (player.health < 0) player.health = 0;
 
         // Re-render players

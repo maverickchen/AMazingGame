@@ -94,6 +94,8 @@ localPlayerContainer.y += 33;
 var gameUI = new PIXI.Container();
 gameScreen.addChild(gameUI);
 
+var endGameContainer = new PIXI.Container();
+app.stage.addChild(endGameContainer);
 
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
@@ -526,29 +528,32 @@ function checkCollisions() {
 
 function handleInput(delta) {
     this.local_time += delta;
-    var input = {};
-    input.x_dir = 0;
-    input.y_dir = 0;
-    input.shooting = false;
-    if (left.isDown) input.x_dir += -1; 
-    if (right.isDown) input.x_dir += 1; 
-    if (up.isDown) input.y_dir += -1;
-    if (down.isDown) input.y_dir += 1; 
-    if (shoot.isDown) input.shooting = true;
+    if (localState.players[myID].health > 0) {
+        var input = {};
+        input.x_dir = 0;
+        input.y_dir = 0;
+        input.shooting = false;
+        if (left.isDown) input.x_dir += -1; 
+        if (right.isDown) input.x_dir += 1; 
+        if (up.isDown) input.y_dir += -1;
+        if (down.isDown) input.y_dir += 1; 
+        if (shoot.isDown) input.shooting = true;
 
-    if (input.x_dir != 0 || input.y_dir != 0) {
-        this.input_seq += 1;
-        input.time = new Date().getTime();
-        input.seq = this.input_seq;
-        socket.emit('move', input);
-        inputs.push(input);
-        // change the player's sprite based off movement
-        if (input.x_dir == 1) setSprite(playerSprites[myID].right, myID);
-        else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
-        else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
-        else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
+        if (input.x_dir != 0 || input.y_dir != 0) {
+            this.input_seq += 1;
+            input.time = new Date().getTime();
+            input.seq = this.input_seq;
+            socket.emit('move', input);
+            inputs.push(input);
+            // change the player's sprite based off movement
+
+            if (input.x_dir == 1) setSprite(playerSprites[myID].right, myID);
+            else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
+            else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
+            else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
+        }
+        if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
     }
-    if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
 }
 
 
@@ -820,8 +825,17 @@ function loadPlayerSprites(lighting) {
             sprites.shoot = newPlayerSprite(p2Frames.shoot, x, y, false, container);
             sprites.current = sprites.down;
         }
+
+        // Add tombstone sprite
+        sprites.dead = new PIXI.Sprite.fromImage('assets/Tombstone.png');
+        sprites.dead.scale.x = 3;
+        sprites.dead.scale.y = 3;
+        sprites.dead.visible = false;
+        sprites.dead.anchor.set(0.5);
+        container.addChild(sprites.dead);
+
         if (myID == id) {
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 6; i++) {
                 var lightbulb = new PIXI.Graphics();
                 lightbulb.beginFill(0x706050, 1.0);
                 lightbulb.drawCircle(0, 0, 500);
@@ -832,6 +846,7 @@ function loadPlayerSprites(lighting) {
                 if (i == 2) sprites.left.addChild(lightbulb);
                 if (i == 3) sprites.right.addChild(lightbulb);
                 if (i == 4) sprites.shoot.addChild(lightbulb);
+                if (i == 5) sprites.dead.addChild(lightbulb);
             }
         }
         playerSprites[id] = sprites;
@@ -843,7 +858,7 @@ function loadPlayerSprites(lighting) {
  * setSprite: given an animatedSprite from var playerSprites{.left.right.up.down.shoot}
  * make the new sprite visible with the right coordinates and the old sprite invisble
  */
-function setSprite(animation,id) {
+function setSprite(animation, id) {
     if (playerSprites[id].current !== animation) {
         offsetX = 1; // account for shooting sprite's different size 
         offsetY = 4;
@@ -855,10 +870,13 @@ function setSprite(animation,id) {
         } else if (playerSprites[id].current === playerSprites[id].shoot) {
             newDirSprite.x = playerSprites[id].current.x + offsetX;
             newDirSprite.y = playerSprites[id].current.y + offsetY;
+        } else if (animation === playerSprites[id].dead) {
+            newDirSprite.x = playerSprites[id].current.x - 30;
+            newDirSprite.y = playerSprites[id].current.y - 30;
         } else {
             newDirSprite.x = playerSprites[id].current.x;
             newDirSprite.y = playerSprites[id].current.y;
-        }
+        } 
         newDirSprite.visible = true;
         playerSprites[id].current.visible = false;
         playerSprites[id].current = newDirSprite;
@@ -874,37 +892,44 @@ var bulletsNum; // Text to display the number of bullets - updated everytime new
 function updatePlayerSprites(state, gameTextStyle) {
     // draw player sprites
     for (var id in state.players) {
-        // Update my character
-        if (myID == id) {
-            // move maze instead so that local player remains centered
-            xdiff = w/2 - (state.players[id].x);
-            ydiff = h/2 - (state.players[id].y);
-            mazeContainer.x = xdiff;
-            mazeContainer.y = ydiff;
 
-            hp.width = (state.players[id].health/100) * hpBkg.width;
+        // Make player sprites tombstones if their HP is zero.
+        if (state.players[id].health === 0) {
+            setSprite(playerSprites[id].dead, id);
+        }
+        else {
+            // Update my character
+            if (myID == id) {
+                // move maze instead so that local player remains centered
+                xdiff = w/2 - (state.players[id].x);
+                ydiff = h/2 - (state.players[id].y);
+                mazeContainer.x = xdiff;
+                mazeContainer.y = ydiff;
 
-            // Create texts for number of bullets
-            var index = gameUI.children.indexOf(bulletsNum);
-            if (index !== -1) gameUI.removeChild(bulletsNum);
-            bulletsNum = new PIXI.Text(state.players[id].bullets, gameTextStyle);
-            bulletsNum.x = app.screen.width - 200;
-            bulletsNum.y = 235;
-            gameUI.addChild(bulletsNum);
-        } 
-        else { // nonlocal players
-            // match sprite with direction of movement
-            if (playerSprites[id].current.x < state.players[id].x) {
-                setSprite(playerSprites[id].right, id);
-            } else if (playerSprites[id].current.x > state.players[id].x) {
-                setSprite(playerSprites[id].left, id);
-            } else if (playerSprites[id].current.y > state.players[id].y) {
-                setSprite(playerSprites[id].up, id);
-            } else if (playerSprites[id].current.y < state.players[id].y) {
-                setSprite(playerSprites[id].down, id);
+                hp.width = (state.players[id].health/100) * hpBkg.width;
+
+                // Create texts for number of bullets
+                var index = gameUI.children.indexOf(bulletsNum);
+                if (index !== -1) gameUI.removeChild(bulletsNum);
+                bulletsNum = new PIXI.Text(state.players[id].bullets, gameTextStyle);
+                bulletsNum.x = app.screen.width - 200;
+                bulletsNum.y = 235;
+                gameUI.addChild(bulletsNum);
+            } 
+            else { // nonlocal players
+                // match sprite with direction of movement
+                if (playerSprites[id].current.x < state.players[id].x) {
+                    setSprite(playerSprites[id].right, id);
+                } else if (playerSprites[id].current.x > state.players[id].x) {
+                    setSprite(playerSprites[id].left, id);
+                } else if (playerSprites[id].current.y > state.players[id].y) {
+                    setSprite(playerSprites[id].up, id);
+                } else if (playerSprites[id].current.y < state.players[id].y) {
+                    setSprite(playerSprites[id].down, id);
+                }
+                playerSprites[id].current.x = state.players[id].x;
+                playerSprites[id].current.y = state.players[id].y;
             }
-            playerSprites[id].current.x = state.players[id].x;
-            playerSprites[id].current.y = state.players[id].y;
         }
     }
 }
