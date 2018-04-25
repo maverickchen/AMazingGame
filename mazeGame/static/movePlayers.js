@@ -1160,8 +1160,10 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
-    result.scale.x *= 1;
-    result.scale.y *= 1;
-    
+    result.scale.x *= 5;
+    result.scale.y *= 5;
+    result.x = app.screen.width / 2;
+    result.y = app.screen.height / 2;
+
     endGameContainer.addChild(result);
 }
