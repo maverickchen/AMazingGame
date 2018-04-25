@@ -872,8 +872,8 @@ function setSprite(animation, id) {
             newDirSprite.x = playerSprites[id].current.x + offsetX;
             newDirSprite.y = playerSprites[id].current.y + offsetY;
         } else if (animation === playerSprites[id].dead) {
-            newDirSprite.x = playerSprites[id].current.x - 30;
-            newDirSprite.y = playerSprites[id].current.y - 30;
+            newDirSprite.x = playerSprites[id].current.x;
+            newDirSprite.y = playerSprites[id].current.y;
         } else {
             newDirSprite.x = playerSprites[id].current.x;
             newDirSprite.y = playerSprites[id].current.y;
@@ -1141,6 +1141,12 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
 }
 
 /************** End game screen *******************/
+
+// This only runs when the game is finished
+socket.on('wonGame', function(won) {
+    loadGameEnd(won);
+});
+
 function loadGameEnd(won) {
     // Switch visible screen
     gameScreen.visible = false;
