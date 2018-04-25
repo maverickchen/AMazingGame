@@ -59,9 +59,15 @@ document.body.appendChild(app.view);
 app.stage = new PIXI.display.Stage();
 
 /* Make Containers to manage separate sprite groups */
+
+// Container for game ID input
+//var gameID = new PIXI.Container();
+//app.stage.addChild(gameID);
+
 // Container for all start screen assets
 var startScreen = new PIXI.Container();
 app.stage.addChild(startScreen);
+//startScreen.visible = false;
 
 // Container for all in game assets
 var gameScreen = new PIXI.Container();
@@ -114,6 +120,7 @@ app.renderer.backgroundColor = 0x061639;
 var graphics = new PIXI.Graphics();
 
 //app.ticker.add(chooseTeam);
+
 window.onload = chooseTeam;
 
 // var outlineFilterBlue = new PIXI.filters.OutlineFilter(2, 0x99ff99);
@@ -144,12 +151,12 @@ var team2_ppl = 0;
 
 
 // Style for UI text
-    var style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: ['#ffffff'] // gradient
-    });
+var style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 18,
+    fontWeight: 'bold',
+    fill: ['#ffffff'] // gradient
+});
 var team1_text;
 var team2_text;
 socket.on('peopleInTeam', function(arr) {
@@ -172,6 +179,7 @@ socket.on('peopleInTeam', function(arr) {
 });
 
 function chooseTeam() {
+
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -183,6 +191,14 @@ function chooseTeam() {
     instructionText.x = 115;
     instructionText.y = 50;
     startScreen.addChild(instructionText);
+
+    // Test if input box works - TODO if we have time
+    //var PIXI = require("pixi.js");
+    //var PixiTextInput = require('pixitextinput');
+    //var inputField = new PIXITextInput('hello', instructionStyle);
+    //inputField.x = 115;
+    //inputField.y = 100;
+    //startScreen.addChild(inputField);
 
 /*
     socket.on('peopleInTeam', function(arr) {
