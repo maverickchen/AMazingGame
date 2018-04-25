@@ -107,7 +107,7 @@ io.on('connection', function(socket) {
 
                 if ((team1.length === 2) && (team2.length === 2)) {
                     if (!gameInProgress) startGame();
-                    else joinGame();
+                    else joinGame(id);
                 } else {
                     socket.emit('validChoice', true);
                     io.emit('peopleInTeam', [team1.length, team2.length]);
@@ -172,7 +172,7 @@ function joinGame() {
     initialGameState.maze = maze;
     initialGameState.t = new Date().getTime();
 
-    io.emit('canStartGame', initialGameState);
+    clientSockets[id].emit('canStartGame', initialGameState);
 }
 
 var SERVPORT = 8080;
