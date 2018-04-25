@@ -36,3 +36,5 @@ Our game's PIXI.Container hierarchy
 
 		— endGameContainer
 			— You won/lost text assets
+
+		- tutorial Container

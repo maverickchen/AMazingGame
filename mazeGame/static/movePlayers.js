@@ -104,6 +104,11 @@ var endGameContainer = new PIXI.Container();
 app.stage.addChild(endGameContainer);
 endGameContainer.visible = false;
 
+// Should come last because we want the tutorial screen to be over everything
+var tutorialScreen = new PIXI.Container();
+app.stage.addChild(tutorialScreen);
+tutorialScreen.visible = false;
+
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
 // app.renderer.view.style.height = window.innerHeight - 50 + "px";
@@ -252,11 +257,13 @@ function chooseTeam() {
     team1.interactive = true;
     team2.interactive = true;
     ready.interactive = true;
+    questionMark.interactive = true;
 
     // Shows hand cursor
     team1.buttonMode = true;
     team2.buttonMode = true;
     ready.buttonMode = true;
+    questionMark.buttonMode = true;
 
     var text1;
     var text2;
@@ -283,6 +290,37 @@ function chooseTeam() {
         .on('pointerout', () => {team2.scale.x /= 1.5; team2.scale.y /= 1.5;});
     ready.on('pointerover', () => {ready.scale.x *= 2; ready.scale.y *= 2;})
         .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
+    
+    // Load tutorial assets
+    var panel = PIXI.Sprite.fromImage('assets/Panel.png');
+    panel.anchor.set(0.5);
+    panel.x = app.screen.width / 2 + 50;
+    panel.y = app.screen.height / 2;
+    panel.scale.x *= 10;
+    panel.scale.y *= 5;
+    tutorialScreen.addChild(panel);
+
+    var tutorial_text = "You're locked in a dungeon! \n Your only way out is to shoot and kill" +
+    " everyone in the other team. \n Move with the ARROW keys. \n Shoot with SPACE bar." + 
+    "\n Your health decreases whether or not you're moving, \n so be sure to keep navigating" +
+    " to pick up bullets and health potions! \n \n GOOD LUCK!";
+    var tutorialText = new PIXI.Text(tutorial_text, instructionStyle);
+    tutorialText.anchor.set(0.5);
+    tutorialText.x = app.screen.width / 2;
+    tutorialText.y = app.screen.height / 2;
+    tutorialText.scale.x *= 0.8;
+    tutorialText.scale.y *= 0.8;
+    tutorialScreen.addChild(tutorialText);
+
+    // When user hovers over question mark,
+    questionMark.on('pointerover', function() {
+        // Render instruction screen
+        tutorialScreen.visible = true;
+    });
+    questionMark.on('pointerout', function() {
+        // Render instruction screen
+        tutorialScreen.visible = false;
+    });
 
     // When team 1 is selected,
     team1.on('pointerdown', function() {
@@ -372,7 +410,7 @@ function chooseTeam() {
     startScreen.addChild(team1);
     startScreen.addChild(team2);
     startScreen.addChild(ready);
-
+    startScreen.addChild(questionMark);
  
 }
 
