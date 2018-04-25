@@ -219,6 +219,7 @@ function chooseTeam() {
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
     var ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
+    var questionMark = PIXI.Sprite.fromImage('/assets/Instruction.png');
     // Maze 
     var wall = PIXI.Sprite.fromImage('/assets/wall.png');
 
@@ -240,6 +241,12 @@ function chooseTeam() {
     ready.y = app.screen.height / 5 * 4;
     ready.scale.x *= 0.3;
     ready.scale.y *= 0.3;
+
+    questionMark.anchor.set(0.5);
+    questionMark.x = app.screen.width - 50;
+    questionMark.y = 50;
+    questionMark.scale.x *= 0.3;
+    questionMark.scale.y *= 0.3;
 
     // Opt-in to interactivity
     team1.interactive = true;
