@@ -37,12 +37,16 @@ module.exports = class Player {
         this.height = 66;
         this.inputs = [];
         this.dead = false;
+<<<<<<< HEAD
         this.orientation = 'd';
 
         // Add x direction and y direction here
         this.x_dir = 0;
         this.y_dir = 0;
         
+=======
+        this.lastInputSeq = -1;
+>>>>>>> 8a9dad802cbac5c4e9dd519b1d22f0c51eb01d30
     }
 
     move(direction, deltaT, maze) {

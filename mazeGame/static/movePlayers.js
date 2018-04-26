@@ -3,6 +3,7 @@ var socket = io();
 
 // Model variables
 var inputs = []; // a log of this player's last few inputs
+var input_seq = 0;
 var serverStates = []; // log of most recent server updates
 var localState = {}; // clientside model of game state
 var myID; // the server-generated ID
@@ -174,12 +175,12 @@ socket.on('peopleInTeam', function(arr) {
         team1_ppl = arr[0];
         team2_ppl = arr[1];
         team1_text = new PIXI.Text('There are ' + team1_ppl + ' / 2 people in team 1', style);
-        team1_text.x = 80;
-        team1_text.y = app.screen.height / 2 - 100;
+        team1_text.x = 300;
+        team1_text.y = app.screen.height / 2 - 150;
         startScreen.addChild(team1_text);
         team2_text = new PIXI.Text('There are ' + team2_ppl + ' / 2 people in team 2', style);
-        team2_text.x = app.screen.width - 300;
-        team2_text.y = app.screen.height / 2 - 100;
+        team2_text.x = app.screen.width - 550;
+        team2_text.y = app.screen.height / 2 - 150;
         startScreen.addChild(team2_text);
 });
 
@@ -193,8 +194,9 @@ function chooseTeam() {
         fill: ['#E84F2E'] // gradient
     });
     instructionText = new PIXI.Text('Choose Your Team!', instructionStyle);
-    instructionText.x = 115;
-    instructionText.y = 50;
+    instructionText.anchor.set(0.5);
+    instructionText.x = app.screen.width / 2;
+    instructionText.y = 70;
     startScreen.addChild(instructionText);
 
     // Test if input box works - TODO if we have time
@@ -231,27 +233,27 @@ function chooseTeam() {
     // Set the initial position and scale
     team1.anchor.set(0.5);
     team1.x = app.screen.width / 3;
-    team1.y = app.screen.height / 2;
+    team1.y = app.screen.height / 2 - 50;
     team1.scale.x *= 0.3;
     team1.scale.y *= 0.3;
 
     team2.anchor.set(0.5);
     team2.x = app.screen.width / 3 * 2;
-    team2.y = app.screen.height / 2;
+    team2.y = app.screen.height / 2 - 50;
     team2.scale.x *= 0.3;
     team2.scale.y *= 0.3;
 
     ready.anchor.set(0.5);
     ready.x = app.screen.width / 2;
-    ready.y = app.screen.height / 5 * 4;
+    ready.y = app.screen.height / 5 * 4 - 50;
     ready.scale.x *= 0.3;
     ready.scale.y *= 0.3;
 
     questionMark.anchor.set(0.5);
-    questionMark.x = app.screen.width - 50;
-    questionMark.y = 50;
-    questionMark.scale.x *= 0.3;
-    questionMark.scale.y *= 0.3;
+    questionMark.x = app.screen.width - 100;
+    questionMark.y = 100;
+    questionMark.scale.x *= 0.7;
+    questionMark.scale.y *= 0.7;
 
     // Opt-in to interactivity
     team1.interactive = true;
@@ -332,7 +334,7 @@ function chooseTeam() {
 
         teamSelected = 1;
         text1 = new PIXI.Text('You Selected Team 1', style);
-        text1.x = 80;
+        text1.x = 335;
         text1.y = app.screen.height / 2 + 30;
         startScreen.addChild(text1);
     });
@@ -347,7 +349,7 @@ function chooseTeam() {
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
-        text2.x = app.screen.width - 300;
+        text2.x = app.screen.width - 515;
         text2.y = app.screen.height / 2 + 30;
         startScreen.addChild(text2);
     });
@@ -362,7 +364,7 @@ function chooseTeam() {
             var index = startScreen.children.indexOf(msg);
             if (index !== -1) startScreen.removeChild(msg);
             msg = new PIXI.Text('You should select a team before you begin', style);
-            msg.x = 70;
+            msg.x = app.screen.width / 2 - 170;
             msg.y = app.screen.height - 70;
             startScreen.addChild(msg);
         }
@@ -383,8 +385,9 @@ function chooseTeam() {
                     var index = startScreen.children.indexOf(msg);
                     if (index !== -1) startScreen.removeChild(msg);
                     var waitText = new PIXI.Text('Waiting for other players to get ready...', style);
+                    waitText.anchor.set(0.5);
                     waitText.x = app.screen.width / 2;
-                    waitText.y = app.screen.height - 50;
+                    waitText.y = app.screen.height - 70;
                     startScreen.addChild(waitText);
                 }
                 else {
@@ -546,11 +549,11 @@ function onAssetsLoaded() {
     ping = new Date().getTime() - initGameState.t;
     currTime = initGameState.t - ping;
 
+    netOffset = 200;
     socket.on('newGameState', function(state){
         serverStates.push(state);
-        currTime = new Date().getTime();
-
-        ping = currTime - state.t;
+        ping = new Date().getTime() - state.t;
+        currTime = state.t - netOffset;
         //console.log('ping',ping);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
@@ -573,10 +576,9 @@ function onAssetsLoaded() {
 -------------------------------------------------------------------------- */
 
 function update(delta) {
-    var now = currTime;
     checkCollisions();
     handleInput(delta);
-    processServerUpdates(now);
+    processServerUpdates(currTime);
     updatePlayerSprites(localState, this.gameTextStyle);
     updateItemSprites(localState);
     updateBulletSprites(localState);
@@ -590,7 +592,6 @@ function checkCollisions() {
 
 
 function handleInput(delta) {
-    this.local_time += delta;
     if (localState.players[myID].health > 0) {
         var input = {};
         input.x_dir = 0;
@@ -605,9 +606,13 @@ function handleInput(delta) {
         if (shoot.isDown) input.shooting = true;
 
         if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
+<<<<<<< HEAD
             this.input_seq += 1;
+=======
+            input_seq += 1;
+>>>>>>> 8a9dad802cbac5c4e9dd519b1d22f0c51eb01d30
             input.time = new Date().getTime();
-            input.seq = this.input_seq;
+            input.seq = input_seq;
             socket.emit('move', input);
             inputs.push(input);
             // change the player's sprite based off movement
@@ -616,8 +621,8 @@ function handleInput(delta) {
             else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
             else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
             else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
+            else if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
         }
-        if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
     }
 }
 
@@ -650,14 +655,12 @@ function processServerUpdates(time) {
         for (var i = 0; i < serverStates.length - 1; i++) {
             if (serverStates[i].t < time && 
                 time < serverStates[i+1].t) {
-                console.log('HERE');
                 next = serverStates[i+1];
                 prev = serverStates[i];
                 break;
             }
         }
         if (next && prev) {
-            console.log('INTERPOLATING');
             progress = time - prev.t;
             totalTime = next.t - prev.t;
             var ratio = progress/totalTime;
@@ -673,14 +676,14 @@ function processServerUpdates(time) {
             }
         } else { // (!next && !prev)
             // no states to interpolate between; just snap other players to 
-            // latest server position
-            latest = serverStates[serverStates.length-1];
-            localState.items = latest.items;
-            localState.players[myID].bullets = latest.players[myID].bullets;
-            localState.players[myID].health = latest.players[myID].health;
+            // oldest server position
+            oldest = serverStates[0];
+            localState.items = oldest.items;
+            localState.players[myID].bullets = oldest.players[myID].bullets;
+            localState.players[myID].health = oldest.players[myID].health;
             for (var id in localState.players) {
                 if (myID != id) {
-                    localState.players[id] = latest.players[id];
+                    localState.players[id] = oldest.players[id];
                 }
             }
         }
@@ -709,15 +712,22 @@ function replayUsingKnownPos(serverStates, clientInputs) {
     lastServerState = serverStates[serverStates.length - 1]
     if (lastServerState) {
         lastServerStateTime = lastServerState.t;
-        // delete client inputs that have been processed
+        // delete client inputs that have been processed by the server already
         var i = 0;
-        while (i < clientInputs.length && clientInputs[i].time < lastServerStateTime) {
-            clientInputs.splice(0,1);
+        while (i < clientInputs.length && clientInputs[i].seq <= lastServerState.players[myID].lastInputSeq) {
+            i++;
         }
+        clientInputs.splice(0,i);
+
         // replay pending client inputs from the confirmed server position
         localState.players[myID].x = lastServerState.players[myID].x;
         localState.players[myID].y = lastServerState.players[myID].y;
-        physicsUpdate(); // <-- reapply the remaining inputs
+
+        this.localState = localState;
+        this.inputs = inputs;
+        this.myID = myID;
+        this.maze = maze;
+        physicsUpdate.bind(this)(); // <-- reapply the remaining inputs
     }
 }
 
