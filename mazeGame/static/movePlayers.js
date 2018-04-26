@@ -158,7 +158,7 @@ var team2_ppl = 0;
 
 // Style for UI text
 var style = new PIXI.TextStyle({
-    fontFamily: 'Arial',
+    fontFamily: "\"Lucida Console\", Monaco, monospace",
     fontSize: 18,
     fontWeight: 'bold',
     fill: ['#ffffff'] // gradient
@@ -188,7 +188,7 @@ function chooseTeam() {
 
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 30,
         fontWeight: 'bold',
         fill: ['#E84F2E'] // gradient
@@ -294,24 +294,29 @@ function chooseTeam() {
         .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
     
     // Load tutorial assets
-    var panel = PIXI.Sprite.fromImage('assets/Panel.png');
+    var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
     panel.anchor.set(0.5);
-    panel.x = app.screen.width / 2 + 50;
-    panel.y = app.screen.height / 2;
-    panel.scale.x *= 10;
+    panel.x = app.screen.width / 2;
+    panel.y = app.screen.height / 2 + 70;
+    panel.scale.x *= 8;
     panel.scale.y *= 5;
     tutorialScreen.addChild(panel);
 
-    var tutorial_text = "You're locked in a dungeon! \n Your only way out is to shoot and kill" +
-    " everyone in the other team. \n Move with the ARROW keys. \n Shoot with SPACE bar." + 
-    "\n Your health decreases whether or not you're moving, \n so be sure to keep navigating" +
-    " to pick up bullets and health potions! \n \n GOOD LUCK!";
-    var tutorialText = new PIXI.Text(tutorial_text, instructionStyle);
+    var tutorial_style = new PIXI.TextStyle({
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: ['#121314'] // gradient
+    });
+
+    var tutorial_text = "You're locked in a dungeon! \nYour only way out is to shoot and kill" +
+    " everyone in the other team. \nMove with the ARROW keys. \nShoot with SPACE bar." + 
+    "\nYour health decreases whether or not you're moving, \nso be sure to keep navigating" +
+    " to pick up bullets and health potions! \n \nGOOD LUCK!";
+    var tutorialText = new PIXI.Text(tutorial_text, tutorial_style);
     tutorialText.anchor.set(0.5);
     tutorialText.x = app.screen.width / 2;
     tutorialText.y = app.screen.height / 2;
-    tutorialText.scale.x *= 0.8;
-    tutorialText.scale.y *= 0.8;
     tutorialScreen.addChild(tutorialText);
 
     // When user hovers over question mark,
@@ -468,7 +473,7 @@ function onAssetsLoaded() {
 
     // Display "HP:"
     var gameTextStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 20,
         fontWeight: 'bold',
         fill: ['#05090c'] // gradient
