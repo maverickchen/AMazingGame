@@ -413,7 +413,7 @@ function chooseTeam() {
     startScreen.addChild(team1);
     startScreen.addChild(team2);
     startScreen.addChild(ready);
-    startScreen.addChild(questionMark);
+    app.stage.addChild(questionMark);
  
 }
 
