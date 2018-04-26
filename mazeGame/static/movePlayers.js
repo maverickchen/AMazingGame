@@ -174,12 +174,12 @@ socket.on('peopleInTeam', function(arr) {
         team1_ppl = arr[0];
         team2_ppl = arr[1];
         team1_text = new PIXI.Text('There are ' + team1_ppl + ' / 2 people in team 1', style);
-        team1_text.x = 80;
-        team1_text.y = app.screen.height / 2 - 100;
+        team1_text.x = 300;
+        team1_text.y = app.screen.height / 2 - 150;
         startScreen.addChild(team1_text);
         team2_text = new PIXI.Text('There are ' + team2_ppl + ' / 2 people in team 2', style);
-        team2_text.x = app.screen.width - 300;
-        team2_text.y = app.screen.height / 2 - 100;
+        team2_text.x = app.screen.width - 550;
+        team2_text.y = app.screen.height / 2 - 150;
         startScreen.addChild(team2_text);
 });
 
@@ -193,8 +193,9 @@ function chooseTeam() {
         fill: ['#E84F2E'] // gradient
     });
     instructionText = new PIXI.Text('Choose Your Team!', instructionStyle);
-    instructionText.x = 115;
-    instructionText.y = 50;
+    instructionText.anchor.set(0.5);
+    instructionText.x = app.screen.width / 2;
+    instructionText.y = 70;
     startScreen.addChild(instructionText);
 
     // Test if input box works - TODO if we have time
@@ -231,27 +232,27 @@ function chooseTeam() {
     // Set the initial position and scale
     team1.anchor.set(0.5);
     team1.x = app.screen.width / 3;
-    team1.y = app.screen.height / 2;
+    team1.y = app.screen.height / 2 - 50;
     team1.scale.x *= 0.3;
     team1.scale.y *= 0.3;
 
     team2.anchor.set(0.5);
     team2.x = app.screen.width / 3 * 2;
-    team2.y = app.screen.height / 2;
+    team2.y = app.screen.height / 2 - 50;
     team2.scale.x *= 0.3;
     team2.scale.y *= 0.3;
 
     ready.anchor.set(0.5);
     ready.x = app.screen.width / 2;
-    ready.y = app.screen.height / 5 * 4;
+    ready.y = app.screen.height / 5 * 4 - 50;
     ready.scale.x *= 0.3;
     ready.scale.y *= 0.3;
 
     questionMark.anchor.set(0.5);
-    questionMark.x = app.screen.width - 50;
-    questionMark.y = 50;
-    questionMark.scale.x *= 0.3;
-    questionMark.scale.y *= 0.3;
+    questionMark.x = app.screen.width - 100;
+    questionMark.y = 100;
+    questionMark.scale.x *= 0.7;
+    questionMark.scale.y *= 0.7;
 
     // Opt-in to interactivity
     team1.interactive = true;
@@ -332,7 +333,7 @@ function chooseTeam() {
 
         teamSelected = 1;
         text1 = new PIXI.Text('You Selected Team 1', style);
-        text1.x = 80;
+        text1.x = 335;
         text1.y = app.screen.height / 2 + 30;
         startScreen.addChild(text1);
     });
@@ -347,7 +348,7 @@ function chooseTeam() {
 
         teamSelected = 2;
         text2 = new PIXI.Text('You Selected Team 2', style);
-        text2.x = app.screen.width - 300;
+        text2.x = app.screen.width - 515;
         text2.y = app.screen.height / 2 + 30;
         startScreen.addChild(text2);
     });
@@ -362,7 +363,7 @@ function chooseTeam() {
             var index = startScreen.children.indexOf(msg);
             if (index !== -1) startScreen.removeChild(msg);
             msg = new PIXI.Text('You should select a team before you begin', style);
-            msg.x = 70;
+            msg.x = app.screen.width / 2 - 170;
             msg.y = app.screen.height - 70;
             startScreen.addChild(msg);
         }
@@ -383,8 +384,9 @@ function chooseTeam() {
                     var index = startScreen.children.indexOf(msg);
                     if (index !== -1) startScreen.removeChild(msg);
                     var waitText = new PIXI.Text('Waiting for other players to get ready...', style);
+                    waitText.anchor.set(0.5);
                     waitText.x = app.screen.width / 2;
-                    waitText.y = app.screen.height - 50;
+                    waitText.y = app.screen.height - 70;
                     startScreen.addChild(waitText);
                 }
                 else {
