@@ -11,7 +11,6 @@ var local_time = 0.016;
 
 var currTime = new Date().getTime();
 var ping = 0;
-const speed = 150;
 const WALL_WIDTH = 100;
 var maze;
 
@@ -703,11 +702,13 @@ function interpolatePlayer(prev, next, id, ratio) {
 // player is still at the right place
 function replayUsingKnownPos(serverStates, clientInputs) {
     lastServerState = serverStates[serverStates.length - 1]
+    console.log('Before', );
     if (lastServerState) {
+        console.log('Before', localState.players[myID].x, localState.players[myID].y);
         lastServerStateTime = lastServerState.t;
         // delete client inputs that have been processed by the server already
         var i = 0;
-        while (i < clientInputs.length && clientInputs[i].seq <= lastServerState.players[myID].lastInputSeq) {
+        while (i < clientInputs.length && clientInputs[i].seq <= lastServerState.players[myID].serverLastInputSeq) {
             i++;
         }
         clientInputs.splice(0,i);
@@ -715,12 +716,13 @@ function replayUsingKnownPos(serverStates, clientInputs) {
         // replay pending client inputs from the confirmed server position
         localState.players[myID].x = lastServerState.players[myID].x;
         localState.players[myID].y = lastServerState.players[myID].y;
-
+        localState.players[myID].clientLastInputSeq = lastServerState.players[myID].serverLastInputSeq;
         this.localState = localState;
         this.inputs = inputs;
         this.myID = myID;
         this.maze = maze;
         physicsUpdate.bind(this)(); // <-- reapply the remaining inputs
+        console.log('After', localState.players[myID].x, localState.players[myID].y);
     }
 }
 
