@@ -249,10 +249,10 @@ function chooseTeam() {
     ready.scale.y *= 0.3;
 
     questionMark.anchor.set(0.5);
-    questionMark.x = app.screen.width - 100;
+    questionMark.x = 100;
     questionMark.y = 100;
-    questionMark.scale.x *= 0.7;
-    questionMark.scale.y *= 0.7;
+    questionMark.scale.x *= 1;
+    questionMark.scale.y *= 1;
 
     // Opt-in to interactivity
     team1.interactive = true;
@@ -1234,8 +1234,9 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
-    result.scale.x *= 5;
-    result.scale.y *= 5;
+    result.anchor.set(0.5);
+    result.scale.x *= 3;
+    result.scale.y *= 3;
     result.x = app.screen.width / 2;
     result.y = app.screen.height / 2;
 

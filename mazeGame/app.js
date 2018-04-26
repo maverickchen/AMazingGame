@@ -127,7 +127,7 @@ io.on('connection', function(socket) {
 
                 if ((team1.length === 2) && (team2.length === 2)) {
                     if (!gameInProgress) startGame();
-                    else joinGame();
+                    else joinGame(id);
                 } else {
                     socket.emit('validChoice', true);
                     io.emit('peopleInTeam', [team1.length, team2.length]);
@@ -158,7 +158,7 @@ function startGame() {
 
 }
 
-function joinGame() {
+function joinGame(id) {
     this.players = players;
     this.team1 = team1;
     this.team2 = team2;
