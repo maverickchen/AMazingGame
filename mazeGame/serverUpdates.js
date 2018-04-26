@@ -10,10 +10,6 @@ var gameOver = false;
 exports.updatePhysics = function() {
     dt = .015; // change this later; 15ms
 
-    if (!gameOver) {
-        // First check if game is over by checking the health of all players
-        checkGameOver();
-    }
     if (!gameOver) { // Check again since it might have changed in checkGameOver
         // Game has not ended yet!
         for (var id in this.players) {
@@ -76,6 +72,11 @@ function checkGameOver() {
  * send each client an updated gameState. 
  */ 
 exports.updateClients = function() {
+
+    if (!gameOver) {
+        // First check if game is over by checking the health of all players
+        checkGameOver();
+    }
 
     if (!gameOver) {
         for (var id in this.clientSockets) {

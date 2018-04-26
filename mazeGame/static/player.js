@@ -37,7 +37,7 @@ module.exports = class Player {
         this.height = 66;
         this.inputs = [];
         this.dead = false;
-        
+        this.lastInputSeq = -1;
     }
 
     move(direction, deltaT, maze) {
