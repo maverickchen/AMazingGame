@@ -59,9 +59,15 @@ document.body.appendChild(app.view);
 app.stage = new PIXI.display.Stage();
 
 /* Make Containers to manage separate sprite groups */
+
+// Container for game ID input
+//var gameID = new PIXI.Container();
+//app.stage.addChild(gameID);
+
 // Container for all start screen assets
 var startScreen = new PIXI.Container();
 app.stage.addChild(startScreen);
+//startScreen.visible = false;
 
 // Container for all in game assets
 var gameScreen = new PIXI.Container();
@@ -98,6 +104,11 @@ var endGameContainer = new PIXI.Container();
 app.stage.addChild(endGameContainer);
 endGameContainer.visible = false;
 
+// Should come last because we want the tutorial screen to be over everything
+var tutorialScreen = new PIXI.Container();
+app.stage.addChild(tutorialScreen);
+tutorialScreen.visible = false;
+
 // app.renderer.view.style.position = "absolute"
 // app.renderer.view.style.width = window.innerWidth - 50 + "px";
 // app.renderer.view.style.height = window.innerHeight - 50 + "px";
@@ -114,6 +125,7 @@ app.renderer.backgroundColor = 0x061639;
 var graphics = new PIXI.Graphics();
 
 //app.ticker.add(chooseTeam);
+
 window.onload = chooseTeam;
 
 // var outlineFilterBlue = new PIXI.filters.OutlineFilter(2, 0x99ff99);
@@ -144,12 +156,12 @@ var team2_ppl = 0;
 
 
 // Style for UI text
-    var style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 18,
-        fontWeight: 'bold',
-        fill: ['#ffffff'] // gradient
-    });
+var style = new PIXI.TextStyle({
+    fontFamily: 'Arial',
+    fontSize: 18,
+    fontWeight: 'bold',
+    fill: ['#ffffff'] // gradient
+});
 var team1_text;
 var team2_text;
 socket.on('peopleInTeam', function(arr) {
@@ -172,6 +184,7 @@ socket.on('peopleInTeam', function(arr) {
 });
 
 function chooseTeam() {
+
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -183,6 +196,14 @@ function chooseTeam() {
     instructionText.x = 115;
     instructionText.y = 50;
     startScreen.addChild(instructionText);
+
+    // Test if input box works - TODO if we have time
+    //var PIXI = require("pixi.js");
+    //var PixiTextInput = require('pixitextinput');
+    //var inputField = new PIXITextInput('hello', instructionStyle);
+    //inputField.x = 115;
+    //inputField.y = 100;
+    //startScreen.addChild(inputField);
 
 /*
     socket.on('peopleInTeam', function(arr) {
@@ -203,6 +224,7 @@ function chooseTeam() {
     var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
     var ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
+    var questionMark = PIXI.Sprite.fromImage('/assets/Instruction.png');
     // Maze 
     var wall = PIXI.Sprite.fromImage('/assets/wall.png');
 
@@ -225,15 +247,23 @@ function chooseTeam() {
     ready.scale.x *= 0.3;
     ready.scale.y *= 0.3;
 
+    questionMark.anchor.set(0.5);
+    questionMark.x = app.screen.width - 50;
+    questionMark.y = 50;
+    questionMark.scale.x *= 0.3;
+    questionMark.scale.y *= 0.3;
+
     // Opt-in to interactivity
     team1.interactive = true;
     team2.interactive = true;
     ready.interactive = true;
+    questionMark.interactive = true;
 
     // Shows hand cursor
     team1.buttonMode = true;
     team2.buttonMode = true;
     ready.buttonMode = true;
+    questionMark.buttonMode = true;
 
     var text1;
     var text2;
@@ -260,6 +290,37 @@ function chooseTeam() {
         .on('pointerout', () => {team2.scale.x /= 1.5; team2.scale.y /= 1.5;});
     ready.on('pointerover', () => {ready.scale.x *= 2; ready.scale.y *= 2;})
         .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
+    
+    // Load tutorial assets
+    var panel = PIXI.Sprite.fromImage('assets/Panel.png');
+    panel.anchor.set(0.5);
+    panel.x = app.screen.width / 2 + 50;
+    panel.y = app.screen.height / 2;
+    panel.scale.x *= 10;
+    panel.scale.y *= 5;
+    tutorialScreen.addChild(panel);
+
+    var tutorial_text = "You're locked in a dungeon! \n Your only way out is to shoot and kill" +
+    " everyone in the other team. \n Move with the ARROW keys. \n Shoot with SPACE bar." + 
+    "\n Your health decreases whether or not you're moving, \n so be sure to keep navigating" +
+    " to pick up bullets and health potions! \n \n GOOD LUCK!";
+    var tutorialText = new PIXI.Text(tutorial_text, instructionStyle);
+    tutorialText.anchor.set(0.5);
+    tutorialText.x = app.screen.width / 2;
+    tutorialText.y = app.screen.height / 2;
+    tutorialText.scale.x *= 0.8;
+    tutorialText.scale.y *= 0.8;
+    tutorialScreen.addChild(tutorialText);
+
+    // When user hovers over question mark,
+    questionMark.on('pointerover', function() {
+        // Render instruction screen
+        tutorialScreen.visible = true;
+    });
+    questionMark.on('pointerout', function() {
+        // Render instruction screen
+        tutorialScreen.visible = false;
+    });
 
     // When team 1 is selected,
     team1.on('pointerdown', function() {
@@ -349,7 +410,7 @@ function chooseTeam() {
     startScreen.addChild(team1);
     startScreen.addChild(team2);
     startScreen.addChild(ready);
-
+    startScreen.addChild(questionMark);
  
 }
 
@@ -1212,8 +1273,10 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
-    result.scale.x *= 1;
-    result.scale.y *= 1;
-    
+    result.scale.x *= 5;
+    result.scale.y *= 5;
+    result.x = app.screen.width / 2;
+    result.y = app.screen.height / 2;
+
     endGameContainer.addChild(result);
 }

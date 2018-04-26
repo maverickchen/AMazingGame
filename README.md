@@ -14,6 +14,9 @@ Our game's PIXI.Container hierarchy
 
 	— app.stage
 
+		- gameID Container
+			- Text box where player can put their choice of ID in
+
 		— startScreen Container
 			—  UI Buttons and stuff
 		
@@ -33,3 +36,5 @@ Our game's PIXI.Container hierarchy
 
 		— endGameContainer
 			— You won/lost text assets
+
+		- tutorial Container
