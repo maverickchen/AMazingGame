@@ -3,6 +3,7 @@ var socket = io();
 
 // Model variables
 var inputs = []; // a log of this player's last few inputs
+var input_seq = 0;
 var serverStates = []; // log of most recent server updates
 var localState = {}; // clientside model of game state
 var myID; // the server-generated ID
@@ -546,11 +547,11 @@ function onAssetsLoaded() {
     ping = new Date().getTime() - initGameState.t;
     currTime = initGameState.t - ping;
 
+    netOffset = 200;
     socket.on('newGameState', function(state){
         serverStates.push(state);
-        currTime = new Date().getTime();
-
-        ping = currTime - state.t;
+        ping = new Date().getTime() - state.t;
+        currTime = state.t - netOffset;
         //console.log('ping',ping);
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
@@ -573,10 +574,9 @@ function onAssetsLoaded() {
 -------------------------------------------------------------------------- */
 
 function update(delta) {
-    var now = currTime;
     checkCollisions();
     handleInput(delta);
-    processServerUpdates(now);
+    processServerUpdates(currTime);
     updatePlayerSprites(localState, this.gameTextStyle);
     updateItemSprites(localState);
     updateMazeSprites(localState);
@@ -589,7 +589,6 @@ function checkCollisions() {
 
 
 function handleInput(delta) {
-    this.local_time += delta;
     if (localState.players[myID].health > 0) {
         var input = {};
         input.x_dir = 0;
@@ -601,10 +600,10 @@ function handleInput(delta) {
         if (down.isDown) input.y_dir += 1; 
         if (shoot.isDown) input.shooting = true;
 
-        if (input.x_dir != 0 || input.y_dir != 0) {
-            this.input_seq += 1;
+        if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
+            input_seq += 1;
             input.time = new Date().getTime();
-            input.seq = this.input_seq;
+            input.seq = input_seq;
             socket.emit('move', input);
             inputs.push(input);
             // change the player's sprite based off movement
@@ -613,8 +612,8 @@ function handleInput(delta) {
             else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
             else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
             else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
+            else if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
         }
-        if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
     }
 }
 
@@ -647,14 +646,12 @@ function processServerUpdates(time) {
         for (var i = 0; i < serverStates.length - 1; i++) {
             if (serverStates[i].t < time && 
                 time < serverStates[i+1].t) {
-                console.log('HERE');
                 next = serverStates[i+1];
                 prev = serverStates[i];
                 break;
             }
         }
         if (next && prev) {
-            console.log('INTERPOLATING');
             progress = time - prev.t;
             totalTime = next.t - prev.t;
             var ratio = progress/totalTime;
@@ -670,14 +667,14 @@ function processServerUpdates(time) {
             }
         } else { // (!next && !prev)
             // no states to interpolate between; just snap other players to 
-            // latest server position
-            latest = serverStates[serverStates.length-1];
-            localState.items = latest.items;
-            localState.players[myID].bullets = latest.players[myID].bullets;
-            localState.players[myID].health = latest.players[myID].health;
+            // oldest server position
+            oldest = serverStates[0];
+            localState.items = oldest.items;
+            localState.players[myID].bullets = oldest.players[myID].bullets;
+            localState.players[myID].health = oldest.players[myID].health;
             for (var id in localState.players) {
                 if (myID != id) {
-                    localState.players[id] = latest.players[id];
+                    localState.players[id] = oldest.players[id];
                 }
             }
         }
@@ -706,15 +703,22 @@ function replayUsingKnownPos(serverStates, clientInputs) {
     lastServerState = serverStates[serverStates.length - 1]
     if (lastServerState) {
         lastServerStateTime = lastServerState.t;
-        // delete client inputs that have been processed
+        // delete client inputs that have been processed by the server already
         var i = 0;
-        while (i < clientInputs.length && clientInputs[i].time < lastServerStateTime) {
-            clientInputs.splice(0,1);
+        while (i < clientInputs.length && clientInputs[i].seq <= lastServerState.players[myID].lastInputSeq) {
+            i++;
         }
+        clientInputs.splice(0,i);
+
         // replay pending client inputs from the confirmed server position
         localState.players[myID].x = lastServerState.players[myID].x;
         localState.players[myID].y = lastServerState.players[myID].y;
-        physicsUpdate(); // <-- reapply the remaining inputs
+
+        this.localState = localState;
+        this.inputs = inputs;
+        this.myID = myID;
+        this.maze = maze;
+        physicsUpdate.bind(this)(); // <-- reapply the remaining inputs
     }
 }
 

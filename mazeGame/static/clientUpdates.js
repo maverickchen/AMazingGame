@@ -1,6 +1,5 @@
 // Apply all queued inputs
 function physicsUpdate() {
-
     if (this.localState.players[this.myID].health > 0) {
         var dt = .015; // 15 ms input checking rate
         var player = this.localState.players[this.myID];
@@ -16,10 +15,10 @@ function physicsUpdate() {
             var y1 = Math.floor((player.y + speed*dt*input.y_dir ) / 100);
             var y2 = Math.floor((player.y + player.height + speed*dt*input.y_dir) / 100);
 
-            if (x1 < 0 || x1 >= maze[0].length) return; // x corresponds to COLUMNS
-            if (y1 < 0 || y1 >= maze.length) return; // y corresponds to ROWS
-            if (x2 < 0 || x2 >= maze[0].length) return;
-            if (y2 < 0 || y2 >= maze.length) return;
+            if (x1 < 0 || x1 >= this.maze[0].length) return; // x corresponds to COLUMNS
+            if (y1 < 0 || y1 >= this.maze.length) return; // y corresponds to ROWS
+            if (x2 < 0 || x2 >= this.maze[0].length) return;
+            if (y2 < 0 || y2 >= this.maze.length) return;
 
             if (this.maze[y1][x1] == 1 && this.maze[y2][x1] == 1 && this.maze[y1][x2] == 1 && this.maze[y2][x2] == 1) {
                 player.x = player.x + speed*dt*input.x_dir;
@@ -27,8 +26,16 @@ function physicsUpdate() {
             }
         }
         this.inputs = []; // clear inputs
+        // check item collisions
+        for (var i = 0; i < this.localState.items.length; i++) {
+            if (collides(this.localState.items[i], player)) {
+                //console.log('Item collision');
+                this.localState.items.splice(i,1);
+                // Play sound effect
+                break;
+            }
+        }
     }
-    
 }
 
 // function move() {
