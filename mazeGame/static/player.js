@@ -37,10 +37,25 @@ module.exports = class Player {
         this.height = 66;
         this.inputs = [];
         this.dead = false;
+        this.orientation = 'd';
+
+        // Add x direction and y direction here
+        this.x_dir = 0;
+        this.y_dir = 0;
         
     }
 
     move(direction, deltaT, maze) {
+        // Get move in the x direction and y direction. If x direction is -1, that means
+        // the player are heading left, otherwise, heading rihgt;
+        // If the y direction is -1, that means the player is going up, if y is 1,
+        // that means the player is going down. 
+        this.x_dir = direction.x_dir;
+        this.y_dir = direction.y_dir;
+        if (this.x_dir > 0) this.orientation = 'r';
+        else if (this.x_dir < 0) this.orientation = 'l';
+        else if (this.y_dir < 0) this.orientation = 'u';
+        else if (this.y_dir > 0) this.orientation = 'd';
 
         if (this.health > 0) {
             var x1 = Math.floor((this.x + speed*deltaT*direction.x_dir) / 100);
@@ -58,6 +73,5 @@ module.exports = class Player {
                 this.y = this.y + speed*deltaT*direction.y_dir;  
             }
         }
-        
     }
 };

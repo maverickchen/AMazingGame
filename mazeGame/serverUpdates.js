@@ -1,4 +1,5 @@
 var Collision = require('./static/collides');
+var bullet = require('./static/bullet');
 
 /*
  * updatePhysics: given a list of clientInputs, process them and calculate 
@@ -6,6 +7,7 @@ var Collision = require('./static/collides');
  */
 
 var gameOver = false;
+var bullet_list = [];
 
 exports.updatePhysics = function() {
     dt = .015; // change this later; 15ms
@@ -25,8 +27,19 @@ exports.updatePhysics = function() {
 
             // Re-render players
             for (var i = 0; i < player.inputs.length; i++) {
+                if (player.inputs[i].shooting) {
+                    //console.log("Shooting");
+                    // If the player myID is shooting, add the bullet to the bullet_list and
+                    // then add it to the input. Pass the x direction and y direction as input
+                    // directly.  
+                    // FIND ME
+                    var newBullet = new bullet(player.x, player.y, player.orientation, id);                       
+                    bullet_list[bullet_list.length] = newBullet;                     
+                }
                 player.move(player.inputs[i], dt, this.maze);
             }
+
+            //console.log("before the remove " + bullet_list.length);
 
             player.inputs = []; // clear their inputs
             // check item collisions
@@ -38,6 +51,39 @@ exports.updatePhysics = function() {
                     break;
                 }
             }
+
+            // FIND ME
+            // move the bullet
+            //console.log("bullet list length " + bullet_list.length);
+
+            for(var i = 0; i < bullet_list.length; i++) {
+
+                //console.log("in for loop");
+                var collide_wall = bullet_list[i].move(dt, this.maze);
+                //console.log("under");
+
+                if (collide_wall) {
+                    //console.log("Show the dt in bullet list");
+                    bullet_list.splice(i,1);
+                }
+            }
+
+            // Chech for bullet collisions
+            for(var i = 0; i < bullet_list.length; i++) {
+                if(Collision.collides(bullet_list[i], id)) {
+                    if (bullet_list[i].owner != player) {
+
+                        console.log("bullet_list " + bullet_list[i]);
+
+                        bullet_list[i].use(player);
+                        bullet_list.splice(i,1);
+                        break;
+                    }
+                }
+            }
+
+
+
         }
     }
 }
@@ -82,6 +128,7 @@ exports.updateClients = function() {
             gameState = {
                 players : this.players, 
                 items : getRelevantItems(this.items, this.players[id]),
+                bullets: this.bullet_list,
                 t : new Date().getTime()
             };
             this.clientSockets[id].emit('newGameState', gameState);

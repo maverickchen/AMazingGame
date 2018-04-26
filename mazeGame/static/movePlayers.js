@@ -518,6 +518,7 @@ function update(delta) {
     processServerUpdates(now);
     updatePlayerSprites(localState, this.gameTextStyle);
     updateItemSprites(localState);
+    updateBulletSprites(localState);
     updateMazeSprites(localState);
 }
 
@@ -533,6 +534,8 @@ function handleInput(delta) {
         var input = {};
         input.x_dir = 0;
         input.y_dir = 0;
+        // Initialize the bullet list
+        //input.bullet_list = [];
         input.shooting = false;
         if (left.isDown) input.x_dir += -1; 
         if (right.isDown) input.x_dir += 1; 
@@ -540,7 +543,7 @@ function handleInput(delta) {
         if (down.isDown) input.y_dir += 1; 
         if (shoot.isDown) input.shooting = true;
 
-        if (input.x_dir != 0 || input.y_dir != 0) {
+        if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
             this.input_seq += 1;
             input.time = new Date().getTime();
             input.seq = this.input_seq;
@@ -945,9 +948,58 @@ function updateBulletSprites(state) {
     rCount = 0;
     uCount = 0;
     dCount = 0;
-    for (var dir in state.bullets) {
-        for (var i = 0; i < state.bullets[dir].length; i++) {
+    console.log("state bullet list " + state.bullet_list);
+
+    for(var i = 0; i < state.bullet_list.length; i++) {
+        if(state.bullet_list[i].x_dir < 0) {
+            if (lCount > bulletSprites.lefts.length) {
+                bulletSprites.lefts.push(newBulletSprite('l'));
+            }
+            bulletSprites.lefts[lCount].x = state.bullet_list[i].x;
+            bulletSprites.lefts[lCount].y = state.bullet_list[i].y;
+            lCount += 1;
+            //setSprite(bulletSprites.lefts, i);
         }
+        if(state.bullet_list[i].x_dir > 0) {
+            if (rCount > bulletSprites.rights.length) {
+                bulletSprites.rights.push(newBulletSprite('r'));
+            }
+            bulletSprites.rights[rCount].x = state.bullet_list[i].x;
+            bulletSprites.rights[rCount].y = state.bullet_list[i].y;
+            rCount += 1;
+        }
+        if(state.bullet_list[i].y_dir < 0) {
+            if (uCount > bulletSprites.ups.length) {
+                bulletSprites.ups.push(newBulletSprite('u'));
+            }
+            bulletSprites.ups[uCount].x = state.bullet_list[i].x;
+            bulletSprites.ups[uCount].y = state.bullet_list[i].y;
+            uCount += 1;
+        }
+        if(state.bullet_list[i].y_dir > 0) {
+            if (dCount > bulletSprites.downs.length) {
+                bulletSprites.downs.push(newBulletSprite('d'));
+            }
+            bulletSprites.downs[dCount].x = state.bullet_list[i].x;
+            bulletSprites.downs[dCount].y = state.bullet_list[i].y;
+            dCount += 1;
+        }
+    }
+    while (lCount < bulletSprites.lefts.length) {
+        bulletSprites.lefts[lCount].visible = false;
+        lCount++;
+    }
+    while (rCount < bulletSprites.rights.length) {
+        bulletSprites.rights[rCount].visible = false;
+        rCount++;
+    }
+    while (uCount < bulletSprites.ups.length) {
+        bulletSprites.ups[uCount].visible = false;
+        uCount++;
+    }
+    while (dCount < bulletSprites.downs.length) {
+        bulletSprites.downs[dCount].visible = false;
+        dCount++;
     }
 }
 
