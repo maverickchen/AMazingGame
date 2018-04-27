@@ -9,8 +9,12 @@ function collides(obj1, obj2) {
     r2 = obj2.x + obj2.width;
     d2 = obj2.y + obj2.height;
 
-    if ((l1 <= l2 && l2 <= r1) || (l1 <= r2 && r2 <= r1)) {
-        return ((u1 <= u2 && u2 <= d1) || (u1<= d2 && d2 <= d1));
+    if (l1 > r2 || l2 > r1) {
+        return false;
     }
-    return false;
+    if (u1 > d2 || u2 > d1) {
+        return false;
+    }
+    console.log('Collision');
+    return true;
 }
