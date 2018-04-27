@@ -630,7 +630,7 @@ function checkCollisions() {
 
 }
 
-
+var shootPressedBefore = false;
 function handleInput(delta) {
     if (localState.players[myID].health > 0) {
         var input = {};
@@ -641,7 +641,12 @@ function handleInput(delta) {
         if (right.isDown) input.x_dir += 1; 
         if (up.isDown) input.y_dir += -1;
         if (down.isDown) input.y_dir += 1; 
-        if (shoot.isDown) input.shooting = true;
+        if (shoot.isDown) shootPressedBefore = true;//; input.shooting = true;
+
+        if (shoot.isUp && shootPressedBefore) {
+            input.shooting = true; 
+            shootPressedBefore = false; //state.players[myID].bullet -= 1;
+        }
 
         if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
             input_seq += 1;
@@ -1198,6 +1203,7 @@ function updateBulletSprites(state) {
             bulletSprites.downs[dCount].visible = false;
             dCount += 1;
         }
+
     }
 
 
