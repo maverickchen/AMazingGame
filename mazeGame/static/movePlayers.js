@@ -11,7 +11,6 @@ var local_time = 0.016;
 
 var currTime = new Date().getTime();
 var ping = 0;
-const speed = 150;
 const WALL_WIDTH = 100;
 var maze;
 
@@ -158,7 +157,7 @@ var team2_ppl = 0;
 
 // Style for UI text
 var style = new PIXI.TextStyle({
-    fontFamily: 'Arial',
+    fontFamily: "\"Lucida Console\", Monaco, monospace",
     fontSize: 18,
     fontWeight: 'bold',
     fill: ['#ffffff'] // gradient
@@ -188,7 +187,7 @@ function chooseTeam() {
 
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 30,
         fontWeight: 'bold',
         fill: ['#E84F2E'] // gradient
@@ -250,10 +249,10 @@ function chooseTeam() {
     ready.scale.y *= 0.3;
 
     questionMark.anchor.set(0.5);
-    questionMark.x = app.screen.width - 100;
+    questionMark.x = 100;
     questionMark.y = 100;
-    questionMark.scale.x *= 0.7;
-    questionMark.scale.y *= 0.7;
+    questionMark.scale.x *= 1;
+    questionMark.scale.y *= 1;
 
     // Opt-in to interactivity
     team1.interactive = true;
@@ -294,24 +293,29 @@ function chooseTeam() {
         .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
     
     // Load tutorial assets
-    var panel = PIXI.Sprite.fromImage('assets/Panel.png');
+    var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
     panel.anchor.set(0.5);
-    panel.x = app.screen.width / 2 + 50;
-    panel.y = app.screen.height / 2;
-    panel.scale.x *= 10;
+    panel.x = app.screen.width / 2;
+    panel.y = app.screen.height / 2 + 70;
+    panel.scale.x *= 8;
     panel.scale.y *= 5;
     tutorialScreen.addChild(panel);
 
-    var tutorial_text = "You're locked in a dungeon! \n Your only way out is to shoot and kill" +
-    " everyone in the other team. \n Move with the ARROW keys. \n Shoot with SPACE bar." + 
-    "\n Your health decreases whether or not you're moving, \n so be sure to keep navigating" +
-    " to pick up bullets and health potions! \n \n GOOD LUCK!";
-    var tutorialText = new PIXI.Text(tutorial_text, instructionStyle);
+    var tutorial_style = new PIXI.TextStyle({
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: ['#121314'] // gradient
+    });
+
+    var tutorial_text = "You're locked in a dungeon! \nYour only way out is to shoot and kill" +
+    " everyone in the other team. \nMove with the ARROW keys. \nShoot with SPACE bar." + 
+    "\nYour health decreases whether or not you're moving, \nso be sure to keep navigating" +
+    " to pick up bullets and health potions! \n \nGOOD LUCK!";
+    var tutorialText = new PIXI.Text(tutorial_text, tutorial_style);
     tutorialText.anchor.set(0.5);
     tutorialText.x = app.screen.width / 2;
     tutorialText.y = app.screen.height / 2;
-    tutorialText.scale.x *= 0.8;
-    tutorialText.scale.y *= 0.8;
     tutorialScreen.addChild(tutorialText);
 
     // When user hovers over question mark,
@@ -466,42 +470,78 @@ function onAssetsLoaded() {
     panel.scale.y *= 4;
     gameUI.addChild(panel);
 
-    // Display "HP:"
     var gameTextStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 20,
         fontWeight: 'bold',
         fill: ['#05090c'] // gradient
     });
+
+    // Display Player Sprite on Panel
+    var playerSprite;
+    if (localState.players[myID].teamNumber === 1) {
+        playerSprite = PIXI.Sprite.fromImage('assets/Player1Example.png');
+    }
+    else {
+        playerSprite = PIXI.Sprite.fromImage('assets/Player2Example.png');
+    }
+    playerSprite.x = app.screen.width - 320;
+    playerSprite.y = 125;
+    playerSprite.scale.x *= 0.4;
+    playerSprite.scale.y *= 0.4;
+    gameUI.addChild(playerSprite);
+
+    // Display user's team
+    var userTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
+    userTeam.x = app.screen.width - 230;
+    userTeam.y = 150;
+    gameUI.addChild(userTeam);
+
+    // Display Health Potion sprite on panel
+    var healthSprite = PIXI.Sprite.fromImage('assets/Ammo.png');
+    healthSprite.x = app.screen.width - 230;
+    healthSprite.y = 250;
+    gameUI.addChild(healthSprite);
+
+    // Display Bullet sprite on panel
+    var bulletSprite = PIXI.Sprite.fromImage('assets/Ammo.png');
+    bulletSprite.x = app.screen.width - 340;
+    bulletSprite.y = 400;
+    bulletSprite.scale.x *= 0.2;
+    bulletSprite.scale.y *= 0.2;
+    gameUI.addChild(bulletSprite);
+
+    /*
     this.gameTextStyle = gameTextStyle;
     var healthPointText = new PIXI.Text('HP:', gameTextStyle);
     healthPointText.x = app.screen.width - 350;
     healthPointText.y = 115;
     gameUI.addChild(healthPointText);
+    */
 
+    /*
     // Display user's id - hardcoded for now
     var userID = new PIXI.Text('User', gameTextStyle);
     userID.x = app.screen.width - 350;
     userID.y = 155;
     gameUI.addChild(userID);
+    */
 
-    // Display user's team - also hardcoded
-    var userTeam = new PIXI.Text('Team', gameTextStyle);
-    userTeam.x = app.screen.width - 350;
-    userTeam.y = 195;
-    gameUI.addChild(userTeam);
-
+    /*
     // Display bullet remaining - also hardcoded
-    var bulletsRemaining = new PIXI.Text('Bullet Left:', gameTextStyle);
+    var bulletsRemaining = new PIXI.Text('Bullets Left:', gameTextStyle);
     bulletsRemaining.x = app.screen.width - 350;
     bulletsRemaining.y = 235;
     gameUI.addChild(bulletsRemaining);
+    */
 
+    /*
     // Leave space for customized maze
     var mazeText = new PIXI.Text('Your Maze:', gameTextStyle);
     mazeText.x = app.screen.width - 350;
     mazeText.y = 275;
     gameUI.addChild(mazeText);
+    */
 
     // var hazeSprite = PIXI.Sprite.fromImage('/assets/haze.png');
     // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 50);
@@ -706,11 +746,13 @@ function interpolatePlayer(prev, next, id, ratio) {
 // player is still at the right place
 function replayUsingKnownPos(serverStates, clientInputs) {
     lastServerState = serverStates[serverStates.length - 1]
+    console.log('Before', );
     if (lastServerState) {
+        console.log('Before', localState.players[myID].x, localState.players[myID].y);
         lastServerStateTime = lastServerState.t;
         // delete client inputs that have been processed by the server already
         var i = 0;
-        while (i < clientInputs.length && clientInputs[i].seq <= lastServerState.players[myID].lastInputSeq) {
+        while (i < clientInputs.length && clientInputs[i].seq <= lastServerState.players[myID].serverLastInputSeq) {
             i++;
         }
         clientInputs.splice(0,i);
@@ -718,12 +760,13 @@ function replayUsingKnownPos(serverStates, clientInputs) {
         // replay pending client inputs from the confirmed server position
         localState.players[myID].x = lastServerState.players[myID].x;
         localState.players[myID].y = lastServerState.players[myID].y;
-
+        localState.players[myID].clientLastInputSeq = lastServerState.players[myID].serverLastInputSeq;
         this.localState = localState;
         this.inputs = inputs;
         this.myID = myID;
         this.maze = maze;
         physicsUpdate.bind(this)(); // <-- reapply the remaining inputs
+        console.log('After', localState.players[myID].x, localState.players[myID].y);
     }
 }
 
@@ -960,6 +1003,7 @@ function setSprite(animation, id) {
  * player sprites
  */ 
 var bulletsNum; // Text to display the number of bullets - updated everytime newGameState is changed
+var healthText;
 function updatePlayerSprites(state, gameTextStyle) {
     // draw player sprites
     for (var id in state.players) {
@@ -983,9 +1027,18 @@ function updatePlayerSprites(state, gameTextStyle) {
                 var index = gameUI.children.indexOf(bulletsNum);
                 if (index !== -1) gameUI.removeChild(bulletsNum);
                 bulletsNum = new PIXI.Text(state.players[id].bullets, gameTextStyle);
-                bulletsNum.x = app.screen.width - 200;
-                bulletsNum.y = 235;
+                bulletsNum.x = app.screen.width - 180;
+                bulletsNum.y = 400;
                 gameUI.addChild(bulletsNum);
+
+                // Create texts for health
+                var index = gameUI.children.indexOf(healthText);
+                if (index !== -1) gameUI.removeChild(healthText);
+                healthText = new PIXI.Text(state.players[id].health + " / 100", gameTextStyle);
+                healthText.x = app.screen.width - 200;
+                healthText.y = 300;
+                gameUI.addChild(healthText);
+
             } 
             else { // nonlocal players
                 // match sprite with direction of movement
@@ -1231,12 +1284,12 @@ function newHPSprite(lighting){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
     spriteBkg.scale.y *= .4;
-    spriteBkg.x = w - 250;
+    spriteBkg.x = w - 300;
     spriteBkg.y = 110;
     spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
     spriteHP.scale.x *= .4;
     spriteHP.scale.y *= .4;
-    spriteHP.x = w - 250;
+    spriteHP.x = w - 300;
     spriteHP.y = 110;
     gameUI.addChild(spriteBkg);
     gameUI.addChild(spriteHP);
@@ -1292,8 +1345,9 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
-    result.scale.x *= 5;
-    result.scale.y *= 5;
+    result.anchor.set(0.5);
+    result.scale.x *= 3;
+    result.scale.y *= 3;
     result.x = app.screen.width / 2;
     result.y = app.screen.height / 2;
 

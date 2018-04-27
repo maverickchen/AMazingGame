@@ -37,13 +37,18 @@ module.exports = class Player {
         this.height = 66;
         this.inputs = [];
         this.dead = false;
+<<<<<<< HEAD
         this.orientation = 'd';
         //this.lastInputSeq = -1;
         
+=======
+        this.serverLastInputSeq = -1;
+        this.clientLastInputSeq = -1;
+>>>>>>> 1caa6d3a77172046313d5e3a761fbe531076179e
     }
 
     move(direction, deltaT, maze) {
-
+        this.serverLastInputSeq = direction.seq;
         if (this.health > 0) {
             var x1 = Math.floor((this.x + speed*deltaT*direction.x_dir) / 100);
             var x2 = Math.floor((this.x + this.width + speed*deltaT*direction.x_dir) / 100);
