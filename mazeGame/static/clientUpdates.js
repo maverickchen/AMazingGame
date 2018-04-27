@@ -1,5 +1,7 @@
 // Apply all queued inputs
 const speed = 150;
+var playingAmmoSound = false;
+var playingPotionSound = false;
 
 function physicsUpdate() {
     if (this.localState.players[this.myID].health > 0) {
@@ -31,9 +33,31 @@ function physicsUpdate() {
         // check item collisions
         for (var i = 0; i < this.localState.items.length; i++) {
             if (collides(this.localState.items[i], player)) {
-                //console.log('Item collision');
-                //this.localState.items.splice(i,1);
-                // Play sound effect
+                if (this.localState.items[i].type == 'Ammo') {
+                    if (!playingAmmoSound) {
+                        playingAmmoSound = true;
+                        PIXI.sound.Sound.from({
+                            url: 'assets/reloadSound.mp3',
+                            autoPlay: true,
+                            loop: false,
+                            complete: function() {
+                                playingAmmoSound = false;
+                            }
+                        });
+                    }
+                } else if (this.localState.items[i].type == 'Potion') {
+                    if (!playingPotionSound) {
+                        playingPotionSound = true;
+                        PIXI.sound.Sound.from({
+                            url: 'assets/PopCork.mp3',
+                            autoPlay: true,
+                            loop: false,
+                            complete: function() {
+                                playingPotionSound = false;;
+                            }
+                        });
+                    }
+                }
                 break;
             }
         }
