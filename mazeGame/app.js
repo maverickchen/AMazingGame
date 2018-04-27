@@ -5,12 +5,11 @@ var path = require('path');
 var io = require('socket.io')(server);
 var Player = require('./static/player');
 var Item = require('./static/item');
-// var Collision = require('./static/collides');
 var Updates = require('./serverUpdates');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
-var width = 512;
+var width = 50;
 
 var maze_cell = generator(width);
 var maze = converter.convertMaze(maze_cell);

@@ -7,7 +7,7 @@ function physicsUpdate() {
     if (this.localState.players[this.myID].health > 0) {
         var dt = .015; // 15 ms input checking rate
         var player = this.localState.players[this.myID];
-        
+
         // apply local player position
         var input;
         for (var i = 0; i < this.inputs.length; i++) {
@@ -40,6 +40,7 @@ function physicsUpdate() {
                             url: 'assets/PopCork.mp3',
                             autoPlay: true,
                             loop: false,
+                            volume: 3,
                             complete: function() {
                                 playingPotionSound = false;;
                             }
