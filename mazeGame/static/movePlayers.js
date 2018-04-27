@@ -470,25 +470,54 @@ function onAssetsLoaded() {
     panel.scale.y *= 4;
     gameUI.addChild(panel);
 
-    /*
-    // Display "HP:"
     var gameTextStyle = new PIXI.TextStyle({
         fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 20,
         fontWeight: 'bold',
         fill: ['#05090c'] // gradient
     });
+
+    // Display Player Sprite on Panel
+    var playerSprite;
+    if (localState.players[myID].teamNumber === 1) {
+        playerSprite = PIXI.Sprite.fromImage('assets/Player1Example.png');
+    }
+    else {
+        playerSprite = PIXI.Sprite.fromImage('assets/Player2Example.png');
+    }
+    playerSprite.x = app.screen.width - 320;
+    playerSprite.y = 125;
+    playerSprite.scale.x *= 0.4;
+    playerSprite.scale.y *= 0.4;
+    gameUI.addChild(playerSprite);
+
+    // Display user's team
+    var userTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
+    userTeam.x = app.screen.width - 230;
+    userTeam.y = 150;
+    gameUI.addChild(userTeam);
+
+    // Display Health Potion sprite on panel
+    var healthSprite = PIXI.Sprite.fromImage('assets/Ammo.png');
+    healthSprite.x = app.screen.width - 230;
+    healthSprite.y = 250;
+    gameUI.addChild(healthSprite);
+
+    // Display Bullet sprite on panel
+    var bulletSprite = PIXI.Sprite.fromImage('assets/Ammo.png');
+    bulletSprite.x = app.screen.width - 340;
+    bulletSprite.y = 400;
+    bulletSprite.scale.x *= 0.2;
+    bulletSprite.scale.y *= 0.2;
+    gameUI.addChild(bulletSprite);
+
+    /*
     this.gameTextStyle = gameTextStyle;
     var healthPointText = new PIXI.Text('HP:', gameTextStyle);
     healthPointText.x = app.screen.width - 350;
     healthPointText.y = 115;
     gameUI.addChild(healthPointText);
     */
-
-
-    // Display Health Potion sprite instead
-    //var potionSprite = PIXI.Sprite.fromImage('assets/');
-
 
     /*
     // Display user's id - hardcoded for now
@@ -497,12 +526,6 @@ function onAssetsLoaded() {
     userID.y = 155;
     gameUI.addChild(userID);
     */
-
-    // Display user's team - also hardcoded
-    var userTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
-    userTeam.x = app.screen.width - 350;
-    userTeam.y = 195;
-    gameUI.addChild(userTeam);
 
     /*
     // Display bullet remaining - also hardcoded
@@ -977,6 +1000,7 @@ function setSprite(animation, id) {
  * player sprites
  */ 
 var bulletsNum; // Text to display the number of bullets - updated everytime newGameState is changed
+var healthText;
 function updatePlayerSprites(state, gameTextStyle) {
     // draw player sprites
     for (var id in state.players) {
@@ -1000,9 +1024,18 @@ function updatePlayerSprites(state, gameTextStyle) {
                 var index = gameUI.children.indexOf(bulletsNum);
                 if (index !== -1) gameUI.removeChild(bulletsNum);
                 bulletsNum = new PIXI.Text(state.players[id].bullets, gameTextStyle);
-                bulletsNum.x = app.screen.width - 200;
-                bulletsNum.y = 235;
+                bulletsNum.x = app.screen.width - 180;
+                bulletsNum.y = 400;
                 gameUI.addChild(bulletsNum);
+
+                // Create texts for health
+                var index = gameUI.children.indexOf(healthText);
+                if (index !== -1) gameUI.removeChild(healthText);
+                healthText = new PIXI.Text(state.players[id].health + " / 100", gameTextStyle);
+                healthText.x = app.screen.width - 200;
+                healthText.y = 300;
+                gameUI.addChild(healthText);
+
             } 
             else { // nonlocal players
                 // match sprite with direction of movement
