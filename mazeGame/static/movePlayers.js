@@ -157,7 +157,7 @@ var team2_ppl = 0;
 
 // Style for UI text
 var style = new PIXI.TextStyle({
-    fontFamily: 'Arial',
+    fontFamily: "\"Lucida Console\", Monaco, monospace",
     fontSize: 18,
     fontWeight: 'bold',
     fill: ['#ffffff'] // gradient
@@ -187,7 +187,7 @@ function chooseTeam() {
 
     // Style for instructionText
     var instructionStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 30,
         fontWeight: 'bold',
         fill: ['#E84F2E'] // gradient
@@ -249,10 +249,10 @@ function chooseTeam() {
     ready.scale.y *= 0.3;
 
     questionMark.anchor.set(0.5);
-    questionMark.x = app.screen.width - 100;
+    questionMark.x = 100;
     questionMark.y = 100;
-    questionMark.scale.x *= 0.7;
-    questionMark.scale.y *= 0.7;
+    questionMark.scale.x *= 1;
+    questionMark.scale.y *= 1;
 
     // Opt-in to interactivity
     team1.interactive = true;
@@ -293,24 +293,29 @@ function chooseTeam() {
         .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
     
     // Load tutorial assets
-    var panel = PIXI.Sprite.fromImage('assets/Panel.png');
+    var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
     panel.anchor.set(0.5);
-    panel.x = app.screen.width / 2 + 50;
-    panel.y = app.screen.height / 2;
-    panel.scale.x *= 10;
+    panel.x = app.screen.width / 2;
+    panel.y = app.screen.height / 2 + 70;
+    panel.scale.x *= 8;
     panel.scale.y *= 5;
     tutorialScreen.addChild(panel);
 
-    var tutorial_text = "You're locked in a dungeon! \n Your only way out is to shoot and kill" +
-    " everyone in the other team. \n Move with the ARROW keys. \n Shoot with SPACE bar." + 
-    "\n Your health decreases whether or not you're moving, \n so be sure to keep navigating" +
-    " to pick up bullets and health potions! \n \n GOOD LUCK!";
-    var tutorialText = new PIXI.Text(tutorial_text, instructionStyle);
+    var tutorial_style = new PIXI.TextStyle({
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: ['#121314'] // gradient
+    });
+
+    var tutorial_text = "You're locked in a dungeon! \nYour only way out is to shoot and kill" +
+    " everyone in the other team. \nMove with the ARROW keys. \nShoot with SPACE bar." + 
+    "\nYour health decreases whether or not you're moving, \nso be sure to keep navigating" +
+    " to pick up bullets and health potions! \n \nGOOD LUCK!";
+    var tutorialText = new PIXI.Text(tutorial_text, tutorial_style);
     tutorialText.anchor.set(0.5);
     tutorialText.x = app.screen.width / 2;
     tutorialText.y = app.screen.height / 2;
-    tutorialText.scale.x *= 0.8;
-    tutorialText.scale.y *= 0.8;
     tutorialScreen.addChild(tutorialText);
 
     // When user hovers over question mark,
@@ -465,9 +470,10 @@ function onAssetsLoaded() {
     panel.scale.y *= 4;
     gameUI.addChild(panel);
 
+    /*
     // Display "HP:"
     var gameTextStyle = new PIXI.TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
         fontSize: 20,
         fontWeight: 'bold',
         fill: ['#05090c'] // gradient
@@ -477,30 +483,42 @@ function onAssetsLoaded() {
     healthPointText.x = app.screen.width - 350;
     healthPointText.y = 115;
     gameUI.addChild(healthPointText);
+    */
 
+
+    // Display Health Potion sprite instead
+    //var potionSprite = PIXI.Sprite.fromImage('assets/');
+
+
+    /*
     // Display user's id - hardcoded for now
     var userID = new PIXI.Text('User', gameTextStyle);
     userID.x = app.screen.width - 350;
     userID.y = 155;
     gameUI.addChild(userID);
+    */
 
     // Display user's team - also hardcoded
-    var userTeam = new PIXI.Text('Team', gameTextStyle);
+    var userTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
     userTeam.x = app.screen.width - 350;
     userTeam.y = 195;
     gameUI.addChild(userTeam);
 
+    /*
     // Display bullet remaining - also hardcoded
-    var bulletsRemaining = new PIXI.Text('Bullet Left:', gameTextStyle);
+    var bulletsRemaining = new PIXI.Text('Bullets Left:', gameTextStyle);
     bulletsRemaining.x = app.screen.width - 350;
     bulletsRemaining.y = 235;
     gameUI.addChild(bulletsRemaining);
+    */
 
+    /*
     // Leave space for customized maze
     var mazeText = new PIXI.Text('Your Maze:', gameTextStyle);
     mazeText.x = app.screen.width - 350;
     mazeText.y = 275;
     gameUI.addChild(mazeText);
+    */
 
     // var hazeSprite = PIXI.Sprite.fromImage('/assets/haze.png');
     // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 50);
@@ -1168,12 +1186,12 @@ function newHPSprite(lighting){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
     spriteBkg.scale.y *= .4;
-    spriteBkg.x = w - 250;
+    spriteBkg.x = w - 300;
     spriteBkg.y = 110;
     spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
     spriteHP.scale.x *= .4;
     spriteHP.scale.y *= .4;
-    spriteHP.x = w - 250;
+    spriteHP.x = w - 300;
     spriteHP.y = 110;
     gameUI.addChild(spriteBkg);
     gameUI.addChild(spriteHP);
@@ -1229,8 +1247,9 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
-    result.scale.x *= 5;
-    result.scale.y *= 5;
+    result.anchor.set(0.5);
+    result.scale.x *= 3;
+    result.scale.y *= 3;
     result.x = app.screen.width / 2;
     result.y = app.screen.height / 2;
 
