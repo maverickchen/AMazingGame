@@ -15,6 +15,5 @@ function collides(obj1, obj2) {
     if (u1 > d2 || u2 > d1) {
         return false;
     }
-    console.log('Collision');
     return true;
 }
