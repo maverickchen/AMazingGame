@@ -18,6 +18,16 @@ function physicsUpdate() {
                 var y1 = Math.floor((player.y + speed*dt*input.y_dir ) / 100);
                 var y2 = Math.floor((player.y + player.height + speed*dt*input.y_dir) / 100);
 
+                if(input.x_dir < 0) {
+                    player.orientation = 'l';
+                } else if (input.x_dir > 0) {
+                    player.orientation = 'r';
+                } else if (input.y_dir < 0) {
+                    player.orientation = 'u';
+                } else if (input.y_dir > 0) {
+                    player.orientation = 'd';
+                }
+
                 if (x1 < 0 || x1 >= this.maze[0].length) return; // x corresponds to COLUMNS
                 if (y1 < 0 || y1 >= this.maze.length) return; // y corresponds to ROWS
                 if (x2 < 0 || x2 >= this.maze[0].length) return;
