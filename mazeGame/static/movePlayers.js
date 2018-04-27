@@ -528,7 +528,7 @@ function onAssetsLoaded() {
     
     loadPlayerSprites(lighting);
     loadMazeSprites();
-
+    loadBulletSprites();
     hpObj = newHPSprite(lighting);
     hpBkg = hpObj.spriteBkg;
     hp = hpObj.spriteHP;
@@ -581,6 +581,7 @@ function update(delta) {
     processServerUpdates(currTime);
     updatePlayerSprites(localState, this.gameTextStyle);
     updateItemSprites(localState);
+    updateBulletSprites(localState);
     updateMazeSprites(localState);
 }
 
@@ -659,6 +660,7 @@ function processServerUpdates(time) {
             var ratio = progress/totalTime;
             // apply item changes immediately
             localState.items = prev.items;
+            localState.bullets_list = prev.bullets_list;
             localState.players[myID].bullets = prev.players[myID].bullets;
             localState.players[myID].health = prev.players[myID].health;
             for (var id in localState.players) {
@@ -672,6 +674,7 @@ function processServerUpdates(time) {
             // oldest server position
             oldest = serverStates[0];
             localState.items = oldest.items;
+            localState.bullets_list = oldest.bullets_list;
             localState.players[myID].bullets = oldest.players[myID].bullets;
             localState.players[myID].health = oldest.players[myID].health;
             for (var id in localState.players) {
@@ -1012,12 +1015,74 @@ function updateBulletSprites(state) {
     rCount = 0;
     uCount = 0;
     dCount = 0;
-    for (var dir in state.bullets) {
-        for (var i = 0; i < state.bullets[dir].length; i++) {
+
+    if (state.bullets_list != null) {
+        console.log("state bullet" + state.bullets_list.length);
+        for (var i = 0; i < state.bullets_list.length; i++) {
+            console.log("state bullet x + " + state.bullets_list[i].x_dir);
+            console.log("state bullet y  + " + state.bullets_list[i].y_dir);
+            if(state.bullets_list[i].x_dir == -1){
+                if (lCount >= bulletSprites.lefts.length) {
+                    bulletSprites.lefts.push(newBulletSprite());
+                }
+                bulletSprites.lefts[lCount].x = state.bullets_list[i].x;
+                bulletSprites.lefts[lCount].y = state.bullets_list[i].y;
+                bulletSprites.lefts[lCount].visible = true;
+                lCount +=1;
+            }
+    
+            if(state.bullets_list[i].x_dir == 1){
+                if (rCount >= bulletSprites.rights.length) {
+                    bulletSprites.rights.push(newBulletSprite());
+                }
+                bulletSprites.rights[rCount].x = state.bullets_list[i].x;
+                bulletSprites.rights[rCount].y = state.bullets_list[i].y;
+                bulletSprites.rights[rCount].visible = true;
+                rCount +=1;
+            }
+    
+            if(state.bullets_list[i].y_dir == -1){
+                if(uCount >= bulletSprites.ups.length) {
+                    bulletSprites.ups.push(newBulletSprite());
+                }
+                bulletSprites.ups[uCount].x = state.bullets_list[i].x;
+                bulletSprites.ups[uCount].y = state.bullets_list[i].y;
+                bulletSprites.ups[uCount].visible = true;
+                uCount +=1;
+            }
+    
+            if(state.bullets_list[i].y_dir == 1){
+                if(dCount >= bulletSprites.downs.length) {
+                    bulletSprites.downs.push(newBulletSprite());
+                }
+                bulletSprites.downs[dCount].x = state.bullets_list[i].x;
+                bulletSprites.downs[dCount].y = state.bullets_list[i].y;
+                bulletSprites.downs[dCount].visible = true;
+                dCount +=1;
+            }
+        }
+    
+        // make any unused bullet sprites invisible
+        while (lCount < bulletSprites.lefts.length) {
+            bulletSprites.lefts[lCount].visible = false;
+            lCount += 1;
+        }
+        while (rCount < bulletSprites.rights.length) {
+            bulletSprites.rights[rCount].visible = false;
+            rCount += 1;
+        }
+        while (uCount < bulletSprites.ups.length) {
+            bulletSprites.ups[uCount].visible = false;
+            uCount += 1;
+        }
+        while (dCount < bulletSprites.downs.length) {
+            bulletSprites.downs[dCount].visible = false;
+            dCount += 1;
         }
     }
-}
 
+
+}
 
 /*
  * updateItemSprites: given a game state object (state), update the location of all 
@@ -1083,11 +1148,11 @@ function updateMazeSprites(state) {
         }
     }
     // make any unused wall sprites invisible
-    while (wallSprites[wallCnt].visible) {
+    while (wallCnt < wallSprites.length) {
         wallSprites[wallCnt].visible = false;
         wallCnt += 1;
     }
-    while (floorSprites[floorCnt].visible) {
+    while (floorCnt < floorSprites.length) {
         floorSprites[floorCnt].visible = false;
         floorCnt += 1;
     }

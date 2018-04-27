@@ -1,5 +1,5 @@
 var Collision = require('./static/collides');
-var bullet = require('./static/bullet');
+var Bullet = require('./static/bullet');
 
 /*
  * updatePhysics: given a list of clientInputs, process them and calculate 
@@ -11,6 +11,23 @@ var bullet_list = [];
 
 exports.updatePhysics = function() {
     dt = .015; // change this later; 15ms
+
+    // move all bullets forward
+    /*for (var i = 0; i < bullet_list.length; i++) {
+        bullet_list[i].move(dt, this.maze);  
+    }*/
+
+    for(var i = 0; i < bullet_list.length; i++) {
+
+        //console.log("in for loop");
+        var collide_wall = bullet_list[i].move(dt, this.maze);
+        //console.log("under");
+
+        if (collide_wall) {
+            //console.log("Show the dt in bullet list");
+            bullet_list.splice(i,1);
+        }
+    }
 
     if (!gameOver) { // Check again since it might have changed in checkGameOver
         // Game has not ended yet!
@@ -29,11 +46,15 @@ exports.updatePhysics = function() {
                     // then add it to the input. Pass the x direction and y direction as input
                     // directly.  
                     // FIND ME
-                    var newBullet = new bullet(player.x, player.y, player.orientation, id);                       
-                    bullet_list[bullet_list.length] = newBullet;                     
+                    if (player.bullets > 0) {
+                        var newBullet = new Bullet(player.x, player.y, player.orientation, player.teamNumber);                       
+                        bullet_list.push(newBullet); 
+                    } 
                 }
                 player.move(player.inputs[i], dt, this.maze);
             }
+
+            //console.log("bullet_list length " + bullet_list.length);
 
             //console.log("before the remove " + bullet_list.length);
 
@@ -52,22 +73,15 @@ exports.updatePhysics = function() {
             // move the bullet
             //console.log("bullet list length " + bullet_list.length);
 
-            for(var i = 0; i < bullet_list.length; i++) {
 
-                //console.log("in for loop");
-                var collide_wall = bullet_list[i].move(dt, this.maze);
-                //console.log("under");
 
-                if (collide_wall) {
-                    //console.log("Show the dt in bullet list");
-                    bullet_list.splice(i,1);
-                }
-            }
+            //console.log("Show the dt in bullet list " + bullet_list.length);
 
             // Chech for bullet collisions
             for(var i = 0; i < bullet_list.length; i++) {
-                if(Collision.collides(bullet_list[i], id)) {
-                    if (bullet_list[i].owner != player) {
+                if(Collision.collides(bullet_list[i], player)) {
+                    // Hit others
+                    if (bullet_list[i].owner != player.teamNumber) {
 
                         console.log("bullet_list " + bullet_list[i]);
 
@@ -78,7 +92,7 @@ exports.updatePhysics = function() {
                 }
             }
 
-
+           // console.log("bullet_list after hit player " + bullet_list.length);
 
         }
     }
@@ -129,11 +143,14 @@ exports.updateClients = function() {
             gameState = {
                 players : this.players, 
                 items : getRelevantItems(this.items, this.players[id]),
-                bullets: this.bullet_list,
-                t : new Date().getTime()
+                bullets_list: bullet_list,
+                t : new Date().getTime(),
             };
             this.clientSockets[id].emit('newGameState', gameState);
         }
+
+        console.log("game state bullet list + " + gameState.bullets_list);
+        console.log("bullet list + " + bullet_list);
     }
     
 }

@@ -1,8 +1,8 @@
 // A class to represent a bullet
 "use strict";
-var speed = 200;
+var speed = 300;
 module.exports = class Bullet {
-    constructor(x, y, orientation, ownerID) {
+    constructor(x, y, orientation, teamID) {
         this.x = x;
         this.y = y;
         this.width = 20;
@@ -12,8 +12,8 @@ module.exports = class Bullet {
         // Add x direction and y direction to the bullet
         if (orientation == 'd') this.y_dir = 1;
         else if (orientation == 'u') this.y_dir = -1;
-        else if (oritentation == 'l') this.x_dir = -1;
-        else if (oritentation == 'r') this.x_dir = 1;
+        else if (orientation == 'l') this.x_dir = -1;
+        else if (orientation == 'r') this.x_dir = 1;
 
         /*this.x_dir = x_dir;
         this.y_dir = y_dir;*/
@@ -21,7 +21,7 @@ module.exports = class Bullet {
         //console.log(this.x_dir);
         //console.log(this.y_dir);
 
-        this.owner = ownerID; // id of the player that shot this bullet
+        this.owner = teamID; // id of the player that shot this bullet
     }
 
     use(player) {
@@ -53,10 +53,10 @@ module.exports = class Bullet {
         if (maze[y1][x1] == 1 && maze[y2][x1] == 1 && maze[y1][x2] == 1 && maze[y2][x2] == 1) {
             this.x = this.x + speed*deltaT*this.x_dir;
             this.y = this.y + speed*deltaT*this.y_dir;
-            return true;
+            return false;
         }
         else {
-            return false;
+            return true;
         }
     }
 };
