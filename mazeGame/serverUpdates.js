@@ -112,13 +112,13 @@ function checkGameOver() {
     // Only emit socket when game is finished
     if ((team1_dead === team1.length) || (team2_dead === team2.length)) {
         gameOver = true;
-        if (team1_dead === 2) { // Team 1 LOST
+        if (team1_dead === team1.length) { // Team 1 LOST
             for (var id in this.players) {
                 if (this.players[id].teamNumber === 1) this.clientSockets[id].emit('wonGame', false);
                 else this.clientSockets[id].emit('wonGame', true);
             }
         }
-        if (team2_dead === 2) { // Team 2 LOST
+        if (team2_dead === team2.length) { // Team 2 LOST
             for (var id in this.players) {
                 if (this.players[id].teamNumber === 1) this.clientSockets[id].emit('wonGame', true);
                 else this.clientSockets[id].emit('wonGame', false);

@@ -751,8 +751,10 @@ function processServerUpdates(time, delta) {
             for (var id in localState.players) {
                 if (myID != id) {
                     // interpolate player position
-                    smoothInterpolatePlayer(prev, next, id, ratio, delta);
-                    localState.players[id].orientation = prev.players[id].orientation;
+                    if (prev.players[id] && next.players[id]) {
+                        smoothInterpolatePlayer(prev, next, id, ratio, delta);
+                        localState.players[id].orientation = prev.players[id].orientation;
+                    }
                 }
             }
         } else { // (!next && !prev)
@@ -765,8 +767,10 @@ function processServerUpdates(time, delta) {
             localState.players[myID].health = latest.players[myID].health;
             for (var id in localState.players) {
                 if (myID != id) {
-                    localState.players[id] = latest.players[id];
-                    localState.players[id].orientation = latest.players[id].orientation;
+                    if (latest.players[id]) {
+                        localState.players[id] = latest.players[id];
+                        localState.players[id].orientation = latest.players[id].orientation;
+                    }
                 }
             }
         }
