@@ -1,6 +1,6 @@
 // A class to represent a bullet
 "use strict";
-var speed = 300;
+var speed = 1000;
 module.exports = class Bullet {
     constructor(x, y, orientation, teamID) {
         this.x = x;

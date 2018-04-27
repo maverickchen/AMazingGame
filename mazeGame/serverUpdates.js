@@ -17,37 +17,40 @@ exports.updatePhysics = function() {
         bullet_list[i].move(dt, this.maze);  
     }*/
 
-    for(var i = 0; i < bullet_list.length; i++) {
-
-        //console.log("in for loop");
-        var collide_wall = bullet_list[i].move(dt, this.maze);
-        //console.log("under");
-
-        if (collide_wall) {
-            //console.log("Show the dt in bullet list");
-            bullet_list.splice(i,1);
-        }
-    }
 
     if (!gameOver) { // Check again since it might have changed in checkGameOver
+
+        for(var i = 0; i < bullet_list.length; i++) {
+
+            //console.log("in for loop");
+            var collide_wall = bullet_list[i].move(dt, this.maze);
+            //console.log("under");
+    
+            if (collide_wall) {
+                //console.log("Show the dt in bullet list");
+                bullet_list.splice(i,1);
+            }
+        }
         // Game has not ended yet!
         for (var id in this.players) {
             player = this.players[id];
 
             // Decrease health points
-            player.health -= 1; // 1 per 15
+            player.health -= 0.00001; // 1 per 15
             if (player.health < 0) player.health = 0;
 
             // Re-render players
             for (var i = 0; i < player.inputs.length; i++) {
                 if (player.inputs[i].shooting) {
+                    
                     //console.log("Shooting");
                     // If the player myID is shooting, add the bullet to the bullet_list and
                     // then add it to the input. Pass the x direction and y direction as input
                     // directly.  
                     // FIND ME
                     if (player.bullets > 0) {
-                        var newBullet = new Bullet(player.x, player.y, player.orientation, player.teamNumber);                       
+                        player.bullets -= 1;
+                        var newBullet = new Bullet(player.x, player.y + player.height, player.orientation, player.teamNumber);                       
                         bullet_list.push(newBullet); 
                     } 
                 }
@@ -72,9 +75,6 @@ exports.updatePhysics = function() {
             // FIND ME
             // move the bullet
             //console.log("bullet list length " + bullet_list.length);
-
-
-
             //console.log("Show the dt in bullet list " + bullet_list.length);
 
             // Chech for bullet collisions
