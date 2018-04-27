@@ -946,7 +946,7 @@ function loadPlayerSprites(lighting) {
     p2Frames.right = frames;
 
     frames = []
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 8; i++) {
         frames.push(PIXI.Texture.fromFrame('Player2ShootDown' + i + '.png'));
     }
     p2Frames.shootDown = frames;
