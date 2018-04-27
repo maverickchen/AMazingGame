@@ -470,6 +470,7 @@ function onAssetsLoaded() {
     panel.scale.y *= 4;
     gameUI.addChild(panel);
 
+    /*
     // Display "HP:"
     var gameTextStyle = new PIXI.TextStyle({
         fontFamily: "\"Lucida Console\", Monaco, monospace",
@@ -482,30 +483,42 @@ function onAssetsLoaded() {
     healthPointText.x = app.screen.width - 350;
     healthPointText.y = 115;
     gameUI.addChild(healthPointText);
+    */
 
+
+    // Display Health Potion sprite instead
+    //var potionSprite = PIXI.Sprite.fromImage('assets/');
+
+
+    /*
     // Display user's id - hardcoded for now
     var userID = new PIXI.Text('User', gameTextStyle);
     userID.x = app.screen.width - 350;
     userID.y = 155;
     gameUI.addChild(userID);
+    */
 
     // Display user's team - also hardcoded
-    var userTeam = new PIXI.Text('Team', gameTextStyle);
+    var userTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
     userTeam.x = app.screen.width - 350;
     userTeam.y = 195;
     gameUI.addChild(userTeam);
 
+    /*
     // Display bullet remaining - also hardcoded
-    var bulletsRemaining = new PIXI.Text('Bullet Left:', gameTextStyle);
+    var bulletsRemaining = new PIXI.Text('Bullets Left:', gameTextStyle);
     bulletsRemaining.x = app.screen.width - 350;
     bulletsRemaining.y = 235;
     gameUI.addChild(bulletsRemaining);
+    */
 
+    /*
     // Leave space for customized maze
     var mazeText = new PIXI.Text('Your Maze:', gameTextStyle);
     mazeText.x = app.screen.width - 350;
     mazeText.y = 275;
     gameUI.addChild(mazeText);
+    */
 
     // var hazeSprite = PIXI.Sprite.fromImage('/assets/haze.png');
     // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 50);
@@ -1173,12 +1186,12 @@ function newHPSprite(lighting){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
     spriteBkg.scale.y *= .4;
-    spriteBkg.x = w - 250;
+    spriteBkg.x = w - 300;
     spriteBkg.y = 110;
     spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
     spriteHP.scale.x *= .4;
     spriteHP.scale.y *= .4;
-    spriteHP.x = w - 250;
+    spriteHP.x = w - 300;
     spriteHP.y = 110;
     gameUI.addChild(spriteBkg);
     gameUI.addChild(spriteHP);
