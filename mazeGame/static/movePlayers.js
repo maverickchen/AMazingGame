@@ -8,6 +8,8 @@ var serverStates = []; // log of most recent server updates
 var localState = {}; // clientside model of game state
 var myID; // the server-generated ID
 var local_time = 0.016;
+var netOffset = 100;
+var offsetData = [];
 
 var currTime = new Date().getTime();
 var ping = 0;
@@ -595,7 +597,6 @@ function onAssetsLoaded() {
     ping = new Date().getTime() - initGameState.t;
     currTime = initGameState.t - ping;
 
-    netOffset = 200;
     socket.on('newGameState', function(state){
         serverStates.push(state);
         ping = new Date().getTime() - state.t;
@@ -604,6 +605,12 @@ function onAssetsLoaded() {
         if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
             serverStates.splice(0,1); 
         }
+        if (inputs.length) { 
+            offset = new Date().getTime() - inputs[0].time; 
+            offsetData.push(offset/2);
+            netOffset = getAvg(offsetData);
+            if (offsetData.length >= 20) offsetData.splice(0,1);
+        }
         replayUsingKnownPos(serverStates, inputs);
     });
     // Ticker will call update to begin the main game loop with rate 60fps
@@ -611,7 +618,11 @@ function onAssetsLoaded() {
     setInterval(physicsUpdate.bind(this), 15); // update physics separately every 15 ms
 }
 
-
+function getAvg(times) {
+  return times.reduce(function (p, c) {
+    return p + c;
+  }) / times.length;
+}
 
 /* --------------------------------------------------------------------------
 -----------------------------------------------------------------------------
@@ -622,9 +633,11 @@ function onAssetsLoaded() {
 -------------------------------------------------------------------------- */
 
 function update(delta) {
+    //dt = (new Date().getTime() - lastDT) / 1000;
+
     checkCollisions();
     handleInput(delta);
-    processServerUpdates(currTime);
+    processServerUpdates(currTime,delta);
     updatePlayerSprites(localState, this.gameTextStyle);
     updateItemSprites(localState);
     updateBulletSprites(localState);
@@ -710,10 +723,11 @@ function getRelevantTiles(maze, player) {
  * more recent server data
  * Note if there aren't any serverStates, we can't do anything.
  */
-function processServerUpdates(time) {
+function processServerUpdates(time, delta) {
     if (serverStates.length) {
         var next;
         var prev;
+        var latest = serverStates[serverStates.length - 1];
         for (var i = 0; i < serverStates.length - 1; i++) {
             if (serverStates[i].t < time && 
                 time < serverStates[i+1].t) {
@@ -734,7 +748,8 @@ function processServerUpdates(time) {
             for (var id in localState.players) {
                 if (myID != id) {
                     // interpolate player position
-                    interpolatePlayer(prev,next,id,ratio);
+                    smoothInterpolatePlayer(prev, next, id, ratio, delta);
+                    localState.players[id].orientation = prev.players[id].orientation;
                 }
             }
         } else { // (!next && !prev)
@@ -768,15 +783,30 @@ function interpolatePlayer(prev, next, id, ratio) {
     localState.players[id].y = py + (ny - py)*ratio;
 }
 
+/* 
+ * smoothInterpolatePlayer: given two server states and a player, interpolate between 
+ * that player's positions at each state but use smoothing
+ */
+function smoothInterpolatePlayer(prev, next, id, ratio, delta) {
+    var smoothingAmount = (delta * 16.666666 / 1000) * 25;
+    var px = prev.players[id].x;
+    var py = prev.players[id].y;
+    var nx = next.players[id].x;
+    var ny = next.players[id].y;
+    var intX = px + (nx - px)*ratio;
+    var intY = py + (ny - py)*ratio;
+    var playX = localState.players[id].x;
+    var playY = localState.players[id].y;
+    localState.players[id].x = playX + (intX - playX) * smoothingAmount;
+    localState.players[id].y = playY + (intY - playY) * smoothingAmount;
+}
 
 // Using the last received information from the server, we reapply all client 
 // inputs from that point forward to the server information to ensure that our 
 // player is still at the right place
 function replayUsingKnownPos(serverStates, clientInputs) {
     lastServerState = serverStates[serverStates.length - 1]
-    console.log('Before', );
     if (lastServerState) {
-        console.log('Before', localState.players[myID].x, localState.players[myID].y);
         lastServerStateTime = lastServerState.t;
         // delete client inputs that have been processed by the server already
         var i = 0;
@@ -794,7 +824,6 @@ function replayUsingKnownPos(serverStates, clientInputs) {
         this.myID = myID;
         this.maze = maze;
         physicsUpdate.bind(this)(); // <-- reapply the remaining inputs
-        console.log('After', localState.players[myID].x, localState.players[myID].y);
     }
 }
 
