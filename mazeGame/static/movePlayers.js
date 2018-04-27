@@ -1,3 +1,9 @@
+/* 
+Client-side code to display our maze game. Runs in the browser. 
+Client side prediction code is heavily based off of: 
+https://github.com/underscorediscovery/realtime-multiplayer-in-html5
+*/
+
 // make a client socket
 var socket = io();
 
@@ -5,9 +11,8 @@ var socket = io();
 var inputs = []; // a log of this player's last few inputs
 var input_seq = 0;
 var serverStates = []; // log of most recent server updates
-var localState = {}; // clientside model of game state
+var localState = {}; // client-side model of game state
 var myID; // the server-generated ID
-var local_time = 0.016;
 var netOffset = 100;
 var offsetData = [];
 
@@ -633,8 +638,6 @@ function getAvg(times) {
 -------------------------------------------------------------------------- */
 
 function update(delta) {
-    //dt = (new Date().getTime() - lastDT) / 1000;
-
     checkCollisions();
     handleInput(delta);
     processServerUpdates(currTime,delta);
