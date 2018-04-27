@@ -15,8 +15,18 @@ function physicsUpdate() {
                 // check if you collide with maze at any step of the way
                 var x1 = Math.floor((player.x + speed*dt*input.x_dir) / 100);
                 var x2 = Math.floor((player.x + player.width + speed*dt*input.x_dir) / 100);
-                var y1 = Math.floor((player.y + speed*dt*input.y_dir ) / 100);
+                var y1 = Math.floor((player.y + player.height*0.7 + speed*dt*input.y_dir ) / 100);
                 var y2 = Math.floor((player.y + player.height + speed*dt*input.y_dir) / 100);
+
+                if(input.x_dir < 0) {
+                    player.orientation = 'l';
+                } else if (input.x_dir > 0) {
+                    player.orientation = 'r';
+                } else if (input.y_dir < 0) {
+                    player.orientation = 'u';
+                } else if (input.y_dir > 0) {
+                    player.orientation = 'd';
+                }
 
                 if (x1 < 0 || x1 >= this.maze[0].length) return; // x corresponds to COLUMNS
                 if (y1 < 0 || y1 >= this.maze.length) return; // y corresponds to ROWS

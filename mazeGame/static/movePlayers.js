@@ -433,12 +433,18 @@ socket.on('canStartGame', function(initialGameState) {
     .add('assets/Player1Down.json')
     .add('assets/Player1Left.json')
     .add('assets/Player1Right.json')
-    .add('assets/Player1Shoot.json')
+    .add('assets/Player1ShootDown.json')
+    .add('assets/Player1ShootUp.json')
+    .add('assets/Player1ShootLeft.json')
+    .add('assets/Player1ShootRight.json')
     .add('assets/Player2Up.json')
     .add('assets/Player2Down.json')
     .add('assets/Player2Left.json')
     .add('assets/Player2Right.json')
-    .add('assets/Player2Shoot.json')
+    .add('assets/Player2ShootDown.json')
+    .add('assets/Player2ShootUp.json')
+    .add('assets/Player2ShootLeft.json')
+    .add('assets/Player2ShootRight.json')
     .add('assets/Potion.json')
     .load(onAssetsLoaded);
 });
@@ -641,8 +647,7 @@ function handleInput(delta) {
         if (right.isDown) input.x_dir += 1; 
         if (up.isDown) input.y_dir += -1;
         if (down.isDown) input.y_dir += 1; 
-        if (shoot.isDown) shootPressedBefore = true;//; input.shooting = true;
-
+        if (shoot.isDown) shootPressedBefore = true;
         if (shoot.isUp && shootPressedBefore) {
             input.shooting = true; 
             shootPressedBefore = false; //state.players[myID].bullet -= 1;
@@ -660,7 +665,25 @@ function handleInput(delta) {
             else if (input.x_dir == -1) setSprite(playerSprites[myID].left, myID);
             else if (input.y_dir == 1) setSprite(playerSprites[myID].down, myID);
             else if (input.y_dir == -1) setSprite(playerSprites[myID].up, myID);
-            else if (input.shooting) setSprite(playerSprites[myID].shoot, myID);
+            else if (input.shooting) {
+                if (input.x_dir == 0 && input.y_dir == 0) {
+                    var facing = localState.players[myID].orientation;
+                    if (facing == 'r') {
+                        setSprite(playerSprites[myID].shootRight, myID);
+                    } else if (facing == 'l') {
+                        setSprite(playerSprites[myID].shootLeft, myID);
+                    } else if (facing == 'u') {
+                        setSprite(playerSprites[myID].shootUp, myID);
+                    } else {
+                        setSprite(playerSprites[myID].shootDown, myID);
+                    }
+                } else {
+                    if (input.x_dir == 1) setSprite(playerSprites[myID].shootRight, myID);
+                    else if (input.x_dir == -1) setSprite(playerSprites[myID].shootLeft, myID);
+                    else if (input.y_dir == 1) setSprite(playerSprites[myID].shootDown, myID);
+                    else setSprite(playerSprites[myID].shootUp, myID);
+                }
+            }
         }
     }
 }
@@ -717,20 +740,20 @@ function processServerUpdates(time) {
         } else { // (!next && !prev)
             // no states to interpolate between; just snap other players to 
             // oldest server position
-            oldest = serverStates[0];
-            localState.items = oldest.items;
-            localState.bullets_list = oldest.bullets_list;
-            localState.players[myID].bullets = oldest.players[myID].bullets;
-            localState.players[myID].health = oldest.players[myID].health;
+            latest = serverStates[0];
+            localState.items = latest.items;
+            localState.bullets_list = latest.bullets_list;
+            localState.players[myID].bullets = latest.players[myID].bullets;
+            localState.players[myID].health = latest.players[myID].health;
             for (var id in localState.players) {
                 if (myID != id) {
-                    localState.players[id] = oldest.players[id];
+                    localState.players[id] = latest.players[id];
+                    localState.players[id].orientation = latest.players[id].orientation;
                 }
             }
         }
     }
 }
-
 
 /* 
  * interpolatePlayer: given two server states and a player, interpolate between 
@@ -881,9 +904,24 @@ function loadPlayerSprites(lighting) {
     p1Frames.right = frames;
     frames = []
     for (var i = 0; i < 8; i++) {
-        frames.push(PIXI.Texture.fromFrame('Player1Shoot' + i + '.png'));
+        frames.push(PIXI.Texture.fromFrame('Player1ShootDown' + i + '.png'));
     }
-    p1Frames.shoot = frames;
+    p1Frames.shootDown = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1ShootUp' + i + '.png'));
+    }
+    p1Frames.shootUp = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1ShootLeft' + i + '.png'));
+    }
+    p1Frames.shootLeft = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player1ShootRight' + i + '.png'));
+    }
+    p1Frames.shootRight = frames;
 
     // Player 2's animations:
     frames = []
@@ -906,11 +944,28 @@ function loadPlayerSprites(lighting) {
         frames.push(PIXI.Texture.fromFrame('Player2Right' + i + '.png'));
     }
     p2Frames.right = frames;
+
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2ShootDown' + i + '.png'));
+    }
+    p2Frames.shootDown = frames;
+
     frames = []
     for (var i = 0; i < 8; i++) {
-        frames.push(PIXI.Texture.fromFrame('Player2Shoot' + i + '.png'));
+        frames.push(PIXI.Texture.fromFrame('Player2ShootUp' + i + '.png'));
     }
-    p2Frames.shoot = frames;
+    p2Frames.shootUp = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2ShootLeft' + i + '.png'));
+    }
+    p2Frames.shootLeft = frames;
+    frames = []
+    for (var i = 0; i < 8; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2ShootRight' + i + '.png'));
+    }
+    p2Frames.shootRight = frames;
 
     // Load Potion frames
     frames = []
@@ -926,7 +981,7 @@ function loadPlayerSprites(lighting) {
         var container = charContainer;
         if (myID == id) {
             container = localPlayerContainer;
-            x = w/2;
+            x = app.screen.width / 3
             y = h/2;
         }
         if (initGameState.players[id].teamNumber == 1) {
@@ -934,14 +989,20 @@ function loadPlayerSprites(lighting) {
             sprites.up = newPlayerSprite(p1Frames.up, x, y, false, container); 
             sprites.left = newPlayerSprite(p1Frames.left, x, y, false, container);
             sprites.right = newPlayerSprite(p1Frames.right, x, y, false, container);
-            sprites.shoot = newPlayerSprite(p1Frames.shoot, x, y, false, container);
+            sprites.shootDown = newPlayerSprite(p1Frames.shootDown, x, y, false, container);
+            sprites.shootUp = newPlayerSprite(p1Frames.shootUp, x, y, false, container);
+            sprites.shootLeft = newPlayerSprite(p1Frames.shootLeft, x, y, false, container);
+            sprites.shootRight = newPlayerSprite(p1Frames.shootRight, x, y, false, container);
             sprites.current = sprites.down;
         } else if (initGameState.players[id].teamNumber == 2) {
             sprites.down = newPlayerSprite(p2Frames.down, x, y, true, container);  
             sprites.up = newPlayerSprite(p2Frames.up, x, y, false, container); 
             sprites.left = newPlayerSprite(p2Frames.left, x, y, false, container);
             sprites.right = newPlayerSprite(p2Frames.right, x, y, false, container);
-            sprites.shoot = newPlayerSprite(p2Frames.shoot, x, y, false, container);
+            sprites.shootDown = newPlayerSprite(p2Frames.shootDown, x, y, false, container);
+            sprites.shootUp = newPlayerSprite(p2Frames.shootUp, x, y, false, container);
+            sprites.shootLeft = newPlayerSprite(p2Frames.shootLeft, x, y, false, container);
+            sprites.shootRight = newPlayerSprite(p2Frames.shootRight, x, y, false, container);
             sprites.current = sprites.down;
         }
 
@@ -954,7 +1015,7 @@ function loadPlayerSprites(lighting) {
         container.addChild(sprites.dead);
 
         if (myID == id) {
-            for (var i = 0; i < 6; i++) {
+            for (var i = 0; i < 8; i++) {
                 var lightbulb = new PIXI.Graphics();
                 lightbulb.beginFill(0x706050, 1.0);
                 lightbulb.drawCircle(0, 0, 500);
@@ -964,8 +1025,11 @@ function loadPlayerSprites(lighting) {
                 if (i == 1) sprites.up.addChild(lightbulb);
                 if (i == 2) sprites.left.addChild(lightbulb);
                 if (i == 3) sprites.right.addChild(lightbulb);
-                if (i == 4) sprites.shoot.addChild(lightbulb);
-                if (i == 5) sprites.dead.addChild(lightbulb);
+                if (i == 4) sprites.shootDown.addChild(lightbulb);
+                if (i == 5) sprites.shootUp.addChild(lightbulb);
+                if (i == 6) sprites.shootLeft.addChild(lightbulb);
+                if (i == 7) sprites.shootRight.addChild(lightbulb);
+                if (i == 8) sprites.dead.addChild(lightbulb);
             }
         }
         playerSprites[id] = sprites;
@@ -978,28 +1042,45 @@ function loadPlayerSprites(lighting) {
  * make the new sprite visible with the right coordinates and the old sprite invisble
  */
 function setSprite(animation, id) {
+    var isShooting = false;
+    if (playerSprites[id].current === playerSprites[id].shootDown || 
+        playerSprites[id].current === playerSprites[id].shootUp ||
+        playerSprites[id].current === playerSprites[id].shootLeft ||
+        playerSprites[id].current === playerSprites[id].shootRight) {
+        isShooting = true;
+    }
     if (playerSprites[id].current !== animation) {
+        var goingToShoot = false;
+        if (animation === playerSprites[id].shootDown || 
+            animation === playerSprites[id].shootUp ||
+            animation === playerSprites[id].shootLeft ||
+            animation === playerSprites[id].shootRight) {
+            goingToShoot = true;
+        }
         offsetX = 1; // account for shooting sprite's different size 
         offsetY = 4;
         newDirSprite = animation;
-        if (animation === playerSprites[id].shoot) {
+        if (goingToShoot && !isShooting) {
+            // shift sprite up and back and rewind to first frame
             newDirSprite.x = playerSprites[id].current.x - offsetX;
             newDirSprite.y = playerSprites[id].current.y - offsetY;
             animation.gotoAndPlay(4);
-        } else if (playerSprites[id].current === playerSprites[id].shoot) {
+        } else if (!goingToShoot && isShooting) {
             newDirSprite.x = playerSprites[id].current.x + offsetX;
             newDirSprite.y = playerSprites[id].current.y + offsetY;
         } else if (animation === playerSprites[id].dead) {
             newDirSprite.x = playerSprites[id].current.x;
             newDirSprite.y = playerSprites[id].current.y;
         } else {
+            // (!goingToShoot && !isShooting) || (goingToShoot && isShooting)
             newDirSprite.x = playerSprites[id].current.x;
             newDirSprite.y = playerSprites[id].current.y;
-        } 
+            if (goingToShoot) animation.gotoAndPlay(4);
+        }
         newDirSprite.visible = true;
         playerSprites[id].current.visible = false;
         playerSprites[id].current = newDirSprite;
-    } else if (animation === playerSprites[id].shoot) animation.gotoAndPlay(4);
+    } else if (isShooting) animation.gotoAndPlay(4);
 }
 
 
@@ -1021,7 +1102,7 @@ function updatePlayerSprites(state, gameTextStyle) {
             // Update my character
             if (myID == id) {
                 // move maze instead so that local player remains centered
-                xdiff = w/2 - (state.players[id].x);
+                xdiff = app.screen.width / 3 - (state.players[id].x);
                 ydiff = h/2 - (state.players[id].y);
                 mazeContainer.x = xdiff;
                 mazeContainer.y = ydiff;
@@ -1047,15 +1128,11 @@ function updatePlayerSprites(state, gameTextStyle) {
             } 
             else { // nonlocal players
                 // match sprite with direction of movement
-                if (playerSprites[id].current.x < state.players[id].x) {
-                    setSprite(playerSprites[id].right, id);
-                } else if (playerSprites[id].current.x > state.players[id].x) {
-                    setSprite(playerSprites[id].left, id);
-                } else if (playerSprites[id].current.y > state.players[id].y) {
-                    setSprite(playerSprites[id].up, id);
-                } else if (playerSprites[id].current.y < state.players[id].y) {
-                    setSprite(playerSprites[id].down, id);
-                }
+                var facing = state.players[id].orientation;
+                if (facing == 'r') setSprite(playerSprites[id].right, id);
+                else if (facing == 'u') setSprite(playerSprites[id].up, id);
+                else if (facing == 'l') setSprite(playerSprites[id].left, id);
+                else setSprite(playerSprites[id].down, id);
                 playerSprites[id].current.x = state.players[id].x;
                 playerSprites[id].current.y = state.players[id].y;
             }
@@ -1309,7 +1386,10 @@ function newHPSprite(lighting){
  */
 function newPlayerSprite(frames, x, y, isVisible, container) {
     var sprite = new PIXI.extras.AnimatedSprite(frames);
-    if (frames == p1Frames.shoot || frames == p2Frames.shoot) {
+    if (frames == p1Frames.shootDown || frames == p2Frames.shootDown ||
+        frames == p1Frames.shootUp || frames == p2Frames.shootUp ||
+        frames == p1Frames.shootLeft || frames == p2Frames.shootLeft ||
+        frames == p1Frames.shootRight || frames == p2Frames.shootRight) {
         sprite.width = 48;
         sprite.height = 76;
         // shift it back and up since shooting sprite is taller
