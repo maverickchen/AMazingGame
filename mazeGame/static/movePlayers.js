@@ -433,12 +433,18 @@ socket.on('canStartGame', function(initialGameState) {
     .add('assets/Player1Down.json')
     .add('assets/Player1Left.json')
     .add('assets/Player1Right.json')
-    .add('assets/Player1Shoot.json')
+    .add('assets/Player1ShootDown.json')
+    .add('assets/Player1ShootUp.json')
+    .add('assets/Player1ShootLeft.json')
+    .add('assets/Player1ShootRight.json')
     .add('assets/Player2Up.json')
     .add('assets/Player2Down.json')
     .add('assets/Player2Left.json')
     .add('assets/Player2Right.json')
-    .add('assets/Player2Shoot.json')
+    .add('assets/Player2ShootDown.json')
+    .add('assets/Player2ShootUp.json')
+    .add('assets/Player2ShootLeft.json')
+    .add('assets/Player2ShootRight.json')
     .add('assets/Potion.json')
     .load(onAssetsLoaded);
 });
@@ -641,8 +647,7 @@ function handleInput(delta) {
         if (right.isDown) input.x_dir += 1; 
         if (up.isDown) input.y_dir += -1;
         if (down.isDown) input.y_dir += 1; 
-        if (shoot.isDown) shootPressedBefore = true;//; input.shooting = true;
-
+        if (shoot.isDown) shootPressedBefore = true;
         if (shoot.isUp && shootPressedBefore) {
             input.shooting = true; 
             shootPressedBefore = false; //state.players[myID].bullet -= 1;
@@ -939,7 +944,13 @@ function loadPlayerSprites(lighting) {
         frames.push(PIXI.Texture.fromFrame('Player2Right' + i + '.png'));
     }
     p2Frames.right = frames;
+
+    frames = []
+    for (var i = 0; i < 4; i++) {
+        frames.push(PIXI.Texture.fromFrame('Player2ShootDown' + i + '.png'));
+    }
     p2Frames.shootDown = frames;
+
     frames = []
     for (var i = 0; i < 8; i++) {
         frames.push(PIXI.Texture.fromFrame('Player2ShootUp' + i + '.png'));
@@ -970,7 +981,7 @@ function loadPlayerSprites(lighting) {
         var container = charContainer;
         if (myID == id) {
             container = localPlayerContainer;
-            x = w/2;
+            x = app.screen.width / 3
             y = h/2;
         }
         if (initGameState.players[id].teamNumber == 1) {
@@ -1004,7 +1015,7 @@ function loadPlayerSprites(lighting) {
         container.addChild(sprites.dead);
 
         if (myID == id) {
-            for (var i = 0; i < 6; i++) {
+            for (var i = 0; i < 8; i++) {
                 var lightbulb = new PIXI.Graphics();
                 lightbulb.beginFill(0x706050, 1.0);
                 lightbulb.drawCircle(0, 0, 500);
@@ -1064,7 +1075,7 @@ function setSprite(animation, id) {
             // (!goingToShoot && !isShooting) || (goingToShoot && isShooting)
             newDirSprite.x = playerSprites[id].current.x;
             newDirSprite.y = playerSprites[id].current.y;
-            animation.gotoAndPlay(4);
+            if (goingToShoot) animation.gotoAndPlay(4);
         }
         newDirSprite.visible = true;
         playerSprites[id].current.visible = false;
@@ -1091,7 +1102,7 @@ function updatePlayerSprites(state, gameTextStyle) {
             // Update my character
             if (myID == id) {
                 // move maze instead so that local player remains centered
-                xdiff = w/2 - (state.players[id].x);
+                xdiff = app.screen.width / 3 - (state.players[id].x);
                 ydiff = h/2 - (state.players[id].y);
                 mazeContainer.x = xdiff;
                 mazeContainer.y = ydiff;

@@ -15,7 +15,7 @@ function physicsUpdate() {
                 // check if you collide with maze at any step of the way
                 var x1 = Math.floor((player.x + speed*dt*input.x_dir) / 100);
                 var x2 = Math.floor((player.x + player.width + speed*dt*input.x_dir) / 100);
-                var y1 = Math.floor((player.y + speed*dt*input.y_dir ) / 100);
+                var y1 = Math.floor((player.y + player.height*0.7 + speed*dt*input.y_dir ) / 100);
                 var y2 = Math.floor((player.y + player.height + speed*dt*input.y_dir) / 100);
 
                 if(input.x_dir < 0) {

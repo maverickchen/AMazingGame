@@ -46,7 +46,7 @@ module.exports = class Player {
         if (this.health > 0) {
             var x1 = Math.floor((this.x + speed*deltaT*direction.x_dir) / 100);
             var x2 = Math.floor((this.x + this.width + speed*deltaT*direction.x_dir) / 100);
-            var y1 = Math.floor((this.y + speed*deltaT*direction.y_dir ) / 100);
+            var y1 = Math.floor((this.y + this.height*0.7 + speed*deltaT*direction.y_dir ) / 100);
             var y2 = Math.floor((this.y + this.height + speed*deltaT*direction.y_dir) / 100);
 
             if(direction.x_dir < 0) {
