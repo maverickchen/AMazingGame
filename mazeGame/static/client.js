@@ -1165,12 +1165,19 @@ function updatePlayerSprites(state, gameTextStyle) {
             else { // nonlocal players
                 // match sprite with direction of movement
                 var facing = state.players[id].orientation;
-                if (facing == 'r') setSprite(playerSprites[id].right, id);
-                else if (facing == 'u') setSprite(playerSprites[id].up, id);
-                else if (facing == 'l') setSprite(playerSprites[id].left, id);
-                else setSprite(playerSprites[id].down, id);
                 playerSprites[id].current.x = state.players[id].x;
                 playerSprites[id].current.y = state.players[id].y;
+                if (input.shooting) {
+                    if (facing == 'r') setSprite(playerSprites[id].shootRight, id);
+                    else if (facing == 'u') setSprite(playerSprites[id].shootUp, id);
+                    else if (facing == 'l') setSprite(playerSprites[id].shootLeft, id);
+                    else setSprite(playerSprites[id].shootDown, id);
+                } else {
+                    if (facing == 'r') setSprite(playerSprites[id].right, id);
+                    else if (facing == 'u') setSprite(playerSprites[id].up, id);
+                    else if (facing == 'l') setSprite(playerSprites[id].left, id);
+                    else setSprite(playerSprites[id].down, id);
+                }
             }
         }
     }
