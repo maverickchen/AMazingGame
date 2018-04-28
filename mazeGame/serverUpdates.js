@@ -7,6 +7,8 @@ var Item = require('./static/item');
  */
 
 var gameOver = false;
+// The bullet list for the whole game. Store all the bullets
+// for each player in two teams.
 var bullet_list = [];
 
 exports.updatePhysics = function() {
