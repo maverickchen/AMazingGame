@@ -46,8 +46,10 @@ exports.updatePhysics = function() {
                         // then add it to the input. Pass the x direction and y direction as input
                         // directly.  
                         // FIND ME
+
+                        // If the player have bullets
                         if (player.bullets > 0) {
-                            
+          
                             player.bullets -= 1;
                             var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
                             bullet_list.push(newBullet); 
