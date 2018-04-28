@@ -20,6 +20,13 @@ exports.updatePhysics = function() {
 
     if (!gameOver) { // Check again since it might have changed in checkGameOver
 
+        while (this.items.length < 50) {
+            potion = new Item('Potion', maze);
+            ammo = new Item('Ammo', maze);
+            items.push(potion);
+            items.push(ammo);
+        }
+
         for(var i = 0; i < bullet_list.length; i++) {
 
             //console.log("in for loop");
