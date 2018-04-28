@@ -51,6 +51,9 @@ var h = window.innerHeight
 || document.documentElement.clientHeight
 || document.body.clientHeight;
 
+
+var backButton;
+
 // make a PIXI canvas
 var app = new PIXI.Application({
           width: 1280, 
@@ -266,6 +269,8 @@ function chooseTeam() {
     team2.interactive = true;
     ready.interactive = true;
     questionMark.interactive = true;
+
+    
 
     // Shows hand cursor
     team1.buttonMode = true;
@@ -1481,11 +1486,34 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
+
     result.anchor.set(0.5);
     result.scale.x *= 3;
     result.scale.y *= 3;
-    result.x = app.screen.width / 2;
+    result.x = app.screen.width * 2 / 5;
     result.y = app.screen.height / 2;
-
     endGameContainer.addChild(result);
+
+    
+    backButton = PIXI.Sprite.fromImage('assets/MainPage.png');
+    backButton.anchor.set(0.5);
+    backButton.scale.x = 0.28;
+    backButton.scale.y = 0.28;
+    backButton.x = 768; //app.screen.width * 4 / 5;
+    backButton.y = 292; //app.screen.height / 2;
+    endGameContainer.addChild(backButton);
+
+    backButton.interactive = true;
+    backButton.buttonMode = true;
+
+    backButton.on('pointerdown', function() {
+        console.log('Clicked');
+        startScreen.visible = true;
+        endGameContainer.visible = false;
+    })
+
+    backButton.on('pointerover', () => {backButton.scale.x *= 1.5; backButton.scale.y *= 1.5; })
+    .on('pointerout', () => { backButton.scale.x /= 1.5; backButton.scale.y /= 1.5; });
+
+
 }

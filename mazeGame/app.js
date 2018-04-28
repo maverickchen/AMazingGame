@@ -9,7 +9,9 @@ var Updates = require('./serverUpdates');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
-var width = 8;
+
+// The maze size, for test, will change to 8 later
+var width = 3;
 
 var maze_cell = generator(width);
 var maze = converter.convertMaze(maze_cell);
