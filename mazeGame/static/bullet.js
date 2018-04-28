@@ -20,11 +20,12 @@ module.exports = class Bullet {
         else if (orientation == 'l') this.x_dir = -1;
         else if (orientation == 'r') this.x_dir = 1;
 
-        
+        // Assign each player a team id, so they can not kill each other
+        // in the same team
         this.owner = teamID; // id of the player that shot this bullet
     }
 
-    
+    // Detect the health point deduction, if the health point
     use(player) {
         player.health -= 10;
         if (player.health < 0) player.health = 0;
