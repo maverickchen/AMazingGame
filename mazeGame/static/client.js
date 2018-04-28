@@ -1053,7 +1053,7 @@ function loadPlayerSprites(lighting) {
         container.addChild(sprites.dead);
 
         if (myID == id) {
-            for (var i = 0; i < 8; i++) {
+            for (var i = 0; i < 9; i++) {
                 var lightbulb = new PIXI.Graphics();
                 lightbulb.beginFill(0x706050, 1.0);
                 lightbulb.drawCircle(0, 0, 500);
@@ -1169,17 +1169,17 @@ function updatePlayerSprites(state, gameTextStyle) {
                 var facing = state.players[id].orientation;
                 playerSprites[id].current.x = state.players[id].x;
                 playerSprites[id].current.y = state.players[id].y;
-                if (input.shooting) {
-                    if (facing == 'r') setSprite(playerSprites[id].shootRight, id);
-                    else if (facing == 'u') setSprite(playerSprites[id].shootUp, id);
-                    else if (facing == 'l') setSprite(playerSprites[id].shootLeft, id);
-                    else setSprite(playerSprites[id].shootDown, id);
-                } else {
-                    if (facing == 'r') setSprite(playerSprites[id].right, id);
-                    else if (facing == 'u') setSprite(playerSprites[id].up, id);
-                    else if (facing == 'l') setSprite(playerSprites[id].left, id);
-                    else setSprite(playerSprites[id].down, id);
-                }
+                // if (input.shooting) {
+                //     if (facing == 'r') setSprite(playerSprites[id].shootRight, id);
+                //     else if (facing == 'u') setSprite(playerSprites[id].shootUp, id);
+                //     else if (facing == 'l') setSprite(playerSprites[id].shootLeft, id);
+                //     else setSprite(playerSprites[id].shootDown, id);
+                // } else {
+                if (facing == 'r') setSprite(playerSprites[id].right, id);
+                else if (facing == 'u') setSprite(playerSprites[id].up, id);
+                else if (facing == 'l') setSprite(playerSprites[id].left, id);
+                else setSprite(playerSprites[id].down, id);
+                // }
             }
         }
     }
@@ -1346,9 +1346,7 @@ function newWallSprite(x, y) {
     wall = PIXI.Sprite.fromImage('assets/Wall.png');
     wall.width = WALL_WIDTH;
     wall.height = WALL_WIDTH;
-   // wall.height = WALL_LENGTH;
     wall.x = x * WALL_WIDTH;
-    //wall.y = y * WALL_WIDTH;
     wall.y = y * WALL_WIDTH;
     wall.visible = false;
     mazeSpritesContainer.addChild(wall);
