@@ -1417,12 +1417,12 @@ function newHPSprite(lighting){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
     spriteBkg.scale.y *= .7;
-    spriteBkg.x = w - 260;
+    spriteBkg.x = app.screen.width - 260;
     spriteBkg.y = 270;
     spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
     spriteHP.scale.x *= .4;
     spriteHP.scale.y *= .7;
-    spriteHP.x = w - 260;
+    spriteHP.x = app.screen.width - 260;
     spriteHP.y = 270;
     gameUI.addChild(spriteBkg);
     gameUI.addChild(spriteHP);
