@@ -30,6 +30,7 @@ module.exports = class Bullet {
         player.health -= 10;
         if (player.health < 0) player.health = 0;
     }
+    // update the position of the players
     move(deltaT, maze) {
         var x1 = Math.floor((this.x + speed*deltaT*this.x_dir) / 100);
         var x2 = Math.floor((this.x + this.width + speed*deltaT*this.x_dir) / 100);
@@ -41,7 +42,7 @@ module.exports = class Bullet {
         if (x2 < 0 || x2 >= maze[0].length) return;
         if (y2 < 0 || y2 >= maze.length) return;
 
-        // If there is a path, the bullet could go through
+        // If there is a path, the bullet could not go through
         if (maze[y1][x1] == 1 && maze[y2][x1] == 1 && maze[y1][x2] == 1 && maze[y2][x2] == 1) {
             this.x = this.x + speed*deltaT*this.x_dir;
             this.y = this.y + speed*deltaT*this.y_dir;
