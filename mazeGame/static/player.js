@@ -22,8 +22,8 @@ module.exports = class Player {
             var x = maze.length - 1;
             var y = maze.length - 1;
             while (maze[y][x] === 0) {
-                x = x - Math.floor(Math.random() * maze.length / 3);
-                y = y - Math.floor(Math.random() * maze.length / 3);
+                x = maze.length - 1 - Math.floor(Math.random() * maze.length / 3);
+                y = maze.length - 1 - Math.floor(Math.random() * maze.length / 3);
             }
             this.x = x*100 + 50;
             this.y = y*100 + 25;
