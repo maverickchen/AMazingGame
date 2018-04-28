@@ -498,7 +498,7 @@ function onAssetsLoaded() {
     else {
         playerSprite = PIXI.Sprite.fromImage('assets/Player2Example.png');
     }
-    playerSprite.x = app.screen.width - 320;
+    playerSprite.x = app.screen.width - 340;
     playerSprite.y = 125;
     playerSprite.scale.x *= 0.4;
     playerSprite.scale.y *= 0.4;
@@ -512,7 +512,7 @@ function onAssetsLoaded() {
 
     // Display Health Potion sprite on panel
     var healthSprite = PIXI.Sprite.fromImage('assets/PotionExample.png');
-    healthSprite.x = app.screen.width - 315;
+    healthSprite.x = app.screen.width - 335;
     healthSprite.y = 270;
     healthSprite.scale.x *= 0.3;
     healthSprite.scale.y *= 0.3;
@@ -522,8 +522,8 @@ function onAssetsLoaded() {
     var bulletSprite = PIXI.Sprite.fromImage('assets/Ammo.png');
     bulletSprite.x = app.screen.width - 340;
     bulletSprite.y = 400;
-    bulletSprite.scale.x *= 0.2;
-    bulletSprite.scale.y *= 0.2;
+    bulletSprite.scale.x *= 0.15;
+    bulletSprite.scale.y *= 0.15;
     gameUI.addChild(bulletSprite);
 
     /*
@@ -1151,15 +1151,15 @@ function updatePlayerSprites(state, gameTextStyle) {
                 var index = gameUI.children.indexOf(bulletsNum);
                 if (index !== -1) gameUI.removeChild(bulletsNum);
                 bulletsNum = new PIXI.Text(state.players[id].bullets, gameTextStyle);
-                bulletsNum.x = app.screen.width - 180;
-                bulletsNum.y = 400;
+                bulletsNum.x = app.screen.width - 200;
+                bulletsNum.y = 410;
                 gameUI.addChild(bulletsNum);
 
                 // Create texts for health
                 var index = gameUI.children.indexOf(healthText);
                 if (index !== -1) gameUI.removeChild(healthText);
-                healthText = new PIXI.Text(state.players[id].health + " / 100", gameTextStyle);
-                healthText.x = app.screen.width - 240;
+                healthText = new PIXI.Text(Math.round(state.players[id].health) + " / 100", gameTextStyle);
+                healthText.x = app.screen.width - 235;
                 healthText.y = 290;
                 gameUI.addChild(healthText);
 
@@ -1409,14 +1409,14 @@ function newPotionSprite() {
 function newHPSprite(lighting){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
-    spriteBkg.scale.y *= .4;
-    spriteBkg.x = w - 300;
-    spriteBkg.y = 110;
+    spriteBkg.scale.y *= .7;
+    spriteBkg.x = w - 260;
+    spriteBkg.y = 270;
     spriteHP = new PIXI.Sprite.fromImage('assets/HP.png');
     spriteHP.scale.x *= .4;
-    spriteHP.scale.y *= .4;
-    spriteHP.x = w - 300;
-    spriteHP.y = 110;
+    spriteHP.scale.y *= .7;
+    spriteHP.x = w - 260;
+    spriteHP.y = 270;
     gameUI.addChild(spriteBkg);
     gameUI.addChild(spriteHP);
     return {spriteBkg: spriteBkg, spriteHP: spriteHP};
