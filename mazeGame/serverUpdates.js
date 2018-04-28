@@ -12,12 +12,6 @@ var bullet_list = [];
 exports.updatePhysics = function() {
     dt = .015; // change this later; 15ms
 
-    // move all bullets forward
-    /*for (var i = 0; i < bullet_list.length; i++) {
-        bullet_list[i].move(dt, this.maze);  
-    }*/
-
-
     if (!gameOver) { // Check again since it might have changed in checkGameOver
 
         while (this.items.length < 40) {
@@ -28,79 +22,58 @@ exports.updatePhysics = function() {
         }
 
         for(var i = 0; i < bullet_list.length; i++) {
-
-            //console.log("in for loop");
             var collide_wall = bullet_list[i].move(dt, this.maze);
-            //console.log("under");
     
             if (collide_wall) {
-                //console.log("Show the dt in bullet list");
                 bullet_list.splice(i,1);
             }
         }
         // Game has not ended yet!
         for (var id in this.players) {
             player = this.players[id];
-
-            // Decrease health points
-            player.health -= .015; // 5 per 15 seconds
-            if (player.health < 0) player.health = 0;
-
-            // Re-render players
-            for (var i = 0; i < player.inputs.length; i++) {
-                if (player.inputs[i].shooting) {
-                    
-                    //console.log("Shooting");
-                    // If the player myID is shooting, add the bullet to the bullet_list and
-                    // then add it to the input. Pass the x direction and y direction as input
-                    // directly.  
-                    // FIND ME
-                    if (player.bullets > 0) {
-                        player.bullets -= 1;
-                        var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
-                        bullet_list.push(newBullet); 
-                    } 
+            if (player.health > 0) {
+                // Decrease health points
+                player.health -= .015; // 5 per 15 seconds
+                if (player.health < 0) player.health = 0;
+                // Re-render players
+                for (var i = 0; i < player.inputs.length; i++) {
+                    if (player.inputs[i].shooting) {
+                        // If the player myID is shooting, add the bullet to the bullet_list and
+                        // then add it to the input. Pass the x direction and y direction as input
+                        // directly.  
+                        // FIND ME
+                        if (player.bullets > 0) {
+                            player.bullets -= 1;
+                            var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
+                            bullet_list.push(newBullet); 
+                        } 
+                    }
+                    player.move(player.inputs[i], dt, this.maze);
                 }
-                player.move(player.inputs[i], dt, this.maze);
-            }
 
-            //console.log("bullet_list length " + bullet_list.length);
-
-            //console.log("before the remove " + bullet_list.length);
-
-            player.inputs = []; // clear their inputs
-            // check item collisions
-            for (var i = 0; i < this.items.length; i++) {
-                if (Collision.collides(this.items[i],player)) {
-                    //console.log('Item collision');
-                    this.items[i].use(player);
-                    this.items.splice(i,1);
-                    break;
-                }
-            }
-
-            // FIND ME
-            // move the bullet
-            //console.log("bullet list length " + bullet_list.length);
-            //console.log("Show the dt in bullet list " + bullet_list.length);
-
-            // Chech for bullet collisions
-            for(var i = 0; i < bullet_list.length; i++) {
-                if(Collision.collides(bullet_list[i], player)) {
-                    // Hit others
-                    if (bullet_list[i].owner != player.teamNumber) {
-
-                        console.log("bullet_list " + bullet_list[i]);
-
-                        bullet_list[i].use(player);
-                        bullet_list.splice(i,1);
+                player.inputs = []; // clear their inputs
+                // check item collisions
+                for (var i = 0; i < this.items.length; i++) {
+                    if (Collision.collides(this.items[i],player)) {
+                        //console.log('Item collision');
+                        this.items[i].use(player);
+                        this.items.splice(i,1);
                         break;
                     }
                 }
+
+                // Chech for bullet collisions
+                for(var i = 0; i < bullet_list.length; i++) {
+                    if(Collision.collides(bullet_list[i], player)) {
+                        // Hit others
+                        if (bullet_list[i].owner != player.teamNumber) {
+                            bullet_list[i].use(player);
+                            bullet_list.splice(i,1);
+                            break;
+                        }
+                    }
+                }
             }
-
-           // console.log("bullet_list after hit player " + bullet_list.length);
-
         }
     }
 }
@@ -155,9 +128,6 @@ exports.updateClients = function() {
             };
             this.clientSockets[id].emit('newGameState', gameState);
         }
-
-        console.log("game state bullet list + " + gameState.bullets_list);
-        console.log("bullet list + " + bullet_list);
     }
     
 }
