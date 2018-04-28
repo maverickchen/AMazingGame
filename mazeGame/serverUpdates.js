@@ -26,7 +26,8 @@ exports.updatePhysics = function() {
         // with the wall
         for(var i = 0; i < bullet_list.length; i++) {
             var collide_wall = bullet_list[i].move(dt, this.maze);
-    
+            // If it is collision with wall, we remove the bullet from our
+            // bullet list
             if (collide_wall) {
                 bullet_list.splice(i,1);
             }
