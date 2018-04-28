@@ -1,4 +1,5 @@
 # team3
+# The URL for the game is: 128.237.181.9:8080
 Repository for team3
 
 Presentation for Sprint 1:
