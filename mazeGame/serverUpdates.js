@@ -50,7 +50,7 @@ exports.updatePhysics = function() {
                     // FIND ME
                     if (player.bullets > 0) {
                         player.bullets -= 1;
-                        var newBullet = new Bullet(player.x, player.y + player.height, player.orientation, player.teamNumber);                       
+                        var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
                         bullet_list.push(newBullet); 
                     } 
                 }
