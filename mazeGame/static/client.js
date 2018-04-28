@@ -511,9 +511,11 @@ function onAssetsLoaded() {
     gameUI.addChild(userTeam);
 
     // Display Health Potion sprite on panel
-    var healthSprite = PIXI.Sprite.fromImage('assets/Ammo.png');
-    healthSprite.x = app.screen.width - 230;
-    healthSprite.y = 250;
+    var healthSprite = PIXI.Sprite.fromImage('assets/PotionExample.png');
+    healthSprite.x = app.screen.width - 315;
+    healthSprite.y = 270;
+    healthSprite.scale.x *= 0.3;
+    healthSprite.scale.y *= 0.3;
     gameUI.addChild(healthSprite);
 
     // Display Bullet sprite on panel
@@ -1157,8 +1159,8 @@ function updatePlayerSprites(state, gameTextStyle) {
                 var index = gameUI.children.indexOf(healthText);
                 if (index !== -1) gameUI.removeChild(healthText);
                 healthText = new PIXI.Text(state.players[id].health + " / 100", gameTextStyle);
-                healthText.x = app.screen.width - 200;
-                healthText.y = 300;
+                healthText.x = app.screen.width - 240;
+                healthText.y = 290;
                 gameUI.addChild(healthText);
 
             } 
