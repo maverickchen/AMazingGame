@@ -753,6 +753,7 @@ function processServerUpdates(time, delta) {
                     // interpolate player position
                     if (prev.players[id] && next.players[id]) {
                         smoothInterpolatePlayer(prev, next, id, ratio, delta);
+                        localState.players[id].health = prev.players[id].health;
                         localState.players[id].orientation = prev.players[id].orientation;
                     }
                 }
@@ -769,6 +770,7 @@ function processServerUpdates(time, delta) {
                 if (myID != id) {
                     if (latest.players[id]) {
                         localState.players[id] = latest.players[id];
+                        localState.players[id].health = latest.players[id].health;
                         localState.players[id].orientation = latest.players[id].orientation;
                     }
                 }
