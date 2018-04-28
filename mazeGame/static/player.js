@@ -11,8 +11,8 @@ module.exports = class Player {
             var x = 0;
             var y = 0;
             while (maze[y][x] === 0) {
-                x++;
-                y++;
+                x = Math.floor(Math.random() * maze.length / 3);
+                y = Math.floor(Math.random() * maze.length / 3);
             }
             this.x = x*100 + 50;
             this.y = y*100 + 25;
@@ -22,8 +22,8 @@ module.exports = class Player {
             var x = maze.length - 1;
             var y = maze.length - 1;
             while (maze[y][x] === 0) {
-                x--;
-                y--;
+                x = x - Math.floor(Math.random() * maze.length / 3);
+                y = y - Math.floor(Math.random() * maze.length / 3);
             }
             this.x = x*100 + 50;
             this.y = y*100 + 25;
