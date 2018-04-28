@@ -30,7 +30,8 @@ module.exports = class Bullet {
         player.health -= 10;
         if (player.health < 0) player.health = 0;
     }
-    // update the position of the players
+    // update the position of the players, return true if the bullet collison with
+    // the wall
     move(deltaT, maze) {
         var x1 = Math.floor((this.x + speed*deltaT*this.x_dir) / 100);
         var x2 = Math.floor((this.x + this.width + speed*deltaT*this.x_dir) / 100);
