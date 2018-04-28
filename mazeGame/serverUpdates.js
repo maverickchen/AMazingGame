@@ -1,6 +1,6 @@
 var Collision = require('./static/collides');
 var Bullet = require('./static/bullet');
-
+var Item = require('./static/item');
 /*
  * updatePhysics: given a list of clientInputs, process them and calculate 
  * collisions. 
