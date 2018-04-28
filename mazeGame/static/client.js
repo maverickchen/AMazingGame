@@ -466,11 +466,12 @@ socket.on('canStartGame', function(initialGameState) {
 
 
 function onAssetsLoaded() {
-    // PIXI.sound.Sound.from({
-    //         url: 'assets/bkgMusic.mp3',
-    //         autoPlay: true,
-    //         loop: true,
-    // });
+    PIXI.sound.Sound.from({
+            url: 'assets/bkgMusic.mp3',
+            autoPlay: true,
+            loop: true,
+            volume: 0.6;
+    });
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     gameScreen.visible = true;
@@ -668,7 +669,11 @@ function handleInput(delta) {
         if (shoot.isDown) shootPressedBefore = true;
         if (shoot.isUp && shootPressedBefore) {
             input.shooting = true; 
-            shootPressedBefore = false; //state.players[myID].bullet -= 1;
+            shootPressedBefore = false;
+            PIXI.sound.Sound.from({
+                    url: 'assets/GunShot.mp3',
+                    autoPlay: true,
+            });
         }
 
         if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
