@@ -13,7 +13,8 @@ module.exports = class Bullet {
         // y_dir is -1 means go up, 1 means go down
         this.y_dir = 0;
         this.x_dir = 0;
-
+        // Add x direction and y direction to the bullet,
+        // orientation is pass from the serverUpdate.js
         if (orientation == 'd') this.y_dir = 1;
         else if (orientation == 'u') this.y_dir = -1;
         else if (orientation == 'l') this.x_dir = -1;
