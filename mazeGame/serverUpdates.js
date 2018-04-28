@@ -47,6 +47,7 @@ exports.updatePhysics = function() {
                         // directly.  
                         // FIND ME
                         if (player.bullets > 0) {
+                            
                             player.bullets -= 1;
                             var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
                             bullet_list.push(newBullet); 
@@ -68,9 +69,12 @@ exports.updatePhysics = function() {
 
                 // Chech for bullet collisions
                 for(var i = 0; i < bullet_list.length; i++) {
+                    // If the bullet hit one of the player
                     if(Collision.collides(bullet_list[i], player)) {
-                        // Hit others
+                        // Hit others, if the bullet hit the team member or himself
+                        // ignore the hit.
                         if (bullet_list[i].owner != player.teamNumber) {
+                            // Dedect the points of this player
                             bullet_list[i].use(player);
                             bullet_list.splice(i,1);
                             break;
