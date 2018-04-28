@@ -20,7 +20,7 @@ exports.updatePhysics = function() {
 
     if (!gameOver) { // Check again since it might have changed in checkGameOver
 
-        while (this.items.length < 50) {
+        while (this.items.length < 40) {
             potion = new Item('Potion', maze);
             ammo = new Item('Ammo', maze);
             items.push(potion);
