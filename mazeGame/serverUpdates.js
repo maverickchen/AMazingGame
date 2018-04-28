@@ -52,6 +52,9 @@ exports.updatePhysics = function() {
                             // When the player is shooting, deduct the bullets
                             // number of this player
                             player.bullets -= 1;
+                            // Make new bullets for each player when they shooting,
+                            // the start position for the bullets should from the central of the 
+                            // player
                             var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
                             bullet_list.push(newBullet); 
                         } 
