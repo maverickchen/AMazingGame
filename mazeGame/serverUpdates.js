@@ -49,7 +49,8 @@ exports.updatePhysics = function() {
 
                         // If the player have bullets
                         if (player.bullets > 0) {
-          
+                            // When the player is shooting, deduct the bullets
+                            // number of this player
                             player.bullets -= 1;
                             var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
                             bullet_list.push(newBullet); 
