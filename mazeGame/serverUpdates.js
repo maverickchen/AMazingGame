@@ -22,7 +22,8 @@ exports.updatePhysics = function() {
             items.push(potion);
             items.push(ammo);
         }
-
+        // Go through the bullets list to check if there are any collision
+        // with the wall
         for(var i = 0; i < bullet_list.length; i++) {
             var collide_wall = bullet_list[i].move(dt, this.maze);
     
