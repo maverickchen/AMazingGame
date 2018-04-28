@@ -297,12 +297,39 @@ function chooseTeam() {
     // filterOff.call(ready);
     
     //console.log(team1.scale);
-    team1.on('pointerover', () => { team1.scale.x *= 1.5; team1.scale.y *= 1.5; })
-        .on('pointerout', () => { team1.scale.x /= 1.5; team1.scale.y /= 1.5; });
-    team2.on('pointerover', () => {team2.scale.x *= 1.5; team2.scale.y *= 1.5;})
-        .on('pointerout', () => {team2.scale.x /= 1.5; team2.scale.y /= 1.5;});
-    ready.on('pointerover', () => {ready.scale.x *= 2; ready.scale.y *= 2;})
-        .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
+    team1.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+         team1.scale.x *= 1.5; 
+         team1.scale.y *= 1.5; 
+        }).on('pointerout', () => {
+             team1.scale.x /= 1.5; 
+             team1.scale.y /= 1.5; 
+    });
+    team2.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+        team2.scale.x *= 1.5; 
+        team2.scale.y *= 1.5;
+    }).on('pointerout', () => {
+        team2.scale.x /= 1.5; 
+        team2.scale.y /= 1.5;
+    });
+    ready.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+        ready.scale.x *= 2; 
+        ready.scale.y *= 2;
+    }).on('pointerout', () => {
+        ready.scale.x /= 2;
+         ready.scale.y /= 2;
+        });
     
     // Load tutorial assets
     var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
@@ -1510,10 +1537,18 @@ function loadGameEnd(won) {
         console.log('Clicked');
         startScreen.visible = true;
         endGameContainer.visible = false;
-    })
+    });
 
-    backButton.on('pointerover', () => {backButton.scale.x *= 1.5; backButton.scale.y *= 1.5; })
-    .on('pointerout', () => { backButton.scale.x /= 1.5; backButton.scale.y /= 1.5; });
+    backButton.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
 
-
+        backButton.scale.x *= 1.5;
+        backButton.scale.y *= 1.5; 
+    }).on('pointerout', () => { 
+        backButton.scale.x /= 1.5;
+        backButton.scale.y /= 1.5; 
+    });
 }
