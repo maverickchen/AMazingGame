@@ -9,7 +9,8 @@ module.exports = class Bullet {
         this.width = 20;
         this.height = 20;
         // Initialize the direction of bullets
-  
+        // x_dir is -1 means go left, 1 means go right
+        // y_dir is -1 means go up, 1 means go down
         this.y_dir = 0;
         this.x_dir = 0;
 
