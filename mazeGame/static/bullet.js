@@ -25,7 +25,7 @@ module.exports = class Bullet {
     }
 
     use(player) {
-        player.health -= 25;
+        player.health -= 10;
         if (player.health < 0) player.health = 0;
     }
 
