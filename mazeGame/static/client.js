@@ -470,7 +470,7 @@ function onAssetsLoaded() {
             url: 'assets/bkgMusic.mp3',
             autoPlay: true,
             loop: true,
-            volume: 0.6;
+            volume: 0.6,
     });
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
