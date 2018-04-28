@@ -53,8 +53,8 @@ var h = window.innerHeight
 
 // make a PIXI canvas
 var app = new PIXI.Application({
-          width: w, 
-          height: h,
+          width: 1280, 
+          height: 624,
           antialiasing: true, 
           transparent: false, 
           resolution: 1
