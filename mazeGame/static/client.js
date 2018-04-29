@@ -298,6 +298,7 @@ function chooseTeam() {
     
     //console.log(team1.scale);
     team1.on('pointerover', () => {
+        // Add sound effect 
         PIXI.sound.Sound.from({
             url: 'assets/backToMainPage.mp3',
             autoPlay: true,
@@ -1546,7 +1547,6 @@ function loadGameEnd(won) {
             url: 'assets/backToMainPage.mp3',
             autoPlay: true,
         });
-
         backButton.scale.x *= 1.5;
         backButton.scale.y *= 1.5; 
     }).on('pointerout', () => { 
