@@ -9,24 +9,21 @@ var Updates = require('./serverUpdates');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
-
-// The maze size, for test, will change to 8 later
-var width = 3;
-
-var maze_cell = generator(width);
-var maze = converter.convertMaze(maze_cell);
+const width = 8;
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
+var physicsLoop;
+var updateClientsLoop;
 
 /************ Set of data used throughout the game ******************/
 var gameInProgress = false;
 var gameState = {};
 var clientSockets = {}; // dictionary mapping player id to socket
 var players = {}; // dictionary mapping player id to player
+var maze = converter.convertMaze(generator(width)); // gen maze of dimension width * width
 var items = [];
 var team1 = []; // list of players in each team
 var team2 = [];
-var clientInputs = [];
 /******************************************************************/
 
 function initItems() {
@@ -36,7 +33,7 @@ function initItems() {
             if (maze[i][j] === 1) pathCount++;
         }
     }
-    var itemNum = Math.floor(pathCount * 0.3);
+    var itemNum = Math.floor(pathCount * 0.25);
     console.log(itemNum);
     for (var i = 0; i < itemNum; i++) {
         potion = new Item('Potion', maze);
@@ -45,7 +42,6 @@ function initItems() {
         items.push(ammo);
     }
 }
-initItems();
 app.use(express.static(path.join(__dirname,'static')));
 
 app.get('/', function (req, res) {
@@ -56,9 +52,6 @@ io.on('connection', function(socket) {
     var player;
     var id = idCounter;
     idCounter += 1;
-    
-    //console.log('a user connected with id ' + id);
-    //console.log('There are now '+Object.keys(players).length+' player(s) in the room');
 
     socket.emit('onconnected', {id: id}); // send the client their server id 
 
@@ -85,16 +78,13 @@ io.on('connection', function(socket) {
         }
         if (players[id]) delete players[id];
         if (clientSockets[id]) delete clientSockets[id];
-
-        //console.log('user '+id+' disconnected. There are '+Object.keys(players).length+' remaining player(s)');
     });
 
-    // Send to client (movePlayers.js) - the # of people in each team
+    // Send to client (client.js) - the # of people in each team
     io.emit('peopleInTeam', [team1.length, team2.length]);    
     
     // When one user selects a team
-    socket.on('teamSelection', function(teamNum) { // receives info - from movePlayers.js
-        //console.log("teamSelection");
+    socket.on('teamSelection', function(teamNum) { // receives info - from client.js
         if (teamNum == 1) { // If player selected team 1
             if (team1.length == 2) { // Check if this selection is valid. If not, send a message
                 socket.emit('validChoice', false);
@@ -105,10 +95,12 @@ io.on('connection', function(socket) {
                 team1.push(player);
                 players[id] = player; // player successfully added to player roster
                 clientSockets[id] = socket; // subscribe client socket to server updates
-
+                if (gameInProgress) {
+                    joinGame(id);
+                    return;
+                }
                 if ((team1.length === 2) && (team2.length === 2)) {
                     if (!gameInProgress) startGame();
-                    else joinGame(id);
                 } else {
                     socket.emit('validChoice', true);
                     io.emit('peopleInTeam', [team1.length, team2.length]);
@@ -125,10 +117,12 @@ io.on('connection', function(socket) {
                 team2.push(player);
                 players[id] = player; // player successfully added to game roster
                 clientSockets[id] = socket; // add client socket to server updates
-
+                if (gameInProgress) {
+                    joinGame(id);
+                    return;
+                }
                 if ((team1.length === 2) && (team2.length === 2)) {
                     if (!gameInProgress) startGame();
-                    else joinGame(id);
                 } else {
                     socket.emit('validChoice', true);
                     io.emit('peopleInTeam', [team1.length, team2.length]);
@@ -138,8 +132,27 @@ io.on('connection', function(socket) {
     });
 });
 
+
+function onGameOver() {
+    if (gameInProgress) {
+        gameInProgress = false;
+        // clear game loops
+        if (physicsLoop) clearInterval(physicsLoop);
+        if (updateClientsLoop) clearInterval(updateClientsLoop);
+        // reinitialize model data
+        players = {};
+        clientSockets = {};
+        items = [];
+        team1 = [];
+        team2 = [];
+        maze = converter.convertMaze(generator(width));
+        io.emit('peopleInTeam', [team1.length, team2.length]);
+    }
+}
+
 function startGame() {
     gameInProgress = true;
+    initItems();
     this.players = players;
     this.team1 = team1;
     this.team2 = team2;
@@ -154,10 +167,10 @@ function startGame() {
     initialGameState.t = new Date().getTime();
 
     io.emit('canStartGame', initialGameState);
-    setInterval(Updates.updatePhysics.bind(this), 15);
-    setInterval(Updates.updateClients.bind(this), 45);
-
+    physicsLoop = setInterval(Updates.updatePhysics.bind(this), 15);
+    updateClientsLoop = setInterval(Updates.updateClients.bind(this), 45);
 }
+
 
 function joinGame(id) {
     this.players = players;
@@ -178,5 +191,5 @@ function joinGame(id) {
 
 var SERVPORT = 8080;
 server.listen(SERVPORT,'0.0.0.0', function () {
-  //console.log('App listening on port ' + SERVPORT);
+  console.log('App listening on port ' + SERVPORT);
 });
