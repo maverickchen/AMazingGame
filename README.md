@@ -1,5 +1,5 @@
 # team3
-## The URL for the game is: 34.207.53.213 (AWS)
+## The URL for the game is: http://34.207.53.213:8080 (AWS)
 Repository for team3
 
 ## Our Project: 
