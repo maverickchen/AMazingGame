@@ -298,7 +298,7 @@ function chooseTeam() {
     
     //console.log(team1.scale);
     team1.on('pointerover', () => {
-        // Add sound effect 
+        // Add sound effect to the button in the home page
         PIXI.sound.Sound.from({
             url: 'assets/backToMainPage.mp3',
             autoPlay: true,
@@ -350,7 +350,7 @@ function chooseTeam() {
 
     var tutorial_text = "You're locked in a dungeon! \nYour only way out is to shoot and kill" +
     " everyone in the other team. \nMove with the ARROW keys. \nShoot with SPACE bar." + 
-    "\nYour health decreases whether or not you're moving, \nso be sure to keep navigating" +
+    "\nYour health decreases whether or not you're moving, \n so be sure to keep navigating" +
     " to pick up bullets and health potions! \n \nGOOD LUCK!";
     var tutorialText = new PIXI.Text(tutorial_text, tutorial_style);
     tutorialText.anchor.set(0.5);
@@ -361,6 +361,10 @@ function chooseTeam() {
     // When user hovers over question mark,
     questionMark.on('pointerover', function() {
         // Render instruction screen
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
         tutorialScreen.visible = true;
     });
     questionMark.on('pointerout', function() {
