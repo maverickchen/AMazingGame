@@ -82,7 +82,6 @@ app.stage = new PIXI.display.Stage();
 // Container for all start screen assets
 var startScreen = new PIXI.Container();
 app.stage.addChild(startScreen);
-//startScreen.visible = false;
 
 // Container for all in game assets
 var gameScreen = new PIXI.Container();
@@ -129,32 +128,13 @@ tutorialScreen.visible = false;
 // app.renderer.view.style.height = window.innerHeight - 50 + "px";
 // app.renderer.view.style.display = "block";
 
-//The `renderer.view` is just an ordinary `<canvas>` element.
-//Here's how you can reference to add an optional dashed 
-//border around the canvas 
-// app.renderer.view.style.border = "1px dashed black";
-//To resize the canvas
-// app.renderer.resize(512, 512);
 //To change the background color
 app.renderer.backgroundColor = 0x061639;
 var graphics = new PIXI.Graphics();
 
-//app.ticker.add(chooseTeam);
-
 window.onload = chooseTeam;
 
-// var outlineFilterBlue = new PIXI.filters.OutlineFilter(2, 0x99ff99);
-// var outlineFilterRed = new PIXI.filters.GlowFilter(15, 2, 1, 0xff9999, 0.5);
-
-// function filterOn() {
-//     this.filters = [outlineFilterRed];
-// }
-// function filterOff() {
-//     this.filters = [outlineFilterBlue];
-// }
-
 socket.on('onconnected', function(msg){
-    //console.log('My server id is '+msg.id);
     myID = msg.id;
 });
 
@@ -198,9 +178,16 @@ socket.on('peopleInTeam', function(arr) {
         startScreen.addChild(team2_text);
 });
 
+// StartScreen UI Buttons
 var team1;
 var team2;
 var ready;
+// Startscreen UI text
+var text1;
+var text2;
+var msg;
+var cantEnter;
+var waitText;
 
 function chooseTeam() {
 
@@ -225,21 +212,6 @@ function chooseTeam() {
     //inputField.y = 100;
     //startScreen.addChild(inputField);
 
-/*
-    socket.on('peopleInTeam', function(arr) {
-        console.log("received");
-        team1_ppl = arr[0];
-        team2_ppl = arr[1];
-        var team1_text = new PIXI.Text('There are ' + team1_ppl + ' people in team 1', style);
-        team1_text.x = 80;
-        team1_text.y = app.screen.height / 2 - 100;
-        app.stage.addChild(team1_text);
-        team2_text = new PIXI.Text('There are ' + team2_ppl + ' people in team 2', style);
-        team2_text.x = app.screen.width - 300;
-        team2_text.y = app.screen.height / 2 - 100;
-        app.stage.addChild(team2_text);
-    });
-*/
     // Bring in image assets
     team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
     team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
@@ -287,24 +259,6 @@ function chooseTeam() {
     ready.buttonMode = true;
     questionMark.buttonMode = true;
 
-    var text1;
-    var text2;
-    var teamSelected = 0;
-
-    // Pointers normalize touch and mouse
-
-    
-    // Red glow when a mouse is hovered over buttons
-    // team1.on('pointerover', filterOn)
-    //     .on('pointerout', filterOff );
-    // filterOff.call(team1);
-    // team2.on('pointerover', filterOn)
-    //     .on('pointerout', filterOff );
-    // filterOff.call(team2);
-    // ready.on('pointerover', filterOn)
-    //     .on('pointerout', filterOff );
-    // filterOff.call(ready);
-
     team1.on('pointerover', () => {
                 // Add sound effect to the button in the home page
                 PIXI.sound.Sound.from({
@@ -338,10 +292,10 @@ function chooseTeam() {
                 ready.scale.x *= 2; 
                 ready.scale.y *= 2;
             })
-        .on('pointerout', () => {
-            ready.scale.x /= 2;
-             ready.scale.y /= 2;
-            });
+            .on('pointerout', () => {
+                ready.scale.x /= 2;
+                 ready.scale.y /= 2;
+                });
     
     // Load tutorial assets
     var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
@@ -379,53 +333,55 @@ function chooseTeam() {
         tutorialScreen.visible = true;
     });
     questionMark.on('pointerout', function() {
-        // Render instruction screen
+        // Hide instruction screen
         tutorialScreen.visible = false;
     });
 
+    text1 = new PIXI.Text('', style);
+    text1.x = 335;
+    text1.y = app.screen.height / 2 + 30;
+    startScreen.addChild(text1);
+    text2 = new PIXI.Text('', style);
+    text2.x = app.screen.width - 515;
+    text2.y = app.screen.height / 2 + 30;
+    startScreen.addChild(text2);
+    var teamSelected = 0;
+
     // When team 1 is selected,
     team1.on('pointerdown', function() {
-        // First, get rid of previous text1, text2
-        var index = startScreen.children.indexOf(text1);
-        if (index !== -1) startScreen.removeChild(text1);
-        var index = startScreen.children.indexOf(text2);
-        if (index !== -1) startScreen.removeChild(text2);
-
+        text1.text = 'You Selected Team 1';
+        text2.text = '';
         teamSelected = 1;
-        text1 = new PIXI.Text('You Selected Team 1', style);
-        text1.x = 335;
-        text1.y = app.screen.height / 2 + 30;
-        startScreen.addChild(text1);
     });
 
     // When team 2 is selected,
     team2.on('pointerdown', function() {
-        // First, get rid of previous text1, text2
-        var index = startScreen.children.indexOf(text1);
-        if (index !== -1) startScreen.removeChild(text1);
-        var index = startScreen.children.indexOf(text2);
-        if (index !== -1) startScreen.removeChild(text2);
-
+        text1.text = '';
+        text2.text = 'You Selected Team 2';
         teamSelected = 2;
-        text2 = new PIXI.Text('You Selected Team 2', style);
-        text2.x = app.screen.width - 515;
-        text2.y = app.screen.height / 2 + 30;
-        startScreen.addChild(text2);
     });
 
-    var msg;
-    var cantEnter;
+    msg = new PIXI.Text('', style);
+    msg.x = app.screen.width / 2 - 170;
+    msg.y = app.screen.height - 70;
+    startScreen.addChild(msg);
+
+    cantEnter = new PIXI.Text('',style);
+    cantEnter.x = app.screen.width / 2;
+    cantEnter.y = app.screen.height - 50;
+    startScreen.addChild(cantEnter);
+
+    waitText = new PIXI.Text('', style);
+    waitText.anchor.set(0.5);
+    waitText.x = app.screen.width / 2;
+    waitText.y = app.screen.height - 70;
+    startScreen.addChild(waitText);
+
     // When Ready button is clicked,
     ready.on('pointerdown', function() {
 
         if (teamSelected === 0) {
-            // First, get rid of previous msg
-            var index = startScreen.children.indexOf(msg);
-            if (index !== -1) startScreen.removeChild(msg);
-            msg = new PIXI.Text('You should select a team before you begin', style);
-            msg.x = app.screen.width / 2 - 170;
-            msg.y = app.screen.height - 70;
-            startScreen.addChild(msg);
+            msg.text = 'You should select a team before you begin';
         }
 
         else if (teamSelected === 1 || teamSelected === 2) {
@@ -441,40 +397,54 @@ function chooseTeam() {
                     team2.interactive = false;
                     team2.buttonMode = false;
                     // Display "Waiting for other players to get ready..." until game starts
-                    var index = startScreen.children.indexOf(msg);
-                    if (index !== -1) startScreen.removeChild(msg);
-                    var waitText = new PIXI.Text('Waiting for other players to get ready...', style);
-                    waitText.anchor.set(0.5);
-                    waitText.x = app.screen.width / 2;
-                    waitText.y = app.screen.height - 70;
-                    startScreen.addChild(waitText);
+                    msg.text = '';
+                    waitText.text = 'Waiting for other players to get ready...';
                 }
                 else {
                     // Display the msg: You can't enter Team x ...
                     socket.on('message', function(msg) {
-                        // Get rid of previous text first
-                        var index = startScreen.children.indexOf(cantEnter);
-                        if (index !== -1) startScreen.removeChild(cantEnter);
-                        cantEnter = new PIXI.Text(msg, style);
-                        cantEnter.x = app.screen.width / 2;
-                        cantEnter.y = app.screen.height - 50;
-                        startScreen.addChild(cantEnter);
+                        cantEnter.text = msg;
                     });
                 }
             });
         }
     });
 
-    // Alternatively, use the mouse & touch events:
-    // sprite.on('click', onClick); // mouse-only
-    // sprite.on('tap', onClick); // touch-only
-
     startScreen.addChild(team1);
     startScreen.addChild(team2);
     startScreen.addChild(ready);
     app.stage.addChild(questionMark);
- 
 }
+
+
+// Wait for everyone to get ready - start game when they do
+// (Transition into GAME SCREEN code)
+socket.on('canStartGame', function(initialGameState) {
+    // suppress all the startScreen messages
+    if (text1) text1.text = '';
+    if (text2) text2.text = '';
+    if (msg) msg.text = '';
+    if (cantEnter) cantEnter.text = '';
+    if (waitText) waitText.text = '';
+
+    startGame(initialGameState);
+});
+
+/* --------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+                GAME SCREEN FUNCTIONS
+
+-----------------------------------------------------------------------------
+-------------------------------------------------------------------------- */
+
+
+var gameTextStyle = new PIXI.TextStyle({
+        fontFamily: "\"Lucida Console\", Monaco, monospace",
+        fontSize: 20,
+        fontWeight: 'bold',
+        fill: ['#05090c'] // gradient
+    });
 
 PIXI.loader.add('assets/Player1Up.json')
     .add('assets/Player1Down.json')
@@ -496,50 +466,6 @@ PIXI.loader.add('assets/Player1Up.json')
     .load(onAssetsLoaded);
 
 
-// Wait for everyone to get ready - start game when they do
-// (Transition into GAME SCREEN code)
-socket.on('canStartGame', function(initialGameState) {
-    localState = initialGameState;
-    serverStates.push(initialGameState);
-    localState.lastServerUpdate = initialGameState.t;
-    initGameState = initialGameState;
-    startGame(initialGameState);
-});
-
-/* --------------------------------------------------------------------------
------------------------------------------------------------------------------
-
-                GAME SCREEN FUNCTIONS
-
------------------------------------------------------------------------------
--------------------------------------------------------------------------- */
-
-var gameTextStyle = new PIXI.TextStyle({
-        fontFamily: "\"Lucida Console\", Monaco, monospace",
-        fontSize: 20,
-        fontWeight: 'bold',
-        fill: ['#05090c'] // gradient
-    });
-
-socket.on('newGameState', function(state){
-    if (gameInProgress) {
-        serverStates.push(state);
-        ping = new Date().getTime() - state.t;
-        currTime = state.t - netOffset;
-        if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
-            serverStates.splice(0,1); 
-        }
-        if (inputs.length) { 
-            offset = new Date().getTime() - inputs[0].time; 
-            offsetData.push(offset/2);
-            netOffset = getAvg(offsetData);
-            if (offsetData.length >= 20) offsetData.splice(0,1);
-        }
-        replayUsingKnownPos(serverStates, inputs);
-    }
-});
-
-
 function onAssetsLoaded() {
     bkgMusic = PIXI.sound.Sound.from({
             url: 'assets/bkgMusic.mp3',
@@ -554,26 +480,6 @@ function onAssetsLoaded() {
     panel.scale.x *= 3.5;
     panel.scale.y *= 4;
     gameUI.addChild(panel);
-
-    // // Display Player Sprite on Panel
-    // var playerSprite;
-    // if (localState.players[myID].teamNumber === 1) {
-    //     playerSprite = PIXI.Sprite.fromImage('assets/Player1Example.png');
-    // }
-    // else {
-    //     playerSprite = PIXI.Sprite.fromImage('assets/Player2Example.png');
-    // }
-    // playerSprite.x = app.screen.width - 340;
-    // playerSprite.y = 125;
-    // playerSprite.scale.x *= 0.4;
-    // playerSprite.scale.y *= 0.4;
-    // gameUI.addChild(playerSprite);
-
-    // // Display user's team
-    // var userTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
-    // userTeam.x = app.screen.width - 230;
-    // userTeam.y = 150;
-    // gameUI.addChild(userTeam);
 
     // Display Health Potion sprite on panel
     var healthSprite = PIXI.Sprite.fromImage('assets/PotionExample.png');
@@ -590,6 +496,21 @@ function onAssetsLoaded() {
     bulletSprite.scale.x *= 0.15;
     bulletSprite.scale.y *= 0.15;
     gameUI.addChild(bulletSprite);
+
+    hpObj = newHPSprite();
+    hpBkg = hpObj.spriteBkg;
+    hp = hpObj.spriteHP;
+
+    bulletsNum = new PIXI.Text('', gameTextStyle); // Text to display the number of bullets - updated everytime newGameState is changed
+    bulletsNum.x = app.screen.width - 200;
+    bulletsNum.y = 410;
+
+    healthText = new PIXI.Text('', gameTextStyle);
+    healthText.x = app.screen.width - 235;
+    healthText.y = 290;
+
+    gameUI.addChild(bulletsNum);
+    gameUI.addChild(healthText);
 
     /*
     this.gameTextStyle = gameTextStyle;
@@ -623,10 +544,6 @@ function onAssetsLoaded() {
     gameUI.addChild(mazeText);
     */
 
-    // var hazeSprite = PIXI.Sprite.fromImage('/assets/haze.png');
-    // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 50);
-    // gameView.filters = [dispFilt];
-
     // make the background dark by putting a layer over it
     lighting = new PIXI.display.Layer();
     lighting.on('display', function (element) {
@@ -641,41 +558,11 @@ function onAssetsLoaded() {
     lightingSprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
 
     gameView.addChild(lightingSprite);
-
-    // var hazeSprite = PIXI.Sprite.fromImage('/assets/smoke.png');
-    // var dispFilt = new PIXI.filters.DisplacementFilter(hazeSprite, 2);
-    // lighting.filters = [dispFilt];
     
     loadSpriteFrames(lighting);
     loadMazeSprites();
     loadBulletSprites();
     loadEndgameAssets();
-    hpObj = newHPSprite(lighting);
-    hpBkg = hpObj.spriteBkg;
-    hp = hpObj.spriteHP;
-
-    // ping = new Date().getTime() - initGameState.t;
-    // currTime = initGameState.t - netOffset;
-
-    // socket.on('newGameState', function(state){
-    //     serverStates.push(state);
-    //     ping = new Date().getTime() - state.t;
-    //     currTime = state.t - netOffset;
-    //     //console.log('ping',ping);
-    //     if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
-    //         serverStates.splice(0,1); 
-    //     }
-    //     if (inputs.length) { 
-    //         offset = new Date().getTime() - inputs[0].time; 
-    //         offsetData.push(offset/2);
-    //         netOffset = getAvg(offsetData);
-    //         if (offsetData.length >= 20) offsetData.splice(0,1);
-    //     }
-    //     replayUsingKnownPos(serverStates, inputs);
-    // });
-    // // Ticker will call update to begin the main game loop with rate 60fps
-    // app.ticker.add(update.bind(this)); // pass current context to update function
-    // setInterval(physicsUpdate.bind(this), 15); // update physics separately every 15 ms
 }
 
 
@@ -687,26 +574,27 @@ var panelUserTeam;
 function initPanel() {
 
     if (panelPlayerSprite) panelPlayerSprite.destroy();
-    if (panelUserTeam) panelUserTeam.destroy();
 
     // Display Player Sprite on Panel
     if (localState.players[myID].teamNumber === 1) {
-            panelPlayerSprite = PIXI.Sprite.fromImage('assets/Player1Example.png');
-        }
-        else {
-            panelPlayerSprite = PIXI.Sprite.fromImage('assets/Player2Example.png');
-        }
-        panelPlayerSprite.x = app.screen.width - 340;
-        panelPlayerSprite.y = 125;
-        panelPlayerSprite.scale.x *= 0.4;
-        panelPlayerSprite.scale.y *= 0.4;
-        gameUI.addChild(panelPlayerSprite);
+        panelPlayerSprite = PIXI.Sprite.fromImage('assets/Player1Example.png');
+    } else {
+        panelPlayerSprite = PIXI.Sprite.fromImage('assets/Player2Example.png');
+    }
+    panelPlayerSprite.x = app.screen.width - 340;
+    panelPlayerSprite.y = 125;
+    panelPlayerSprite.scale.x *= 0.4;
+    panelPlayerSprite.scale.y *= 0.4;
+    gameUI.addChild(panelPlayerSprite);
 
-        // Display user's team
-        var panelUserTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
+    // Display user's team
+    if (panelUserTeam) panelUserTeam.text = "Team " + localState.players[myID].teamNumber;
+    else {
+        panelUserTeam = new PIXI.Text("Team " + localState.players[myID].teamNumber, gameTextStyle);
         panelUserTeam.x = app.screen.width - 230;
         panelUserTeam.y = 150;
         gameUI.addChild(panelUserTeam);
+    }
 }
 
 
@@ -723,15 +611,16 @@ function startGame(initialGameState) {
     serverStates.push(initialGameState);
     localState.lastServerUpdate = initialGameState.t;
 
-    ping = new Date().getTime() - initGameState.t;
-    currTime = initGameState.t - netOffset;
+    ping = new Date().getTime() - initialGameState.t;
+    currTime = initialGameState.t - netOffset;
 
     if (bkgMusic) bkgMusic.play();
+
     // suppress the startScreen UI elements and show the game screen
     startScreen.visible = false;
     gameScreen.visible = true;
 
-    maze = initGameState.maze;
+    maze = initialGameState.maze;
     this.localState = localState;
     this.update = update;
     this.inputs = inputs;
@@ -740,7 +629,7 @@ function startGame(initialGameState) {
     this.WALL_WIDTH = WALL_WIDTH;
 
     initPanel();
-    loadPlayerSprites();
+    loadPlayerSprites(initialGameState);
     updatePlayerSprites(localState, gameTextStyle);
     updateItemSprites(localState);
     updateMazeSprites(localState);
@@ -750,12 +639,6 @@ function startGame(initialGameState) {
     updatePhysicsFn = physicsUpdate.bind(this);
     app.ticker.add(updateViewFn); 
     physicsUpdateHandle = setInterval(updatePhysicsFn, 15); // run every 15ms
-}
-
-function getAvg(times) {
-  return times.reduce(function (p, c) {
-    return p + c;
-  }) / times.length;
 }
 
 /* --------------------------------------------------------------------------
@@ -775,8 +658,33 @@ function update(delta) {
     updateMazeSprites(localState);
 }
 
+socket.on('newGameState', function(state){
+    if (gameInProgress) {
+        serverStates.push(state);
+        ping = new Date().getTime() - state.t;
+        currTime = state.t - netOffset;
+        if (serverStates.length >= 60*2) { // keep 2 seconds worth of serverStates
+            serverStates.splice(0,1); 
+        }
+        if (inputs.length) { 
+            offset = new Date().getTime() - inputs[0].time; 
+            offsetData.push(offset/2);
+            netOffset = getAvg(offsetData);
+            if (offsetData.length >= 20) offsetData.splice(0,1);
+        }
+        replayUsingKnownPos(serverStates, inputs);
+    }
+});
+
+// Taken from stackoverflow. Gets the average value of an array.
+function getAvg(times) {
+    return times.reduce(function (p, c) {
+        return p + c;
+    }) / times.length;
+}
 
 var shootPressedBefore = false;
+
 function handleInput(delta) {
     if (localState.players[myID].health > 0) {
         var input = {};
@@ -787,7 +695,7 @@ function handleInput(delta) {
         if (right.isDown) input.x_dir += 1; 
         if (up.isDown) input.y_dir += -1;
         if (down.isDown) input.y_dir += 1; 
-        if (shoot.isDown) shootPressedBefore = true;
+        if (shoot.isDown) shootPressedBefore = true; // guarantee 1 space bar press => 1 bullet
         if (shoot.isUp && shootPressedBefore) {
             input.shooting = true; 
             shootPressedBefore = false;
@@ -796,7 +704,6 @@ function handleInput(delta) {
                     autoPlay: true,
             });
         }
-
         if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
             input_seq += 1;
             input.time = new Date().getTime();
@@ -889,17 +796,17 @@ function processServerUpdates(time, delta) {
         } else { // (!next && !prev)
             // no states to interpolate between; just snap other players to 
             // oldest server position
-            latest = serverStates[0];
-            localState.items = latest.items;
-            localState.bullets_list = latest.bullets_list;
-            localState.players[myID].bullets = latest.players[myID].bullets;
-            localState.players[myID].health = latest.players[myID].health;
+            oldest = serverStates[0];
+            localState.items = oldest.items;
+            localState.bullets_list = oldest.bullets_list;
+            localState.players[myID].bullets = oldest.players[myID].bullets;
+            localState.players[myID].health = oldest.players[myID].health;
             for (var id in localState.players) {
                 if (myID != id) {
-                    if (latest.players[id]) {
-                        localState.players[id] = latest.players[id];
-                        localState.players[id].health = latest.players[id].health;
-                        localState.players[id].orientation = latest.players[id].orientation;
+                    if (oldest.players[id]) {
+                        localState.players[id] = oldest.players[id];
+                        localState.players[id].health = oldest.players[id].health;
+                        localState.players[id].orientation = oldest.players[id].orientation;
                     }
                 }
             }
@@ -1130,7 +1037,8 @@ function loadSpriteFrames(lighting) {
  * playerSprites[id] is player id's set of sprites
  * playerSprites[id].current is the current sprite displayed for that player
  */
-function loadPlayerSprites() {
+function loadPlayerSprites(initialGameState) {
+    // Delete all old playerSprites from the last game to start fresh
     if (playerSprites) {
         for (var id in playerSprites) {
             for (var dir in playerSprites[id]) {
@@ -1140,17 +1048,17 @@ function loadPlayerSprites() {
     }
     playerSprites = {};
 
-    for (var id in initGameState.players) {
+    for (var id in initialGameState.players) {
         var sprites = {};
         var x = 0;
         var y = 0;
         var container = charContainer;
         if (myID == id) {
             container = localPlayerContainer;
-            x = app.screen.width / 3
-            y = h/2;
+            x = app.screen.width / 3 + 21; // add half width of player sprite
+            y = app.screen.height / 2 - 33; // subtract half-height of sprite
         }
-        if (initGameState.players[id].teamNumber == 1) {
+        if (initialGameState.players[id].teamNumber == 1) {
             sprites.down = newPlayerSprite(p1Frames.down, x, y, true, container);  
             sprites.up = newPlayerSprite(p1Frames.up, x, y, false, container); 
             sprites.left = newPlayerSprite(p1Frames.left, x, y, false, container);
@@ -1160,7 +1068,7 @@ function loadPlayerSprites() {
             sprites.shootLeft = newPlayerSprite(p1Frames.shootLeft, x, y, false, container);
             sprites.shootRight = newPlayerSprite(p1Frames.shootRight, x, y, false, container);
             sprites.current = sprites.down;
-        } else if (initGameState.players[id].teamNumber == 2) {
+        } else if (initialGameState.players[id].teamNumber == 2) {
             sprites.down = newPlayerSprite(p2Frames.down, x, y, true, container);  
             sprites.up = newPlayerSprite(p2Frames.up, x, y, false, container); 
             sprites.left = newPlayerSprite(p2Frames.left, x, y, false, container);
@@ -1254,45 +1162,31 @@ function setSprite(animation, id) {
  * updatePlayerSprites: given a game state object (state), update the location of all 
  * player sprites
  */ 
-var bulletsNum; // Text to display the number of bullets - updated everytime newGameState is changed
+var bulletsNum;
+
 var healthText;
+
 function updatePlayerSprites(state, gameTextStyle) {
     // draw player sprites
     for (var id in state.players) {
+        // Update my character
+        if (myID == id) {
+            // move maze instead so that local player remains centered
+            xdiff = app.screen.width / 3 + 21 - (state.players[id].x);
+            ydiff = app.screen.height / 2 - 33 - (state.players[id].y);
+            mazeContainer.x = xdiff;
+            mazeContainer.y = ydiff;
 
-        // Make player sprites tombstones if their HP is zero.
-        if (state.players[id].health === 0) {
-            setSprite(playerSprites[id].dead, id);
-        }
-        else {
-            // Update my character
-            if (myID == id) {
-                // move maze instead so that local player remains centered
-                xdiff = app.screen.width / 3 - (state.players[id].x);
-                ydiff = h/2 - (state.players[id].y);
-                mazeContainer.x = xdiff;
-                mazeContainer.y = ydiff;
+            hp.width = (state.players[id].health/100) * hpBkg.width;
 
-                hp.width = (state.players[id].health/100) * hpBkg.width;
+            // Update text for number of bullets
+            bulletsNum.text = state.players[id].bullets;
 
-                // Create texts for number of bullets
-                var index = gameUI.children.indexOf(bulletsNum);
-                if (index !== -1) gameUI.removeChild(bulletsNum);
-                bulletsNum = new PIXI.Text(state.players[id].bullets, gameTextStyle);
-                bulletsNum.x = app.screen.width - 200;
-                bulletsNum.y = 410;
-                gameUI.addChild(bulletsNum);
-
-                // Create texts for health
-                var index = gameUI.children.indexOf(healthText);
-                if (index !== -1) gameUI.removeChild(healthText);
-                healthText = new PIXI.Text(Math.round(state.players[id].health) + " / 100", gameTextStyle);
-                healthText.x = app.screen.width - 235;
-                healthText.y = 290;
-                gameUI.addChild(healthText);
-
-            } 
-            else { // nonlocal players
+            // Update text for health
+            healthText.text = Math.round(state.players[id].health) + ' / 100';
+        } 
+        else { // nonlocal players
+            if (state.players[id].health > 0) {
                 // match sprite with direction of movement
                 var facing = state.players[id].orientation;
                 playerSprites[id].current.x = state.players[id].x;
@@ -1309,6 +1203,10 @@ function updatePlayerSprites(state, gameTextStyle) {
                 else setSprite(playerSprites[id].down, id);
                 // }
             }
+        } 
+        // Make player sprites tombstones if their HP is zero.
+        if (state.players[id].health === 0) {
+            setSprite(playerSprites[id].dead, id);
         }
     }
 }
@@ -1325,10 +1223,7 @@ function updateBulletSprites(state) {
     dCount = 0;
 
     if (state.bullets_list != null) {
-        console.log("state bullet" + state.bullets_list.length);
         for (var i = 0; i < state.bullets_list.length; i++) {
-            console.log("state bullet x + " + state.bullets_list[i].x_dir);
-            console.log("state bullet y  + " + state.bullets_list[i].y_dir);
             if(state.bullets_list[i].x_dir == -1){
                 if (lCount >= bulletSprites.lefts.length) {
                     bulletSprites.lefts.push(newBulletSprite());
@@ -1370,20 +1265,20 @@ function updateBulletSprites(state) {
             }
         }
     
-        // make any unused bullet sprites invisible
-        while (lCount < bulletSprites.lefts.length) {
+        // make any unused bullet sprites in the pool invisible
+        while (lCount < bulletSprites.lefts.length && bulletSprites.lefts[lCount].visible) {
             bulletSprites.lefts[lCount].visible = false;
             lCount += 1;
         }
-        while (rCount < bulletSprites.rights.length) {
+        while (rCount < bulletSprites.rights.length && bulletSprites.rights[rCount].visible) {
             bulletSprites.rights[rCount].visible = false;
             rCount += 1;
         }
-        while (uCount < bulletSprites.ups.length) {
+        while (uCount < bulletSprites.ups.length && bulletSprites.ups[uCount].visible) {
             bulletSprites.ups[uCount].visible = false;
             uCount += 1;
         }
-        while (dCount < bulletSprites.downs.length) {
+        while (dCount < bulletSprites.downs.length && bulletSprites.downs[dCount].visible) {
             bulletSprites.downs[dCount].visible = false;
             dCount += 1;
         }
@@ -1427,7 +1322,6 @@ function updateItemSprites(state) {
             potionSprites.pop().destroy();
         }
 }
-
 
 
 /* 
@@ -1531,7 +1425,7 @@ function newPotionSprite() {
     return sprite;
 }
 
-function newHPSprite(lighting){
+function newHPSprite(){
     spriteBkg = new PIXI.Sprite.fromImage('assets/HPBkg.png');
     spriteBkg.scale.x *= .4;
     spriteBkg.scale.y *= .7;
