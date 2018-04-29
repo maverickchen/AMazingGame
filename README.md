@@ -1,5 +1,5 @@
 # team3
-## The URL for the game is(may be change later): 128.237.181.9:8080
+## The URL for the game is(may be change later): 34.207.53.213 (AWS)
 Repository for team3
 
 Presentation for Sprint 1:
@@ -10,6 +10,18 @@ https://docs.google.com/presentation/d/1iCLLIOb6F7LBdgQSFq89oVJAO1P8pGEHcp8UIhZa
 
 MinSun Park - I broke my computer so I'm using someone else's laptop for a month.
 So my id in commits shows as "SChandra96'.
+
+
+Our Project: A multiplayer online team deathmatch maze game! Pick a team and explore our randomly generated maze with a partner, but beware! Another team is also lurking somewhere nearby, and the Maze Haze(TM) will slowly drain your health over time. Pick up health and bullets to prepare for any enemies and survive the harsh maze conditions!
+
+Tools + Resources Used:
+pixi.js
+socket.io
+nodejs
+piskelapp.com 
+soundbible.com
+
+Clientside prediction code (found in client.js) was heavily inspired by https://github.com/underscorediscovery/realtime-multiplayer-in-html5
 
 Our game's PIXI.Container hierarchy
 
