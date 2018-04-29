@@ -774,6 +774,33 @@ function processServerUpdates(time, delta) {
                         smoothInterpolatePlayer(prev, next, id, ratio, delta);
                         localState.players[id].health = prev.players[id].health;
                         localState.players[id].orientation = prev.players[id].orientation;
+                    } else if (prev.players[id]) {
+                        for (var sid in next.players) {
+                            if (!localState.players[sid] && 
+                                localState.players[id].teamNumber == next.players[sid].teamNumber) { 
+                                playerSprites[sid] = playerSprites[id];
+                                localState.players[sid] = next.players[sid];
+                                delete localState.players[id]; 
+                                delete playerSprites[id];
+                                break;
+                            }
+                        }
+                    } else if (next.players[id]) {
+                        localState.players[id] = next.players[id];
+                    } else {
+                        for (var sid in prev.players) {
+                            if (!localState.players[sid] && 
+                                localState.players[id].teamNumber == prev.players[sid].teamNumber) { 
+                                playerSprites[sid] = playerSprites[id];
+                                localState.players[sid] = prev.players[sid];
+                                delete localState.players[id]; 
+                                delete playerSprites[id];
+                                if (next.players[sid]) {
+                                    smoothInterpolatePlayer(prev, next, sid, ratio, delta);
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -789,8 +816,16 @@ function processServerUpdates(time, delta) {
                 if (myID != id) {
                     if (oldest.players[id]) {
                         localState.players[id] = oldest.players[id];
-                        localState.players[id].health = oldest.players[id].health;
-                        localState.players[id].orientation = oldest.players[id].orientation;
+                    } else {
+                        for (var sid in oldest.players[id]) {
+                            if (!localState.players[sid] && 
+                                localState.players[id].teamNumber == oldest.players[id].teamNumber) {
+                                playerSprites[sid] = playerSprites[id];
+                                localState.players[sid] = oldest.players[sid];
+                                delete playerSprites[id];
+                                delete localState.players[id];
+                            }
+                        }
                     }
                 }
             }
