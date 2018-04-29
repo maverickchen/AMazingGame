@@ -56,6 +56,9 @@ var h = window.innerHeight
 || document.documentElement.clientHeight
 || document.body.clientHeight;
 
+
+var backButton;
+
 // make a PIXI canvas
 var app = new PIXI.Application({
           width: 1280, 
@@ -272,6 +275,8 @@ function chooseTeam() {
     ready.interactive = true;
     questionMark.interactive = true;
 
+    
+
     // Shows hand cursor
     team1.buttonMode = true;
     team2.buttonMode = true;
@@ -296,12 +301,50 @@ function chooseTeam() {
     //     .on('pointerout', filterOff );
     // filterOff.call(ready);
     
+<<<<<<< HEAD
     team1.on('pointerover', () => { team1.scale.x *= 1.5; team1.scale.y *= 1.5; })
         .on('pointerout', () => { team1.scale.x /= 1.5; team1.scale.y /= 1.5; });
     team2.on('pointerover', () => {team2.scale.x *= 1.5; team2.scale.y *= 1.5;})
         .on('pointerout', () => {team2.scale.x /= 1.5; team2.scale.y /= 1.5;});
     ready.on('pointerover', () => {ready.scale.x *= 2; ready.scale.y *= 2;})
         .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
+=======
+    //console.log(team1.scale);
+    team1.on('pointerover', () => {
+        // Add sound effect 
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+         team1.scale.x *= 1.5; 
+         team1.scale.y *= 1.5; 
+        }).on('pointerout', () => {
+             team1.scale.x /= 1.5; 
+             team1.scale.y /= 1.5; 
+    });
+    team2.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+        team2.scale.x *= 1.5; 
+        team2.scale.y *= 1.5;
+    }).on('pointerout', () => {
+        team2.scale.x /= 1.5; 
+        team2.scale.y /= 1.5;
+    });
+    ready.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+        ready.scale.x *= 2; 
+        ready.scale.y *= 2;
+    }).on('pointerout', () => {
+        ready.scale.x /= 2;
+         ready.scale.y /= 2;
+        });
+>>>>>>> 0c0ccadedf32e260e853872e747c054c3aa20fc8
     
     // Load tutorial assets
     var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
@@ -1561,11 +1604,43 @@ function loadGameEnd(won) {
     else {
         result = PIXI.Sprite.fromImage('assets/YouLose.png');
     }
+
     result.anchor.set(0.5);
     result.scale.x *= 3;
     result.scale.y *= 3;
-    result.x = app.screen.width / 2;
+    result.x = app.screen.width * 2 / 5;
     result.y = app.screen.height / 2;
-
     endGameContainer.addChild(result);
+
+    // Add the back button to go to the main page
+    backButton = PIXI.Sprite.fromImage('assets/MainPage.png');
+    backButton.anchor.set(0.5);
+    backButton.scale.x = 0.28;
+    backButton.scale.y = 0.28;
+    backButton.x = 768; //app.screen.width * 4 / 5;
+    backButton.y = 292; //app.screen.height / 2;
+    endGameContainer.addChild(backButton);
+    backButton.interactive = true;
+    backButton.buttonMode = true;
+
+    // When click the go to home page button, 
+    // link to the home page
+    backButton.on('pointerdown', function() {
+        //console.log('Clicked');
+        startScreen.visible = true;
+        endGameContainer.visible = false;
+    });
+
+    // Add sound effect to when hover the button
+    backButton.on('pointerover', () => {
+        PIXI.sound.Sound.from({
+            url: 'assets/backToMainPage.mp3',
+            autoPlay: true,
+        });
+        backButton.scale.x *= 1.5;
+        backButton.scale.y *= 1.5; 
+    }).on('pointerout', () => { 
+        backButton.scale.x /= 1.5;
+        backButton.scale.y /= 1.5; 
+    });
 }

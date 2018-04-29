@@ -7,6 +7,8 @@ var Item = require('./static/item');
  */
 
 var gameOver = false;
+// The bullet list for the whole game. Store all the bullets
+// for each player in two teams.
 var bullet_list = [];
 
 exports.updatePhysics = function() {
@@ -20,10 +22,12 @@ exports.updatePhysics = function() {
             items.push(potion);
             items.push(ammo);
         }
-
+        // Go through the bullets list to check if there are any collision
+        // with the wall
         for(var i = 0; i < bullet_list.length; i++) {
             var collide_wall = bullet_list[i].move(dt, this.maze);
-    
+            // If it is collision with wall, we remove the bullet from our
+            // bullet list
             if (collide_wall) {
                 bullet_list.splice(i,1);
             }
@@ -42,8 +46,15 @@ exports.updatePhysics = function() {
                         // then add it to the input. Pass the x direction and y direction as input
                         // directly.  
                         // FIND ME
+
+                        // If the player have bullets
                         if (player.bullets > 0) {
+                            // When the player is shooting, deduct the bullets
+                            // number of this player
                             player.bullets -= 1;
+                            // Make new bullets for each player when they shooting,
+                            // the start position for the bullets should from the central of the 
+                            // player
                             var newBullet = new Bullet(player.x + player.width / 2, player.y + player.height / 2, player.orientation, player.teamNumber);                       
                             bullet_list.push(newBullet); 
                         } 
@@ -64,9 +75,12 @@ exports.updatePhysics = function() {
 
                 // Chech for bullet collisions
                 for(var i = 0; i < bullet_list.length; i++) {
+                    // If the bullet hit one of the player
                     if(Collision.collides(bullet_list[i], player)) {
-                        // Hit others
+                        // Hit others, if the bullet hit the team member or himself
+                        // ignore the hit.
                         if (bullet_list[i].owner != player.teamNumber) {
+                            // Dedect the points of this player
                             bullet_list[i].use(player);
                             bullet_list.splice(i,1);
                             break;
