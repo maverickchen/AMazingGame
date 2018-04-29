@@ -10,7 +10,7 @@ var Bullet = require('./static/bullet');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
-const width = 3;
+const width = 7;
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 var physicsLoop;
