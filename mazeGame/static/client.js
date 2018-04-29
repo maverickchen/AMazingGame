@@ -217,8 +217,6 @@ function chooseTeam() {
     team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
     ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
     var questionMark = PIXI.Sprite.fromImage('/assets/Instruction.png');
-    // Maze 
-    var wall = PIXI.Sprite.fromImage('/assets/wall.png');
 
     // Set the initial position and scale
     team1.anchor.set(0.5);

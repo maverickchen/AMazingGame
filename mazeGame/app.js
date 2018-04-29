@@ -10,7 +10,7 @@ var Bullet = require('./static/bullet');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
-const width = 7;
+const width = 10;
 
 var idCounter = 0; // idCounter. Replace with server gen ID later.
 var physicsLoop;
@@ -82,6 +82,7 @@ io.on('connection', function(socket) {
         }
         if (players[id]) delete players[id];
         if (clientSockets[id]) delete clientSockets[id];
+        io.emit('peopleInTeam', [team1.length, team2.length]);   
     });
 
     // Send to client (client.js) - the # of people in each team
@@ -133,7 +134,7 @@ function startGame() {
 function joinGame(id) {
     var initialGameState = {
         players : players,
-        items : [], // send nothing now, will be initialized in next update
+        items : getRelevantItems(items, players[id]),
         maze : maze,
         t : new Date().getTime(),
     };
