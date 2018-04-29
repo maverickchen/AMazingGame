@@ -40,7 +40,7 @@ function physicsUpdate() {
                             url: 'assets/PopCork.mp3',
                             autoPlay: true,
                             loop: false,
-                            volume: 3,
+                            volume: 4,
                             complete: function() {
                                 playingPotionSound = false;;
                             }
