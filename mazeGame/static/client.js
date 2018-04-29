@@ -1521,7 +1521,7 @@ function loadGameEnd(won) {
     result.y = app.screen.height / 2;
     endGameContainer.addChild(result);
 
-    
+    // Add the back button to go to the main page
     backButton = PIXI.Sprite.fromImage('assets/MainPage.png');
     backButton.anchor.set(0.5);
     backButton.scale.x = 0.28;
@@ -1529,16 +1529,18 @@ function loadGameEnd(won) {
     backButton.x = 768; //app.screen.width * 4 / 5;
     backButton.y = 292; //app.screen.height / 2;
     endGameContainer.addChild(backButton);
-
     backButton.interactive = true;
     backButton.buttonMode = true;
 
+    // When click the go to home page button, 
+    // link to the home page
     backButton.on('pointerdown', function() {
-        console.log('Clicked');
+        //console.log('Clicked');
         startScreen.visible = true;
         endGameContainer.visible = false;
     });
 
+    // Add sound effect to when hover the button
     backButton.on('pointerover', () => {
         PIXI.sound.Sound.from({
             url: 'assets/backToMainPage.mp3',
