@@ -683,10 +683,17 @@ function handleInput(delta) {
         if (shoot.isUp && shootPressedBefore) {
             input.shooting = true; 
             shootPressedBefore = false;
-            PIXI.sound.Sound.from({
-                    url: 'assets/GunShot.mp3',
-                    autoPlay: true,
-            });
+            if (localState.players[myID].bullets > 0) {
+                PIXI.sound.Sound.from({
+                        url: 'assets/GunShot.mp3',
+                        autoPlay: true,
+                });
+            } else {
+                PIXI.sound.Sound.from({
+                        url: 'assets/backToMainPage.mp3',
+                        autoPlay: true,
+                });
+            }
         }
         if (input.x_dir != 0 || input.y_dir != 0 || input.shooting) {
             input_seq += 1;
