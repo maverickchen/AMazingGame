@@ -306,30 +306,17 @@ function chooseTeam() {
     // filterOff.call(ready);
 
     team1.on('pointerover', () => {
-<<<<<<< HEAD
-        // Add sound effect to the button in the home page
-        PIXI.sound.Sound.from({
-            url: 'assets/backToMainPage.mp3',
-            autoPlay: true,
-        });
-         team1.scale.x *= 1.5; 
-         team1.scale.y *= 1.5; 
-        }).on('pointerout', () => {
-             team1.scale.x /= 1.5; 
-             team1.scale.y /= 1.5; 
-=======
-                // Add sound effect 
+                // Add sound effect to the button in the home page
                 PIXI.sound.Sound.from({
                     url: 'assets/backToMainPage.mp3',
                     autoPlay: true,
                 });
-                team1.scale.x *= 1.5; 
-                team1.scale.y *= 1.5; 
+                 team1.scale.x *= 1.5; 
+                 team1.scale.y *= 1.5; 
             })
             .on('pointerout', () => {
                 team1.scale.x /= 1.5; 
                 team1.scale.y /= 1.5; 
->>>>>>> 080b560566dffb3be0b967ff9ba9ac40375691ad
     });
     team2.on('pointerover', () => {
                 PIXI.sound.Sound.from({
