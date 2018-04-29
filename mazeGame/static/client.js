@@ -513,27 +513,11 @@ function onAssetsLoaded() {
     gameUI.addChild(healthText);
 
     /*
-    this.gameTextStyle = gameTextStyle;
-    var healthPointText = new PIXI.Text('HP:', gameTextStyle);
-    healthPointText.x = app.screen.width - 350;
-    healthPointText.y = 115;
-    gameUI.addChild(healthPointText);
-    */
-
-    /*
     // Display user's id - hardcoded for now
     var userID = new PIXI.Text('User', gameTextStyle);
     userID.x = app.screen.width - 350;
     userID.y = 155;
     gameUI.addChild(userID);
-    */
-
-    /*
-    // Display bullet remaining - also hardcoded
-    var bulletsRemaining = new PIXI.Text('Bullets Left:', gameTextStyle);
-    bulletsRemaining.x = app.screen.width - 350;
-    bulletsRemaining.y = 235;
-    gameUI.addChild(bulletsRemaining);
     */
 
     /*
@@ -1479,7 +1463,7 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
 socket.on('wonGame', function(won) {
     gameScreen.visible = false;
     endGameContainer.visible = true;
-    loadGameEnd(won);
+    renderGameEnd(won);
 });
 
 /*
@@ -1500,12 +1484,11 @@ function loadEndgameAssets() {
     // When click the go to home page button, 
     // link to the home page
     backButton.on('pointerdown', function() {
-        //console.log('Clicked');
         startScreen.visible = true;
         endGameContainer.visible = false;
     });
 
-    // Add sound effect to when hover the button
+    // Add sound effect when hovering over the button
     backButton.on('pointerover', () => {
         PIXI.sound.Sound.from({
             url: 'assets/backToMainPage.mp3',
@@ -1520,9 +1503,9 @@ function loadEndgameAssets() {
 }
 
 /*
- * loadGameEnd: loads round-specific information and handles game flow logic. 
+ * renderGameEnd: loads round-specific information and handles game flow logic. 
  */
-function loadGameEnd(won) {
+function renderGameEnd(won) {
     // Switch visible screen
     gameScreen.visible = false;
     endGameContainer.visible = true;
