@@ -198,6 +198,10 @@ socket.on('peopleInTeam', function(arr) {
         startScreen.addChild(team2_text);
 });
 
+var team1;
+var team2;
+var ready;
+
 function chooseTeam() {
 
     // Style for instructionText
@@ -237,9 +241,9 @@ function chooseTeam() {
     });
 */
     // Bring in image assets
-    var team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
-    var team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
-    var ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
+    team1 = PIXI.Sprite.fromImage('/assets/Team1.png');
+    team2 = PIXI.Sprite.fromImage('/assets/Team2.png');
+    ready = PIXI.Sprite.fromImage('/assets/ReadyButton.png');
     var questionMark = PIXI.Sprite.fromImage('/assets/Instruction.png');
     // Maze 
     var wall = PIXI.Sprite.fromImage('/assets/wall.png');
@@ -300,51 +304,44 @@ function chooseTeam() {
     // ready.on('pointerover', filterOn)
     //     .on('pointerout', filterOff );
     // filterOff.call(ready);
-    
-<<<<<<< HEAD
-    team1.on('pointerover', () => { team1.scale.x *= 1.5; team1.scale.y *= 1.5; })
-        .on('pointerout', () => { team1.scale.x /= 1.5; team1.scale.y /= 1.5; });
-    team2.on('pointerover', () => {team2.scale.x *= 1.5; team2.scale.y *= 1.5;})
-        .on('pointerout', () => {team2.scale.x /= 1.5; team2.scale.y /= 1.5;});
-    ready.on('pointerover', () => {ready.scale.x *= 2; ready.scale.y *= 2;})
-        .on('pointerout', () => {ready.scale.x /= 2; ready.scale.y /= 2;});
-=======
-    //console.log(team1.scale);
+
     team1.on('pointerover', () => {
-        // Add sound effect 
-        PIXI.sound.Sound.from({
-            url: 'assets/backToMainPage.mp3',
-            autoPlay: true,
-        });
-         team1.scale.x *= 1.5; 
-         team1.scale.y *= 1.5; 
-        }).on('pointerout', () => {
-             team1.scale.x /= 1.5; 
-             team1.scale.y /= 1.5; 
+                // Add sound effect 
+                PIXI.sound.Sound.from({
+                    url: 'assets/backToMainPage.mp3',
+                    autoPlay: true,
+                });
+                team1.scale.x *= 1.5; 
+                team1.scale.y *= 1.5; 
+            })
+            .on('pointerout', () => {
+                team1.scale.x /= 1.5; 
+                team1.scale.y /= 1.5; 
     });
     team2.on('pointerover', () => {
-        PIXI.sound.Sound.from({
-            url: 'assets/backToMainPage.mp3',
-            autoPlay: true,
-        });
-        team2.scale.x *= 1.5; 
-        team2.scale.y *= 1.5;
-    }).on('pointerout', () => {
-        team2.scale.x /= 1.5; 
-        team2.scale.y /= 1.5;
+                PIXI.sound.Sound.from({
+                    url: 'assets/backToMainPage.mp3',
+                    autoPlay: true,
+                });
+                team2.scale.x *= 1.5; 
+                team2.scale.y *= 1.5;
+            })
+            .on('pointerout', () => {
+                team2.scale.x /= 1.5; 
+                team2.scale.y /= 1.5;
     });
     ready.on('pointerover', () => {
-        PIXI.sound.Sound.from({
-            url: 'assets/backToMainPage.mp3',
-            autoPlay: true,
-        });
-        ready.scale.x *= 2; 
-        ready.scale.y *= 2;
-    }).on('pointerout', () => {
-        ready.scale.x /= 2;
-         ready.scale.y /= 2;
-        });
->>>>>>> 0c0ccadedf32e260e853872e747c054c3aa20fc8
+                PIXI.sound.Sound.from({
+                    url: 'assets/backToMainPage.mp3',
+                    autoPlay: true,
+                });
+                ready.scale.x *= 2; 
+                ready.scale.y *= 2;
+            })
+        .on('pointerout', () => {
+            ready.scale.x /= 2;
+             ready.scale.y /= 2;
+            });
     
     // Load tutorial assets
     var panel = PIXI.Sprite.fromImage('assets/TutorialPage.png');
@@ -648,6 +645,7 @@ function onAssetsLoaded() {
     loadSpriteFrames(lighting);
     loadMazeSprites();
     loadBulletSprites();
+    loadEndgameAssets();
     hpObj = newHPSprite(lighting);
     hpBkg = hpObj.spriteBkg;
     hp = hpObj.spriteHP;
@@ -1581,37 +1579,15 @@ function newPlayerSprite(frames, x, y, isVisible, container) {
 
 // This only runs when the game is finished
 socket.on('wonGame', function(won) {
+    gameScreen.visible = false;
+    endGameContainer.visible = true;
     loadGameEnd(won);
 });
 
-function loadGameEnd(won) {
-    // Switch visible screen
-    gameScreen.visible = false;
-    endGameContainer.visible = true;
-
-    gameInProgress = false;
-
-    // stop game loop functions
-    app.ticker.remove(updateViewFn);
-    clearInterval(physicsUpdateHandle);
-
-    if (bkgMusic) bkgMusic.stop();
-    // My team won the game
-    if (won) {
-        result = PIXI.Sprite.fromImage('assets/YouWin.png');
-    }
-    // My team lost the game
-    else {
-        result = PIXI.Sprite.fromImage('assets/YouLose.png');
-    }
-
-    result.anchor.set(0.5);
-    result.scale.x *= 3;
-    result.scale.y *= 3;
-    result.x = app.screen.width * 2 / 5;
-    result.y = app.screen.height / 2;
-    endGameContainer.addChild(result);
-
+/*
+ * loadEndgameAssets: loads general end of game screen UI elements.  
+ */
+function loadEndgameAssets() {
     // Add the back button to go to the main page
     backButton = PIXI.Sprite.fromImage('assets/MainPage.png');
     backButton.anchor.set(0.5);
@@ -1643,4 +1619,44 @@ function loadGameEnd(won) {
         backButton.scale.x /= 1.5;
         backButton.scale.y /= 1.5; 
     });
+}
+
+/*
+ * loadGameEnd: loads round-specific information and handles game flow logic. 
+ */
+function loadGameEnd(won) {
+    // Switch visible screen
+    gameScreen.visible = false;
+    endGameContainer.visible = true;
+
+    gameInProgress = false;
+
+    // stop game loop functions
+    app.ticker.remove(updateViewFn);
+    clearInterval(physicsUpdateHandle);
+
+    if (bkgMusic) bkgMusic.stop();
+    // My team won the game
+    if (won) {
+        result = PIXI.Sprite.fromImage('assets/YouWin.png');
+    }
+    // My team lost the game
+    else {
+        result = PIXI.Sprite.fromImage('assets/YouLose.png');
+    }
+
+    result.anchor.set(0.5);
+    result.scale.x *= 3;
+    result.scale.y *= 3;
+    result.x = app.screen.width * 2 / 5;
+    result.y = app.screen.height / 2;
+    endGameContainer.addChild(result);
+
+    // make start screen buttons clickable again
+    ready.interactive = true; 
+    ready.buttonMode = true;
+    team1.interactive = true;
+    team1.buttonMode = true;
+    team2.interactive = true;
+    team2.buttonMode = true;
 }
