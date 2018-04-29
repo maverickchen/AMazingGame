@@ -27,7 +27,7 @@ module.exports = class Bullet {
 
     // Detect the health point deduction, if the health point
     use(player) {
-        player.health -= 10;
+        player.health -= 15;
         if (player.health < 0) player.health = 0;
     }
     // update the position of the players, return true if the bullet collison with
