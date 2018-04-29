@@ -5,7 +5,7 @@ https://github.com/underscorediscovery/realtime-multiplayer-in-html5
 */
 
 // make a client socket
-var socket = io('http://localhost');
+var socket = io();
 
 // Model variables
 var inputs = []; // a log of this player's last few inputs
