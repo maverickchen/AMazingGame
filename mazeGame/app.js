@@ -7,7 +7,6 @@ var Player = require('./static/player');
 var Item = require('./static/item');
 var Collision = require('./static/collides');
 var Bullet = require('./static/bullet');
-var Updates = require('./serverUpdates');
 
 var generator = require('generate-maze');
 var converter = require('./convertMaze');
