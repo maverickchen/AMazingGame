@@ -28,10 +28,11 @@ var items = [];
 var bullet_list = [];
 var team1 = []; // list of players in each team
 var team2 = [];
+var pathCount = 0;
 /******************************************************************/
 
 function initItems() {
-    var pathCount = 0;
+    pathCount = 0;
     for (var i=0; i<maze.length; i++) {
         for (var j=0; j<maze.length; j++) {
             if (maze[i][j] === 1) pathCount++;
@@ -144,7 +145,7 @@ function joinGame(id) {
 function updatePhysics() {
     dt = .015; // change this later; 15ms
     if (gameInProgress) { // Check again since it might have changed in checkGameOver
-        while (items.length < 40) {
+        while (items.length < (pathCount * 0.25)) {
             potion = new Item('Potion', maze);
             ammo = new Item('Ammo', maze);
             items.push(potion);
@@ -275,7 +276,7 @@ function updateClients() {
 
 
 /* 
- * getRelevantItems: given a player, only send them items that are nearby
+ * getRelevantItems: given a player, return an array of nearby items
  */
 function getRelevantItems(itemList, player) {
     var arr = [];
