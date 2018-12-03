@@ -2,6 +2,10 @@
 ## The URL for the game is: http://34.207.53.213:8080 (AWS)
 Repository for team3
 
+## How to Run:
+	cd mazeGame
+	node app.js
+
 ## Our Project: 
 A multiplayer online team deathmatch maze game! Pick a team and explore our randomly generated maze with a partner, but beware! Another team is also lurking somewhere nearby, and the Maze Haze(TM) will slowly drain your health over time. Pick up health and bullets to prepare for any enemies and survive the harsh maze conditions!
 
